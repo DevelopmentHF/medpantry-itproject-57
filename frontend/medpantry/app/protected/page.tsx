@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import Sidebar from "@/components/sidebar";
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
+import Card from "@/components/card";
 
 
 
@@ -42,8 +43,21 @@ let { data: test_table, error } = await supabase
 
         {/* <Separator></Separator> */}
   
-        <pre>{JSON.stringify(test_table, null, 2)}</pre>
+        {/* <pre>{JSON.stringify(test_table, null, 2)}</pre> */}
       </div>
+
+      <div className="flex flex-wrap gap-4 w-full bg-zinc-700 p-4 rounded-xl">
+        <Card title="Needles" bgColor="bg-secondary" quantity="5" sku="494"></Card>
+        <Card title="Masks" bgColor="bg-secondary" quantity="400" sku="201"></Card>
+        <Card title="Syringes" bgColor="bg-secondary" quantity="72" sku="13"></Card>
+        <Card title="Gloves" bgColor="bg-secondary" quantity="150" sku="874"></Card>
+        <Card title="Bandages" bgColor="bg-secondary" quantity="250" sku="367"></Card>
+        <Card title="Thermometers" bgColor="bg-secondary" quantity="34" sku="652"></Card>
+        <Card title="IV Bags" bgColor="bg-secondary" quantity="20" sku="432"></Card>
+        <Card title="Scalpels" bgColor="bg-secondary" quantity="60" sku="719"></Card>
+        <Card title="Gauze Pads" bgColor="bg-secondary" quantity="300" sku="985"></Card>
+        <Card title="Face Shields" bgColor="bg-secondary" quantity="100" sku="111"></Card>
+    </div>
   
     </div>
   );
