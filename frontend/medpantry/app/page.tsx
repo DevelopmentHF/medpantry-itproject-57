@@ -29,24 +29,15 @@ export default async function Index() {
       </nav>
 
       <div className="flex-1 flex flex-col gap-20 max-w-4xl px-3">
-        <Header />
         <main className="flex-1 flex flex-col gap-6">
-          <h2 className="font-bold text-4xl mb-4">Next steps</h2>
-          {isSupabaseConnected ? <SignUpUserSteps /> : <ConnectSupabaseSteps />}
+          <h2 className="font-bold text-4xl mb-4">Login or sign up to access the Medical Pantry System</h2>
+          <p>note for my teamates just create an account we have authentication by default now which is cool</p>
         </main>
       </div>
 
       <footer className="w-full border-t border-t-foreground/10 p-8 flex justify-center text-center text-xs">
         <p>
-          Powered by{" "}
-          <a
-            href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
-            target="_blank"
-            className="font-bold hover:underline"
-            rel="noreferrer"
-          >
-            Supabase
-          </a>
+          Powered by Team 57
         </p>
       </footer>
     </div>
