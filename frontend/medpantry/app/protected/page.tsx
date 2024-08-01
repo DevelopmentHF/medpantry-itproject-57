@@ -4,6 +4,12 @@ import { createClient } from "@/utils/supabase/server";
 import FetchDataSteps from "@/components/tutorial/FetchDataSteps";
 import Header from "@/components/Header";
 import { redirect } from "next/navigation";
+import Sidebar from "@/components/sidebar";
+import { Input } from "@/components/ui/input"
+import { Separator } from "@/components/ui/separator"
+
+
+
 
 export default async function ProtectedPage() {
   const supabase = createClient();
@@ -24,17 +30,21 @@ let { data: test_table, error } = await supabase
 
 
   return (
-    <div className="flex-1 w-full flex flex-col gap-20 items-center">
-      <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-          <div className="w-full max-w-4xl flex justify-between items-center p-3 text-sm">
-            {/* <DeployButton /> */}
+    <div className="flex-1 w-full flex flex-col gap-12 items-center p-6">
 
-            <AuthButton />
-          </div>
-        </nav>
-      <h1>Medical Pantry Inventory Management</h1>
-      <pre>{JSON.stringify(test_table, null, 2)}</pre>
+      <nav className="flex gap-4 border-b border-b-foreground/10 h-16 w-full items-center">
+        <Input placeholder="Search"></Input>
+        <AuthButton></AuthButton>
+      </nav>
 
+      <div className="flex flex-col gap-4 w-full">
+        <h1 className="font-bold text-4xl justify-start">Overview</h1>
+
+        {/* <Separator></Separator> */}
+  
+        <pre>{JSON.stringify(test_table, null, 2)}</pre>
+      </div>
+  
     </div>
   );
 }
