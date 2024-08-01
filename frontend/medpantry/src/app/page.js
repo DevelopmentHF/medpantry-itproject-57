@@ -9,9 +9,9 @@ export default function Home() {
       </div>
 
       <div className="flex gap-5">
-        <Button className="bg-green-400">Add</Button>
-        <Button className="bg-yellow-400">Edit</Button>
-        <Button className="bg-red-400">Delete</Button>
+        <Button className="text-lg p-10 bg-green-400">Add</Button>
+        <Button className="text-lg p-10 bg-yellow-400">Edit</Button>
+        <Button className="text-lg p-10 bg-red-400">Delete</Button>
       </div>
     
     </main>
