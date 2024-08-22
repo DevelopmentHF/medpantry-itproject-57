@@ -1,4 +1,5 @@
 package org.example.warehouseinterface.api.model;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class BaxterBox {
     /* NOTE: This should match our schema for a 'baxter box' */
@@ -7,7 +8,9 @@ public class BaxterBox {
     private String SKU; // SKU of the product contained by the box
 
     /* Basic constructor for a BaxterBox */
-    public BaxterBox(int id, int warehouseId, String SKU) {
+    public BaxterBox(@JsonProperty("id") int id,
+                     @JsonProperty("warehouseID") int warehouseID,
+                     @JsonProperty("SKU") String SKU) {
         this.id = id;
         this.warehouseId = warehouseId;
         this.SKU = SKU;
