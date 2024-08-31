@@ -8,71 +8,62 @@
 
 ## Folder Structure
 
-├── README.md
-├── backend
-│   └── WarehouseInterface
-│       ├── HELP.md
-│       ├── ...
-│       ├── build.gradle
-│       └── src
-│          ├── main
-│         ├── java
-│         │   └── org
-│         │       └── example
-│         │           └── warehouseinterface
-│         │               ├── WarehouseInterfaceApplication.java
-│         │               ├── api
-│         │               │   ├── controller // endpoints go here :)
-│         │               │   │   └── BaxterBoxController.java
-│         │               │   └── model // database models go here :)
-│         │               │       └── BaxterBox.java
-│         │               └── service  // business logic goes here :)
-│         │                   └── BaxterBoxService.java        
-│         └── resources
-│             ├── application.properties
-│             ├── static
-│             └── templates
-└── test
-    └── java
-        └── org
-            └── example
-                └── warehouseinterface
-                    └── WarehouseInterfaceApplicationTests.java
-└── frontend
-    └── medpantry
-        ├── README.md
-        ├── app
-        ├── components // our front end components get built here :)
-          ├── AuthButton.tsx
-          ├── DeployButton.tsx
-          ├── Header.tsx
-          ├── NextLogo.tsx
-          ├── SupabaseLogo.tsx
-          ├── card.tsx
-          ├── sidebar.tsx
-          ├── tutorial
-          │   ├── Code.tsx
-          │   ├── ConnectSupabaseSteps.tsx
-          │   ├── FetchDataSteps.tsx
-          │   ├── SignUpUserSteps.tsx
-          │   └── Step.tsx
-          └── ui
-              ├── button.tsx
-              ├── input.tsx
-              └── separator.tsx
-        ├── components.json
-        ├── lib
-        ├── middleware.ts
-        ├── next-env.d.ts
-        ├── next.config.js
-        ├── node_modules
-        ├── package-lock.json
-        ├── package.json
-        ├── postcss.config.js
-        ├── tailwind.config.ts
-        ├── tsconfig.json
-        └── utils
-
+├── README.md <br>
+├── backend <br>
+│   └── WarehouseInterface <br>
+│       ├── HELP.md <br>
+│       ├── ... <br>
+│       ├── build.gradle <br>
+│       └── src <br>
+│           ├── main <br>
+│           │   ├── java <br>
+│           │   │   └── org <br>
+│           │   │       └── example <br>
+│           │   │           └── warehouseinterface <br>
+│           │   │               ├── WarehouseInterfaceApplication.java <br>
+│           │   │               ├── api <br>
+│           │   │               │   ├── controller // endpoints go here :) <br>
+│           │   │               │   │   └── BaxterBoxController.java <br>
+│           │   │               │   └── model // database models go here :) <br>
+│           │   │               │       └── BaxterBox.java <br>
+│           │   │               └── service  // business logic goes here :) <br>
+│           │   │                   └── BaxterBoxService.java <br>       
+│           └── resources <br>
+│               ├── application.properties <br>
+│               ├── static <br>
+│               └── templates <br>
+└── test <br>
+    └── java <br>
+        └── org <br>
+            └── example <br>
+                └── warehouseinterface <br>
+                    └── WarehouseInterfaceApplicationTests.java <br>
+└── frontend <br>
+    └── medpantry <br>
+        ├── README.md <br>
+        ├── app <br>
+        ├── components // our front-end components get built here :) <br>
+        │   ├── AuthButton.tsx <br>
+        │   ├── DeployButton.tsx <br>
+        │   ├── Header.tsx <br>
+        │   ├── NextLogo.tsx <br>
+        │   ├── SupabaseLogo.tsx <br>
+        │   ├── card.tsx <br>
+        │   ├── sidebar.tsx <br>
+        │   └── tutorial <br>
+        │       ├── Code.tsx <br>
+        │       ├── ConnectSupabaseSteps.tsx <br>
+        │       ├── FetchDataSteps.tsx <br>
+        │       ├── SignUpUserSteps.tsx <br>
+        │       └── Step.tsx <br>
+        └── ui <br>
+            ├── button.tsx <br>
+            ├── input.tsx <br>
+            └── separator.tsx <br>
+        ├── components.json <br>
+        ├── tailwind.config.ts <br>
+        ├── tsconfig.json <br>
+        └── utils <br>
 
 ---
 
