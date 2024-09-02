@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class BaxterBoxService {
 
     // REQUIRES A .env FILE IN resources/
+    // backend/WarehouseInterface/src/main/resources/.env
     private static final Dotenv dotenv = Dotenv.configure().directory(".env").load();
     private static final String SUPABASE_URL = dotenv.get("SUPABASE_URL");
     private static final String SUPABASE_API_KEY = dotenv.get("SUPABASE_API_KEY");
