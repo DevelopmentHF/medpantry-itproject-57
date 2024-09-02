@@ -42,8 +42,16 @@ public class ShopifyOrdersService {
         JsonNode ordersNode = rootNode.path("orders");
 
         for (JsonNode orderNode : ordersNode) {
-            String orderId = orderNode.path("id").asText();
-            System.out.println("Order ID: " + orderId);
+            String orderNumber = orderNode.path("name").asText();
+            System.out.println("Order Number: " + orderNumber);
+
+            JsonNode lineItemNodes = orderNode.path("line_items");
+            for (JsonNode lineItemNode : lineItemNodes) {
+                String sku = lineItemNode.path("sku").asText();
+                int quantity = lineItemNode.path("quantity").asInt();
+                System.out.println("SKU:" + sku);
+                System.out.println("Quantity: " + quantity);
+            }
         }
 
         return response.body();
