@@ -5,9 +5,7 @@ import org.example.warehouseinterface.service.BaxterBoxService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class BaxterBoxController {
@@ -29,6 +27,29 @@ public class BaxterBoxController {
             // Return an appropriate error response
             return null;
         }
+    }
+
+    @PostMapping("/addToBaxterBox")
+    public ResponseEntity<BaxterBox> addProductsToStock(@RequestParam String SKU) {
+        try {
+            // products of this type might already be packed somewhere
+            BaxterBox existingBaxterBox = baxterBoxService.findBaxterBoxBySKU(SKU);
+
+            if (existingBaxterBox != null) {
+                // update existing BaxterBox with new information
+                BaxterBox updatedBaxterBox = baxterBoxService.updateBaxterBox(baxterBox);
+                return new ResponseEntity<>(updatedBaxterBox, HttpStatus.OK);
+            } else {
+                // create a new BaxterBox
+                BaxterBox newBaxterBox = baxterBoxService.createBaxterBox(baxterBox);
+                return new ResponseEntity<>(newBaxterBox, HttpStatus.CREATED);
+            }
+        } catch (Exception e) {
+            // return an error response
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
 }
