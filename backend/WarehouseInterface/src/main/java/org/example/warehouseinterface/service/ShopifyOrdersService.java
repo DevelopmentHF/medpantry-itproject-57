@@ -42,9 +42,12 @@ public class ShopifyOrdersService {
         JsonNode ordersNode = rootNode.path("orders");
 
         for (JsonNode orderNode : ordersNode) {
-            String sku = orderNode.path("sku").asText();
-            System.out.println(orderNode);
-            System.out.println(sku);
+            JsonNode lineItemsNode = orderNode.path("line_items");
+            for (JsonNode itemNode : lineItemsNode) {
+                String sku = itemNode.path("sku").asText();
+                System.out.println(itemNode);
+                System.out.println(sku);
+            }
         }
 
         return response.body();
