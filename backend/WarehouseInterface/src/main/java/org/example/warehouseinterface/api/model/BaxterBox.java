@@ -5,15 +5,15 @@ public class BaxterBox {
     /* NOTE: This should match our schema for a 'baxter box' */
     private int id; // Unique number of the baxter box
     private int warehouseId = 1; // Unique number of which warehouse the baxter box is present in. Default = 1 as there is only 1 warehouse
-    private String SKU; // SKU of the product contained by the box
+    private String sku; // SKU of the product contained by the box
 
     /* Basic constructor for a BaxterBox */
     public BaxterBox(@JsonProperty("id") int id,
                      @JsonProperty("warehouseID") int warehouseID,
-                     @JsonProperty("SKU") String SKU) {
+                     @JsonProperty("sku") String SKU) {
         this.id = id;
         this.warehouseId = warehouseId;
-        this.SKU = SKU;
+        this.sku = SKU;
     }
 
     public int getId() {
@@ -33,10 +33,10 @@ public class BaxterBox {
     }
 
     public String getSKU() {
-        return SKU;
+        return sku;
     }
 
     public void setSKU(String SKU) {
-        this.SKU = SKU;
+        this.sku = sku;
     }
 }

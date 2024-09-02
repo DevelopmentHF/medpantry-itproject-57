@@ -83,6 +83,30 @@ public class BaxterBoxService {
      */
     public BaxterBox createBaxterBox(String SKU) throws Exception {
         BaxterBox box = new BaxterBox(findNextId(), 1, SKU);
+
+        // convert to json to ready to ship off
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonRequestBody = objectMapper.writeValueAsString(box);
+        System.out.println(jsonRequestBody);
+
+        // ... post it to the db
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(SUPABASE_URL + "/rest/v1/BaxterBoxes"))
+                .header("apikey", SUPABASE_API_KEY)
+                .header("Authorization", "Bearer " + SUPABASE_API_KEY)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(jsonRequestBody))
+                .build();
+
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 201) { // HTTP 201 Created
+            // Parse and return the created BaxterBox
+            throw new Exception("Failed to create BaxterBox: " + response.statusCode() + " - " + response.body());
+        }
+
         return box;
     }
 
@@ -105,7 +129,7 @@ public class BaxterBoxService {
 
         int lowestFreeId = -1;
         for (BaxterBox box : boxes) {
-            if (box.getId() > lowestFreeId) {
+            if (box.getId() >= lowestFreeId) {
                 lowestFreeId = box.getId() + 1;
             }
         }
