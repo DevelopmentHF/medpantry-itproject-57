@@ -37,7 +37,7 @@ public class BaxterBoxController {
 
             if (existingBaxterBox != null) {
                 // update existing BaxterBox with new information
-                BaxterBox updatedBaxterBox = baxterBoxService.updateBaxterBox(existingBaxterBox);
+                BaxterBox updatedBaxterBox = baxterBoxService.updateBaxterBox(existingBaxterBox, units);
                 return new ResponseEntity<>(updatedBaxterBox, HttpStatus.OK);
             } else {
                 // create a new BaxterBox
