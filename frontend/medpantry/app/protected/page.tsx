@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import Card from "@/components/card";
 import { notFound, redirect } from "next/navigation";
+import BaxterBox from "@/components/BaxterBox";
 
 type BaxterBox = {
   id: number;
@@ -58,9 +59,7 @@ export default async function ProtectedPage() {
         {/* <Separator /> */}
         {/* <pre>{JSON.stringify(test_table, null, 2)}</pre> */}
         <p>http://localhost:8080/baxterbox?id=2</p>
-        <p>Box id: {box.id}</p>
-        <p>Box sku: {box.sku}</p>
-        <p>Box warehouse number: {box.warehouseId}</p>
+        <BaxterBox id={box.id} sku={box.sku} warehouseId={box.warehouseId}></BaxterBox>
       </div>
     </div>
   );
