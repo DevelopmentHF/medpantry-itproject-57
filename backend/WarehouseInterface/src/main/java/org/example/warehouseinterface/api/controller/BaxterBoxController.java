@@ -37,11 +37,11 @@ public class BaxterBoxController {
 
             if (existingBaxterBox != null) {
                 // update existing BaxterBox with new information
-                BaxterBox updatedBaxterBox = baxterBoxService.updateBaxterBox(baxterBox);
+                BaxterBox updatedBaxterBox = baxterBoxService.updateBaxterBox(existingBaxterBox);
                 return new ResponseEntity<>(updatedBaxterBox, HttpStatus.OK);
             } else {
                 // create a new BaxterBox
-                BaxterBox newBaxterBox = baxterBoxService.createBaxterBox(baxterBox);
+                BaxterBox newBaxterBox = baxterBoxService.createBaxterBox(SKU);
                 return new ResponseEntity<>(newBaxterBox, HttpStatus.CREATED);
             }
         } catch (Exception e) {

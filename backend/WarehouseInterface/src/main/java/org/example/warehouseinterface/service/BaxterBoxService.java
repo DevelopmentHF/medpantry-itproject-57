@@ -60,6 +60,60 @@ public class BaxterBoxService {
      */
     public BaxterBox findBaxterBoxBySKU(String sku) throws Exception {
         // get all baxter box rows from supabase
+        BaxterBox[] boxes = getAllBaxterBoxes();
+
+        // TODO: This should be more robust. At present, it finds the first box with a matching SKU, but it should be the box with least amount of stock.
+        // TODO: Implement stock checking private method
+        // find row with sku matching
+        for (BaxterBox potentialBox : boxes) {
+            if (potentialBox.getSKU().equals(sku)) {
+                return potentialBox;
+            }
+        }
+
+        // didn't find a box
+        return null;
+    }
+
+    /**
+     *
+     * @param SKU
+     * @return
+     * @throws Exception
+     */
+    public BaxterBox createBaxterBox(String SKU) throws Exception {
+        BaxterBox box = new BaxterBox(findNextId(), 1, SKU);
+        return box;
+    }
+
+    /**
+     *
+     * @param baxterBox
+     * @return
+     * @throws Exception
+     */
+    public BaxterBox updateBaxterBox(BaxterBox baxterBox) throws Exception {
+        return null;
+    }
+
+    /**
+     * Finds a unique location id for a new database entry to use
+     * @return integer location id
+     */
+    private int findNextId() throws Exception {
+        BaxterBox[] boxes = getAllBaxterBoxes();
+
+        int lowestFreeId = -1;
+        for (BaxterBox box : boxes) {
+            if (box.getId() > lowestFreeId) {
+                lowestFreeId = box.getId() + 1;
+            }
+        }
+        return lowestFreeId;
+    }
+
+    private static BaxterBox[] getAllBaxterBoxes() throws Exception {
+        // get all baxter box rows from supabase
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(SUPABASE_URL + "/rest/v1/BaxterBoxes"))
@@ -77,17 +131,6 @@ public class BaxterBoxService {
 
         ObjectMapper objectMapper = new ObjectMapper();
         BaxterBox[] boxes = objectMapper.readValue(response.body(), BaxterBox[].class);
-
-        // TODO: This should be more robust. At present, it finds the first box with a matching SKU, but it should be the box with least amount of stock.
-        // TODO: Implement stock checking private method
-        // find row with sku matching
-        for (BaxterBox potentialBox : boxes) {
-            if (potentialBox.getSKU().equals(sku)) {
-                return potentialBox;
-            }
-        }
-
-        // didn't find a box
-        return null;
+        return boxes;
     }
 }
