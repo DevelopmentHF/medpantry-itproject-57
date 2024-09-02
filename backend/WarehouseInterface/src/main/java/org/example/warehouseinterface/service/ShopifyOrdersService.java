@@ -37,17 +37,13 @@ public class ShopifyOrdersService {
         System.out.println("Response: " + response.body());
 
         ObjectMapper objectMapper = new ObjectMapper();
+        
         JsonNode rootNode = objectMapper.readTree(response.body());
-
         JsonNode ordersNode = rootNode.path("orders");
 
         for (JsonNode orderNode : ordersNode) {
-            JsonNode lineItemsNode = orderNode.path("line_items");
-            for (JsonNode itemNode : lineItemsNode) {
-                String sku = itemNode.path("sku").asText();
-                System.out.println(itemNode);
-                System.out.println(sku);
-            }
+            String orderId = orderNode.path("id").asText();
+            System.out.println("Order ID: " + orderId);
         }
 
         return response.body();
