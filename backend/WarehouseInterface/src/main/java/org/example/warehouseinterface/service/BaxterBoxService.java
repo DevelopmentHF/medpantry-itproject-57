@@ -117,7 +117,29 @@ public class BaxterBoxService {
      * @throws Exception
      */
     public BaxterBox updateBaxterBox(BaxterBox baxterBox) throws Exception {
-        return null;
+        // TODO: We should update our schema to count stock levels so that we can update
+        HttpClient client = HttpClient.newHttpClient();
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // Convert BaxterBox to JSON
+        String jsonRequestBody = objectMapper.writeValueAsString(baxterBox);
+
+        // Create PATCH request
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(SUPABASE_URL + "?id=eq." + baxterBox.getId()))
+                .header("apikey", SUPABASE_API_KEY)
+                .header("Authorization", "Bearer " + SUPABASE_API_KEY)
+                .header("Content-Type", "application/json")
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(jsonRequestBody))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            throw new Exception("Failed to update BaxterBox: " + response.statusCode() + " " + response.body());
+        }
+
+        return objectMapper.readValue(response.body(), BaxterBox.class);
     }
 
     /**
