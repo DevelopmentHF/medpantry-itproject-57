@@ -7,7 +7,7 @@
 --
 
 ## Folder Structure
-
+``` bash 
 ├── README.md
 ├── backend
 │   └── WarehouseInterface
@@ -73,7 +73,7 @@
         ├── tsconfig.json
         └── utils
 
-
+```
 ---
 
 ## Running the project
