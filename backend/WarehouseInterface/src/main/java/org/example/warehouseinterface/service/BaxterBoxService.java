@@ -81,8 +81,8 @@ public class BaxterBoxService {
      * @return
      * @throws Exception
      */
-    public BaxterBox createBaxterBox(String SKU) throws Exception {
-        BaxterBox box = new BaxterBox(findNextId(), 1, SKU);
+    public BaxterBox createBaxterBox(String SKU, int units) throws Exception {
+        BaxterBox box = new BaxterBox(findNextId(), 1, SKU, units);
 
         // convert to json to ready to ship off
         ObjectMapper objectMapper = new ObjectMapper();

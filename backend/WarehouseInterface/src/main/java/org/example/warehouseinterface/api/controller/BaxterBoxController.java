@@ -30,7 +30,7 @@ public class BaxterBoxController {
     }
 
     @PostMapping("/addToBaxterBox")
-    public ResponseEntity<BaxterBox> addProductsToStock(@RequestParam String SKU) {
+    public ResponseEntity<BaxterBox> addProductsToStock(@RequestParam String SKU, @RequestParam int units) {
         try {
             // products of this type might already be packed somewhere
             BaxterBox existingBaxterBox = baxterBoxService.findBaxterBoxBySKU(SKU);
@@ -41,7 +41,7 @@ public class BaxterBoxController {
                 return new ResponseEntity<>(updatedBaxterBox, HttpStatus.OK);
             } else {
                 // create a new BaxterBox
-                BaxterBox newBaxterBox = baxterBoxService.createBaxterBox(SKU);
+                BaxterBox newBaxterBox = baxterBoxService.createBaxterBox(SKU, units);
                 return new ResponseEntity<>(newBaxterBox, HttpStatus.CREATED);
             }
         } catch (Exception e) {

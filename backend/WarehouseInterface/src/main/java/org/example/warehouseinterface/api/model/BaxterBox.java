@@ -6,14 +6,17 @@ public class BaxterBox {
     private int id; // Unique number of the baxter box
     private int warehouseId = 1; // Unique number of which warehouse the baxter box is present in. Default = 1 as there is only 1 warehouse
     private String sku; // SKU of the product contained by the box
+    private int units; // Number of units in baxter box
 
     /* Basic constructor for a BaxterBox */
     public BaxterBox(@JsonProperty("id") int id,
                      @JsonProperty("warehouseID") int warehouseID,
-                     @JsonProperty("sku") String SKU) {
+                     @JsonProperty("sku") String SKU,
+                    @JsonProperty("units") int units) {
         this.id = id;
         this.warehouseId = warehouseId;
         this.sku = SKU;
+        this.units = units;
     }
 
     public int getId() {
@@ -38,5 +41,13 @@ public class BaxterBox {
 
     public void setSKU(String SKU) {
         this.sku = sku;
+    }
+
+    public int getUnits() {
+        return units;
+    }
+
+    public void setUnits(int units) {
+        this.units = units;
     }
 }
