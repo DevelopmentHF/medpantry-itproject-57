@@ -159,7 +159,7 @@ public class BaxterBoxService {
         return lowestFreeId;
     }
 
-    private static BaxterBox[] getAllBaxterBoxes() throws Exception {
+    public BaxterBox[] getAllBaxterBoxes() throws Exception {
         // get all baxter box rows from supabase
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()

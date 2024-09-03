@@ -23,6 +23,9 @@ export default function AddToStockForm() {
 
             const result = await response.json();
             console.log('Success:', result);
+
+            setSku('');
+            setUnitsPacked('');
         } catch (error) {
             console.error('Error:', error);
         }
