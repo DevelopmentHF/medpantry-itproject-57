@@ -9,6 +9,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpHeaders;
+import java.util.ArrayList;
+import java.util.List;
+
 import io.github.cdimascio.dotenv.Dotenv;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -76,6 +79,23 @@ public class BaxterBoxService {
 
         // didn't find a box
         return null;
+    }
+
+    // TODO: Edge case when there are multiple orders for the same SKU
+    // If they just pack orders one at a time this won't matter
+    public List<BaxterBox> findAllBaxterBoxesBySKU(String sku) throws Exception {
+        List<BaxterBox> matchingBoxes = new ArrayList<>();
+
+        // get all baxter box rows from supabase
+        BaxterBox[] boxes = getAllBaxterBoxes();
+
+        for (BaxterBox box : boxes) {
+            if (box.getSKU().equals(sku)) {
+                matchingBoxes.add(box);
+            }
+        }
+
+        return matchingBoxes;
     }
 
     /**

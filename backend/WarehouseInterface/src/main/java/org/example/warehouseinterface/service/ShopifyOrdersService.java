@@ -95,17 +95,14 @@ public class ShopifyOrdersService {
      * @param boxes
      * @return
      */
-//    public List<BaxterBox> findCorrectBaxterBoxes(Order order, BaxterBox[] boxes) {
-//        List<BaxterBox> requiredBoxes = new ArrayList<>();
-//
-//        BaxterBox requiredBox
-//
-//        for (BaxterBox baxterBox : boxes) {
-//            if (baxterBox.getSKU() == order.getSku()) {
-//                requiredBoxes.add(baxterBox);
-//            }
-//        }
-//
-//        return requiredBoxes;
-//    }
+    public List<BaxterBox> findCorrectBaxterBoxes(Order order, BaxterBox[] boxes) throws Exception {
+        List<BaxterBox> requiredBoxes;
+
+        requiredBoxes = baxterBoxService.findAllBaxterBoxesBySKU(order.getSku());
+
+        // TODO: handle logic for multiple boxes/lowest amount
+        // TODO: add tech support meeting to meeting minutes. Discussed edge cases, bug fixing, team structure, scheme, client, planned what to work on next, talked about implementation details of manager log
+
+        return requiredBoxes;
+    }
 }
