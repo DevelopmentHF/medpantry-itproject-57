@@ -13,7 +13,7 @@ export default function AddToStockForm() {
         console.log('SKU to add:', sku);
         
         try {
-            const response = await fetch(`http://localhost:8080/addToBaxterBox?SKU=${sku}&units=${unitsPacked}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/addToBaxterBox?SKU=${sku}&units=${unitsPacked}`, {
                 method: 'POST',
             });
 

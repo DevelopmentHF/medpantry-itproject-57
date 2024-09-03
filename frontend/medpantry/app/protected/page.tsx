@@ -33,7 +33,7 @@ export default async function ProtectedPage({ searchParams }: { searchParams: { 
   if (boxId) {
     try {
       // NEED A .env see discord
-      const res = await fetch(`${process.env.BACKEND_LINK}/baxterbox?id=${boxId}`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/baxterbox?id=${boxId}`);
       if (!res.ok) throw new Error('Network response was not ok');
       box = await res.json();
       console.log(box)
