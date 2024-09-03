@@ -7,7 +7,7 @@ public class BaxterBox {
     private int warehouseId = 1; // Unique number of which warehouse the baxter box is present in. Default = 1 as there is only 1 warehouse
     private String sku; // SKU of the product contained by the box
     private int units; // Number of units in baxter box
-    private boolean isFull; // Can we fit more items in or is it full?
+    private boolean full; // Can we fit more items in or is it full?
 
 
     /* Basic constructor for a BaxterBox */
@@ -15,12 +15,12 @@ public class BaxterBox {
                      @JsonProperty("warehouseID") int warehouseID,
                      @JsonProperty("sku") String SKU,
                     @JsonProperty("units") int units,
-                     @JsonProperty("isFull") boolean isFull) {
+                     @JsonProperty("full") boolean full) {
         this.id = id;
         this.warehouseId = warehouseId;
         this.sku = SKU;
         this.units = units;
-        this.isFull = isFull;
+        this.full = full;
     }
 
     public int getId() {
@@ -57,10 +57,10 @@ public class BaxterBox {
 
 
     public boolean isFull() {
-        return isFull;
+        return full;
     }
 
     public void setFull(boolean full) {
-        isFull = full;
+         this.full = full;
     }
 }

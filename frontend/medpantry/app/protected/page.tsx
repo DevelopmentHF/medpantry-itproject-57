@@ -9,6 +9,8 @@ type BaxterBox = {
   id: number;
   sku: string;
   warehouseId: number;
+  units: number;
+  full: boolean;
 };
 
 export default async function ProtectedPage({ searchParams }: { searchParams: { id?: string } }) {
@@ -34,6 +36,7 @@ export default async function ProtectedPage({ searchParams }: { searchParams: { 
       const res = await fetch(`${process.env.BACKEND_LINK}/baxterbox?id=${boxId}`);
       if (!res.ok) throw new Error('Network response was not ok');
       box = await res.json();
+      console.log(box)
     } catch (error) {
       console.error(error);
       notFound();
@@ -57,7 +60,7 @@ export default async function ProtectedPage({ searchParams }: { searchParams: { 
           <button type="submit" className="btn-primary">Fetch</button>
         </form>
         {box ? (
-          <BaxterBox id={box.id} sku={box.sku} warehouseId={box.warehouseId} />
+          <BaxterBox id={box.id} sku={box.sku} warehouseId={box.warehouseId} units={box.units} isFull={box.full}/>
         ) : (
           <p>No BaxterBox data found.</p>
         )}

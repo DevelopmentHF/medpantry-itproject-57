@@ -22,7 +22,7 @@ export default function BaxterBox({ warehouseId, id, sku, units, isFull, bgColor
             <h2 className='text-card-foreground'>SKU: {sku}</h2>
             <h2 className='text-card-foreground'>warehouseId: {warehouseId}</h2>
             <h2 className='text-card-foreground'>units: {units}</h2>
-            <h2 className='text-card-foreground'>is full: {isFull}</h2>
+            <h2 className='text-card-foreground'>is full: {isFull ? 'true' : 'false'}</h2>
         </div>
     </div>
   );
