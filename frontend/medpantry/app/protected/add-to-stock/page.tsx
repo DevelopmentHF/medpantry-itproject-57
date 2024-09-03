@@ -2,6 +2,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import AuthButton from '@/components/AuthButton';
 import AddToStockForm from '@/components/AddToStockForm';
+import QRScanner from '@/components/QRScanner';
+import { useState } from 'react';
+import AddStock from '@/components/AddStock';
 
 export default function AddToStockPage() {
 
@@ -14,7 +17,7 @@ export default function AddToStockPage() {
                 </a>
             </nav>
             <h1 className="font-bold text-4xl">Add to Stock</h1>
-            <AddToStockForm />
+            <AddStock></AddStock>
         </div>
     );
 }

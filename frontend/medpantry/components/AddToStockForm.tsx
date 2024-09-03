@@ -1,6 +1,6 @@
 "use client"; // Ensures this component is client-side
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import BaxterBox from './BaxterBox';
@@ -13,7 +13,11 @@ type BaxterBox = {
     full: boolean;
   };
 
-export default function AddToStockForm() {
+interface AddToStockFormProps {
+    extractedSku : string
+}
+
+export default function AddToStockForm({extractedSku} : AddToStockFormProps) {
     const [sku, setSku] = useState('');
     const [unitsPacked, setUnitsPacked] = useState('');
 
@@ -53,6 +57,10 @@ export default function AddToStockForm() {
             console.error('Error:', error);
         }
     };
+
+    useEffect(() => {
+        setSku(extractedSku);
+    }, [extractedSku]);
 
     return (
         <>
