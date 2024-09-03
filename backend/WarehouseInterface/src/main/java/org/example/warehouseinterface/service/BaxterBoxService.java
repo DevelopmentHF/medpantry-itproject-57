@@ -82,7 +82,7 @@ public class BaxterBoxService {
      * @throws Exception
      */
     public BaxterBox createBaxterBox(String SKU, int units) throws Exception {
-        BaxterBox box = new BaxterBox(findNextId(), 1, SKU, units);
+        BaxterBox box = new BaxterBox(findNextId(), 1, SKU, units, false);
 
         // convert to json to ready to ship off
         ObjectMapper objectMapper = new ObjectMapper();
