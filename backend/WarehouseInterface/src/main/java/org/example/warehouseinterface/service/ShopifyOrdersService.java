@@ -4,19 +4,28 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.core.type.TypeReference;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.example.warehouseinterface.api.model.BaxterBox;
 import org.example.warehouseinterface.api.model.Order;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ShopifyOrdersService {
     private static final Dotenv dotenv = Dotenv.configure().directory(".env").load();
     private static final String SHOPIFY_ADMIN_KEY = dotenv.get("SHOPIFY_ADMIN_KEY");
+
+    @Autowired
+    private BaxterBoxService baxterBoxService;
 
 
     public String getAllOrders() throws Exception {
@@ -70,6 +79,33 @@ public class ShopifyOrdersService {
         String cleanedOrdersString = objectMapper.writeValueAsString(cleanedOrders);
         System.out.println("cleaned: " + cleanedOrdersString);
 
-        return response.body();
+        List<Order> orders = objectMapper.readValue(cleanedOrdersString, new TypeReference<List<Order>>() {});
+        // Order[] orders = objectMapper.readValue(cleanedOrdersString, Order[].class);
+        System.out.println(orders.get(0).getOrderNumber());
+
+        // find required baxter boxes
+        //List<BaxterBox> requiredBoxes = findCorrectBaxterBoxes(orders.get(0), )
+
+        return cleanedOrdersString;
     }
+
+    /**
+     * Given an SKU and quantity, finds the correct Baxter Box(es) which contain the items that should be shipped
+     * @param order
+     * @param boxes
+     * @return
+     */
+//    public List<BaxterBox> findCorrectBaxterBoxes(Order order, BaxterBox[] boxes) {
+//        List<BaxterBox> requiredBoxes = new ArrayList<>();
+//
+//        BaxterBox requiredBox
+//
+//        for (BaxterBox baxterBox : boxes) {
+//            if (baxterBox.getSKU() == order.getSku()) {
+//                requiredBoxes.add(baxterBox);
+//            }
+//        }
+//
+//        return requiredBoxes;
+//    }
 }
