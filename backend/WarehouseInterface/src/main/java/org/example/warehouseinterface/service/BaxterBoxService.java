@@ -67,6 +67,9 @@ public class BaxterBoxService {
         // find row with sku matching
         for (BaxterBox potentialBox : boxes) {
             if (potentialBox.getSKU().equals(sku)) {
+                if (potentialBox.isFull()) {
+                    continue;
+                }
                 return potentialBox;
             }
         }
