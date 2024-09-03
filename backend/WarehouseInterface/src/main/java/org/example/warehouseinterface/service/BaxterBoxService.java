@@ -21,6 +21,50 @@ public class BaxterBoxService {
     private static final String SUPABASE_URL = dotenv.get("SUPABASE_URL");
     private static final String SUPABASE_API_KEY = dotenv.get("SUPABASE_API_KEY");
 
+    /**
+     * Finds the least full baxter box that currently contains this SKU (product)
+     * @param sku - unique product identifier
+     * @return BaxterBox that currently exists
+     */
+    public BaxterBox findBaxterBoxBySKU(String sku) throws Exception {
+        // get all baxter box rows from supabase
+        BaxterBox[] boxes = getAllBaxterBoxes();
+
+        // TODO: This should be more robust. At present, it finds the first box with a matching SKU, but it should be the box with least amount of stock.
+        // TODO: Implement stock checking private method
+        // find row with sku matching
+        for (BaxterBox potentialBox : boxes) {
+            if (potentialBox.getSKU().equals(sku)) {
+                return potentialBox;
+            }
+        }
+
+        // didn't find a box
+        return null;
+    }
+
+    private static BaxterBox[] getAllBaxterBoxes() throws Exception {
+        // get all baxter box rows from supabase
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(SUPABASE_URL + "/rest/v1/BaxterBoxes"))
+                .header("apikey", SUPABASE_API_KEY)
+                .header("Authorization", "Bearer " + SUPABASE_API_KEY)
+                .header("Accept", "application/json")
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            throw new Exception("Failed to fetch BaxterBoxes: " + response.statusCode());
+
+        }
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        BaxterBox[] boxes = objectMapper.readValue(response.body(), BaxterBox[].class);
+        return boxes;
+    }
+
     /** Returns information about the BaxterBox#id
      * @param id Id of specified baxter box
      * @return The box itself, containing its information
