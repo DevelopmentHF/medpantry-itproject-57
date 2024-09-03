@@ -18,10 +18,13 @@ public class BaxterBoxController {
     }
 
     @GetMapping("/baxterbox")
-    public Object getBaxterBox(@RequestParam(required = false) Integer id) {
+    public Object getBaxterBox(@RequestParam(required = false) Integer id, @RequestParam(required = false) String sku) {
         try {
             if (id != null) {
                 return baxterBoxService.getBaxterBox(id);
+            }
+            if (sku != null) {
+                return baxterBoxService.findBaxterBoxBySKU(sku);
             }
             return baxterBoxService.getAllBaxterBoxes();
         } catch (Exception e) {
