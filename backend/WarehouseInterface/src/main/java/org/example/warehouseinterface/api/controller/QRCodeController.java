@@ -16,10 +16,10 @@ public class QRCodeController {
         this.service = service;
     }
 
-    @GetMapping
-    public String convertQRToSku(@RequestParam String qrCode) {
+    @GetMapping("/linkToSku")
+    public String convertQRToSku(@RequestParam String link) {
         try {
-            return service.findSku(qrCode);
+            return service.findSku(link);
         } catch (Exception e) {
             // Log the exception (optional)
             e.printStackTrace();
