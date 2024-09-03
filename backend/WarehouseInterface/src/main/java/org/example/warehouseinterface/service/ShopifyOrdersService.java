@@ -2,6 +2,8 @@ package org.example.warehouseinterface.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.example.warehouseinterface.api.model.Order;
 import org.springframework.stereotype.Service;
@@ -41,18 +43,32 @@ public class ShopifyOrdersService {
         JsonNode rootNode = objectMapper.readTree(response.body());
         JsonNode ordersNode = rootNode.path("orders");
 
+        ArrayNode cleanedOrders = objectMapper.createArrayNode(); // array of cleaned order data in json format
+
         for (JsonNode orderNode : ordersNode) {
+            String sku = null;
+            int quantity = 0;
             String orderNumber = orderNode.path("name").asText();
             System.out.println("Order Number: " + orderNumber);
 
             JsonNode lineItemNodes = orderNode.path("line_items");
             for (JsonNode lineItemNode : lineItemNodes) {
-                String sku = lineItemNode.path("sku").asText();
-                int quantity = lineItemNode.path("quantity").asInt();
+                sku = lineItemNode.path("sku").asText();
+                quantity = lineItemNode.path("quantity").asInt();
                 System.out.println("SKU:" + sku);
                 System.out.println("Quantity: " + quantity);
             }
+
+            ObjectNode cleanedOrder = objectMapper.createObjectNode();
+            cleanedOrder.put("sku", sku);
+            cleanedOrder.put("quantity", quantity);
+            cleanedOrder.put("order_number", orderNumber);
+
+            cleanedOrders.add(cleanedOrder);
         }
+
+        String cleanedOrdersString = objectMapper.writeValueAsString(cleanedOrders);
+        System.out.println("cleaned: " + cleanedOrdersString);
 
         return response.body();
     }
