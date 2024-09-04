@@ -18,6 +18,8 @@ FROM openjdk:19-jdk
 WORKDIR /app
 
 # Copy the JAR from the build stage
+# Ensure the JAR name matches the actual output
 COPY --from=build /app/build/libs/*.jar app.jar
 ENTRYPOINT ["java","-jar","/app.jar"]
 EXPOSE 8080
+
