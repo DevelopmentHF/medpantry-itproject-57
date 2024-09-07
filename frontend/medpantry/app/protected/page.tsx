@@ -48,6 +48,9 @@ export default async function ProtectedPage({ searchParams }: { searchParams: { 
     <div className="flex-1 w-full flex flex-col gap-12 items-center p-6">
       <nav className="flex gap-4 border-b border-b-foreground/10 h-16 w-full items-center">
         <AuthButton />
+        <a href="protected/dashboard">
+          Dashboard
+        </a>
         <a href="protected/add-to-stock">
           Go to Add to Stock
         </a>

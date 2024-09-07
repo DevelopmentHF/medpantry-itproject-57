@@ -74,40 +74,52 @@ export default function Login({
         Back
       </Link>
 
-      <form className="flex-1 flex flex-col w-full justify-center gap-2 text-foreground">
+      <form className="flex-1 flex flex-col justify-center gap-2 text-foreground">
+        <h1 className="text-3xl font-bold">Sign In</h1>
         <label className="text-md" htmlFor="email">
-          Email
+          Email address*
         </label>
         <input
-          className="rounded-md px-4 py-2 bg-inherit border mb-6"
+          className="rounded-md px-4 py-2 bg-inherit border mb-2"
           name="email"
-          placeholder="you@example.com"
+          placeholder="Email"
           required
         />
+        <small className="text-xs text-gray-500 mb-6">
+          We'll never share your email
+        </small>
+
         <label className="text-md" htmlFor="password">
-          Password
+          Password*
         </label>
         <input
-          className="rounded-md px-4 py-2 bg-inherit border mb-6"
+          className="rounded-md px-4 py-2 bg-inherit border mb-2"
           type="password"
           name="password"
           placeholder="••••••••"
           required
         />
-        <SubmitButton
-          formAction={signIn}
-          className="bg-green-700 rounded-md px-4 py-2 text-foreground mb-2"
-          pendingText="Signing In..."
-        >
-          Sign In
-        </SubmitButton>
-        <SubmitButton
-          formAction={signUp}
-          className="border border-foreground/20 rounded-md px-4 py-2 text-foreground mb-2"
-          pendingText="Signing Up..."
-        >
-          Sign Up
-        </SubmitButton>
+        <small className="text-xs text-gray-500 mb-6">
+          Must include at least 8 characters and 1 number
+        </small>
+
+        <div className="flex flex-row justify-between">
+          <SubmitButton
+            formAction={signIn}
+            className="bg-green-700 rounded-md px-4 py-2 text-foreground mb-2"
+            pendingText="Signing In..."
+          >
+            Sign In
+          </SubmitButton>
+          <SubmitButton
+            formAction={signUp}
+            className="border border-foreground/20 rounded-md px-4 py-2 text-foreground mb-2"
+            pendingText="Signing Up..."
+          >
+            Sign Up
+          </SubmitButton>
+        </div>
+
         {searchParams?.message && (
           <p className="mt-4 p-4 bg-foreground/10 text-foreground text-center">
             {searchParams.message}
