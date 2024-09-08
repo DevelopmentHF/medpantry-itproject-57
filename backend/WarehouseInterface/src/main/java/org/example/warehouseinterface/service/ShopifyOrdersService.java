@@ -16,7 +16,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -28,7 +28,7 @@ public class ShopifyOrdersService {
     private BaxterBoxService baxterBoxService;
 
 
-    public String getAllOrders() throws Exception {
+    public List<Order> getAllOrders() throws Exception {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://team57-itproject.myshopify.com/admin/api/2024-07/orders.json?status=any"))
@@ -84,25 +84,69 @@ public class ShopifyOrdersService {
         System.out.println(orders.get(0).getOrderNumber());
 
         // find required baxter boxes
-        //List<BaxterBox> requiredBoxes = findCorrectBaxterBoxes(orders.get(0), )
+//        List<BaxterBox> requiredBoxes = findCorrectBaxterBoxes(orders.get(0));
+//        System.out.println("length: " + requiredBoxes.size());
+//        System.out.println(requiredBoxes.get(0).getId());
 
-        return cleanedOrdersString;
+        // handleOrderAccept(requiredBoxes, orders.get(0));
+
+        return orders;
     }
 
     /**
-     * Given an SKU and quantity, finds the correct Baxter Box(es) which contain the items that should be shipped
+     * Given an SKU and quantity, finds the correct Baxter Box(es) which contain the items that should be shipped.
+     * The returned Baxter boxes are sorted by quantity from low to high
      * @param order
-     * @param boxes
      * @return
      */
-    public List<BaxterBox> findCorrectBaxterBoxes(Order order, BaxterBox[] boxes) throws Exception {
+    public List<BaxterBox> findCorrectBaxterBoxes(Order order) throws Exception {
         List<BaxterBox> requiredBoxes;
+
 
         requiredBoxes = baxterBoxService.findAllBaxterBoxesBySKU(order.getSku());
 
         // TODO: handle logic for multiple boxes/lowest amount
-        // TODO: add tech support meeting to meeting minutes. Discussed edge cases, bug fixing, team structure, scheme, client, planned what to work on next, talked about implementation details of manager log
+        Collections.sort(requiredBoxes);
 
         return requiredBoxes;
+    }
+
+    public void handleOrderAccept(String orderNumber) throws Exception {
+        Order order = findOrderByOrderNumber(orderNumber);
+        int requiredQuantityRemaining = order.getQuantity();
+        List<BaxterBox> matchingBoxes = findCorrectBaxterBoxes(order);
+
+        for (BaxterBox box : matchingBoxes) {
+            if (box.getUnits() > requiredQuantityRemaining) {
+                // there are more than enough units in this box to satisfy the order
+
+                System.out.println("Required quant:" + requiredQuantityRemaining);
+                baxterBoxService.updateBaxterBox(box, -requiredQuantityRemaining);
+                break;
+            } else {
+                // Baxter box will be depleted, so it needs to be marked as free in the system
+
+            }
+        }
+    }
+
+    /**
+     * Given an order number, finds the matching order Object
+     * @param orderNumber
+     * @return
+     * @throws Exception
+     */
+    public Order findOrderByOrderNumber(String orderNumber) throws Exception {
+        List<Order> orders = getAllOrders();
+
+        for (Order order : orders) {
+            System.out.println(order.getOrderNumber());
+            System.out.println("Ordernum:" + orderNumber);
+            if (order.getOrderNumber().equals(orderNumber)) {
+                return order;
+            }
+        }
+
+        return null;
     }
 }
