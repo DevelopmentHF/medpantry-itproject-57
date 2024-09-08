@@ -51,11 +51,12 @@ export default function Login({
     return redirect("/login?message=Check email to continue sign in process");
   };
 
-  return (
+return (
+  <div className="flex items-center justify-center min-h-screen w-full bg-white">
     <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2">
       <Link
         href="/"
-        className="absolute left-8 top-8 py-2 px-4 rounded-md no-underline text-foreground bg-btn-background hover:bg-btn-background-hover flex items-center group text-sm"
+        className="absolute left-8 top-8 py-2 px-4 rounded-md no-underline text-background bg-btn-background hover:bg-btn-background-hover flex items-center group text-sm "
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -74,50 +75,67 @@ export default function Login({
         Back
       </Link>
 
-      <form className="flex-1 flex flex-col justify-center gap-2 text-foreground">
-        <h1 className="text-3xl font-bold">Sign In</h1>
-        <label className="text-md" htmlFor="email">
+      <form className="flex-1 flex flex-col justify-center gap-4 bg-white">
+        <h1 className="text-3xl font-bold text-center text-background">
+          Sign In
+        </h1>
+        <p className="text-muted-foreground text-center">
+          Enter your provided account to access Medical Pantry
+        </p>
+        <label className="text-md text-background" htmlFor="email">
           Email address*
         </label>
         <input
-          className="rounded-md px-4 py-2 bg-inherit border mb-2"
+          className="border border-background/20 rounded-md px-4 py-2 text-background mb-2"
           name="email"
           placeholder="Email"
           required
         />
-        <small className="text-xs text-gray-500 mb-6">
+        <small className="text-xs text-muted-foreground">
           We'll never share your email
         </small>
 
-        <label className="text-md" htmlFor="password">
+        <label
+          className="text-md flex justify-between items-center text-background"
+          htmlFor="password"
+        >
           Password*
+          <Link
+            href="#"
+            className="text-sm font-medium underline underline-offset-4 hover:text-primary"
+            prefetch={false}
+          >
+            Forgot password?
+          </Link>
         </label>
+
         <input
-          className="rounded-md px-4 py-2 bg-inherit border mb-2"
+          className="border border-background/20 rounded-md px-4 py-2 text-background mb-2"
           type="password"
           name="password"
           placeholder="••••••••"
           required
         />
-        <small className="text-xs text-gray-500 mb-6">
+        <small className="text-xs text-muted-foreground">
           Must include at least 8 characters and 1 number
         </small>
 
         <div className="flex flex-row justify-between">
           <SubmitButton
             formAction={signIn}
-            className="bg-green-700 rounded-md px-4 py-2 text-foreground mb-2"
+            className="bg-red-700 rounded-md px-4 py-2 text-card-foreground mb-2 min-w-full"
             pendingText="Signing In..."
           >
             Sign In
           </SubmitButton>
-          <SubmitButton
+          {/* Sign up button is currently commented out as we should not allow users to sign up */}
+          {/* <SubmitButton
             formAction={signUp}
-            className="border border-foreground/20 rounded-md px-4 py-2 text-foreground mb-2"
+            className="border border-background/20 rounded-md px-4 py-2 text-background mb-2"
             pendingText="Signing Up..."
           >
             Sign Up
-          </SubmitButton>
+          </SubmitButton> */}
         </div>
 
         {searchParams?.message && (
@@ -127,5 +145,6 @@ export default function Login({
         )}
       </form>
     </div>
-  );
+  </div>
+);
 }

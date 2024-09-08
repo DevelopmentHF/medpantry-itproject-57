@@ -32,6 +32,7 @@ export default async function Index() {
         <main className="flex-1 flex flex-col gap-6">
           <h2 className="font-bold text-4xl mb-4">Login or sign up to access the Medical Pantry System</h2>
           <p>note for my teamates just create an account we have authentication by default now which is cool</p>
+          <p>This is intended to be the landing page - long</p>
         </main>
       </div>
 
