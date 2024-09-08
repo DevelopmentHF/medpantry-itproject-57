@@ -54,6 +54,7 @@ export default function Login({
 return (
   <div className="flex items-center justify-center min-h-screen w-full bg-white">
     <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2">
+      {/* Back button */}
       <Link
         href="/"
         className="absolute left-8 top-8 py-2 px-4 rounded-md no-underline text-background bg-btn-background hover:bg-btn-background-hover flex items-center group text-sm "
@@ -74,7 +75,7 @@ return (
         </svg>{" "}
         Back
       </Link>
-
+      {/* Form */}
       <form className="flex-1 flex flex-col justify-center gap-4 bg-white">
         <h1 className="text-3xl font-bold text-center text-background">
           Sign In
@@ -82,11 +83,12 @@ return (
         <p className="text-muted-foreground text-center">
           Enter your provided account to access Medical Pantry
         </p>
+        {/* Email */}
         <label className="text-md text-background" htmlFor="email">
           Email address*
         </label>
         <input
-          className="border border-background/20 rounded-md px-4 py-2 text-background mb-2"
+          className="border border-background/20 rounded-md px-4 py-2 text-background mb-0"
           name="email"
           placeholder="Email"
           required
@@ -94,7 +96,8 @@ return (
         <small className="text-xs text-muted-foreground">
           We'll never share your email
         </small>
-
+        
+        {/* Password */}
         <label
           className="text-md flex justify-between items-center text-background"
           htmlFor="password"
@@ -102,7 +105,7 @@ return (
           Password*
           <Link
             href="#"
-            className="text-sm font-medium underline underline-offset-4 hover:text-primary"
+            className="text-sm font-medium text-muted-foreground hover:text-background"
             prefetch={false}
           >
             Forgot password?
@@ -110,7 +113,7 @@ return (
         </label>
 
         <input
-          className="border border-background/20 rounded-md px-4 py-2 text-background mb-2"
+          className="border border-background/20 rounded-md px-4 py-2 text-background mb-0"
           type="password"
           name="password"
           placeholder="••••••••"
