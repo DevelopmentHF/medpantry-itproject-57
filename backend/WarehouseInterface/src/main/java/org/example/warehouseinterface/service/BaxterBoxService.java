@@ -9,6 +9,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpHeaders;
+import java.util.HashMap;
+
 import io.github.cdimascio.dotenv.Dotenv;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -20,6 +22,7 @@ public class BaxterBoxService {
     private static final Dotenv dotenv = Dotenv.configure().directory(".env").load();
     private static final String SUPABASE_URL = dotenv.get("SUPABASE_URL");
     private static final String SUPABASE_API_KEY = dotenv.get("SUPABASE_API_KEY");
+    private static final String SHOPIFY_ADMIN_KEY = dotenv.get("SHOPIFY_ADMIN_KEY");
 
     /** Returns information about the BaxterBox#id
      * @param id Id of specified baxter box
@@ -120,7 +123,6 @@ public class BaxterBoxService {
      * @throws Exception
      */
     public BaxterBox updateBaxterBox(BaxterBox baxterBox, int units) throws Exception {
-        // TODO: We should update our schema to count stock levels so that we can update
         baxterBox.setUnits(baxterBox.getUnits() + units);
         HttpClient client = HttpClient.newHttpClient();
         ObjectMapper objectMapper = new ObjectMapper();
@@ -182,5 +184,75 @@ public class BaxterBoxService {
         ObjectMapper objectMapper = new ObjectMapper();
         BaxterBox[] boxes = objectMapper.readValue(response.body(), BaxterBox[].class);
         return boxes;
+    }
+
+    /**
+     * Syncs baxterbox data with shopify inventory levels.
+     * Supabase is the source of truth.
+     * @throws Exception
+     */
+    public String sync() throws Exception {
+        /* PLAN OF ATTACK */
+        // go through each SKU (this could be multiple supabase rows)
+        // GET the associated product **variant**
+        // PATCH the variants "inventory_quantity"
+
+        // retrieve list of all boxes
+        BaxterBox[] boxes = getAllBaxterBoxes();
+
+        // init. map of skus and quantity -> squashing down multiple rows into 1 basically
+        HashMap<String, Integer> quantities = new HashMap<>();
+
+        for (BaxterBox box : boxes) {
+            // find if there's already a value
+            int existingQuantity = 0;
+            if (quantities.containsKey(box.getId())) {
+                existingQuantity = quantities.get(box.getSKU());
+            }
+
+            // increment our quantity
+            quantities.put(box.getSKU(), existingQuantity + box.getUnits());
+        }
+
+        // GET all existing products to save on individual requests
+        // TODO: Handle paginiation. Shopify limits to 50 (or if we ask, 250) products per response.
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://team57-itproject.myshopify.com/admin/api/2024-07/products.json"))
+                .header("X-Shopify-Access-Token", SHOPIFY_ADMIN_KEY)
+                .header("Accept", "application/json")
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            throw new Exception("Product extraction from shopify failed: " + response.statusCode());
+        }
+
+        String rawProductsListJson = response.body();
+        // clean up response so we get skus mapping to product variants ids
+
+        // actually sync
+        // TODO: This could be incredibly inefficient. I.e its going to be like 5000 requests to shopify each time...
+        // or maybe it would be okay. 1 GET requests to get all products info which we can then parse, then
+        // if the quantity is different, send a PATCH. so if all products are different, then yes, it would be an
+        // excessive amount of PATCHes, but it probably (?) won't be. Something to think about though.
+        for (String key : quantities.keySet()) {
+            syncSku(key, quantities.get(key));
+        }
+
+        return "Synced successfully";
+    }
+
+    /**
+     * Syncs 1 SKUs values with shopify
+     * @param sku
+     * @param units
+     * @throws Exception
+     */
+    private void syncSku(String sku, int units) throws Exception {
+        // GET the product variant
+
+        // conditionally PATCH inventory level for this id https://shopify.dev/docs/api/admin-rest/2024-07/resources/inventorylevel#post-inventory-levels-set
     }
 }
