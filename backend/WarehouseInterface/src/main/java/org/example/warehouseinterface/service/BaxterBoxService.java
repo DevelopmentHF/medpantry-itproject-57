@@ -166,6 +166,33 @@ public class BaxterBoxService {
         return baxterBox;
     }
 
+    public void freeBaxterBox(BaxterBox baxterBox) throws Exception {
+        baxterBox.setUnits(0);
+        baxterBox.setSKU(null);
+        baxterBox.setFull(false);
+
+        HttpClient client = HttpClient.newHttpClient();
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // Convert BaxterBox to JSON
+        String jsonRequestBody = objectMapper.writeValueAsString(baxterBox);
+
+        // Create PATCH request
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(SUPABASE_URL + "/rest/v1/BaxterBoxes?id=eq." + baxterBox.getId()))
+                .header("apikey", SUPABASE_API_KEY)
+                .header("Authorization", "Bearer " + SUPABASE_API_KEY)
+                .header("Content-Type", "application/json")
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(jsonRequestBody))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200 && response.statusCode() != 204) {
+            throw new Exception("Failed to update BaxterBox: " + response.statusCode() + " " + response.body());
+        }
+    }
+
     /**
      * Finds a unique location id for a new database entry to use
      * @return integer location id

@@ -125,7 +125,13 @@ public class ShopifyOrdersService {
                 break;
             } else {
                 // Baxter box will be depleted, so it needs to be marked as free in the system
+                System.out.println("freed");
+                requiredQuantityRemaining -= box.getUnits();
+                baxterBoxService.freeBaxterBox(box);
 
+                if (requiredQuantityRemaining == 0) {
+                    break;
+                }
             }
         }
     }
