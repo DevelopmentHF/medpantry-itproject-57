@@ -11,6 +11,16 @@ interface OrderProps {
   cards: { quantity: string; sku: string }[];
 }
 
+// This is defined elsewhere as well i wonder if we can like make it its own file and import
+// also defined in AddToStockForm
+type BaxterBox = {
+  id: number;
+  sku: string;
+  warehouseId: number;
+  units: number;
+  full: boolean;
+};
+
 async function getBoxNumber(sku: string) {
    let box: BaxterBox;
    try {
@@ -21,10 +31,9 @@ async function getBoxNumber(sku: string) {
      console.log(box);
    } catch (error) {
      console.error(error);
-     notFound();
      return null;
    }
-   return box.boxId;
+   return box.id;
 };
 
 export default function Order({ orderNumber, cards }: OrderProps) {
