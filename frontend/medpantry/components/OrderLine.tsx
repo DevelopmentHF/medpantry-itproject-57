@@ -9,7 +9,7 @@ interface OrderLineProps {
   boxNumber: string;
 }
 
-export default function OrderLine({ name, quantity, boxNumber }: CardProps) {
+export default function OrderLine({ name, quantity, boxNumber }: OrderLineProps) {
 
 
   return (
