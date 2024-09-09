@@ -54,6 +54,7 @@ export default async function ProtectedPage({ searchParams }: { searchParams: { 
         <a href="protected/add-to-stock">
           Go to Add to Stock
         </a>
+        
       </nav>
 
       <div className="flex flex-col gap-4 w-full">

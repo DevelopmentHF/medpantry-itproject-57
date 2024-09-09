@@ -78,7 +78,7 @@ return (
       {/* Form */}
       <form className="flex-1 flex flex-col justify-center gap-4 bg-white">
         <h1 className="text-3xl font-bold text-center text-background">
-          Sign In
+          Log In
         </h1>
         <p className="text-muted-foreground text-center">
           Enter your provided account to access Medical Pantry
@@ -127,9 +127,9 @@ return (
           <SubmitButton
             formAction={signIn}
             className="bg-red-700 rounded-md px-4 py-2 text-card-foreground mb-2 min-w-full"
-            pendingText="Signing In..."
+            pendingText="Logging In..."
           >
-            Sign In
+            Log In
           </SubmitButton>
           {/* Sign up button is currently commented out as we should not allow users to sign up */}
           {/* <SubmitButton
