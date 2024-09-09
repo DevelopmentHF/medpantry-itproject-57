@@ -6,7 +6,7 @@ import Order from '@/components/Order';
 export default async function Dashboard() {
 
     //Fetch all orders from Shopify
-    let orderString = "";
+    let orderString: any[] = [];
         try{
             const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/ShopifyOrders`);
             if (!res.ok) throw new Error('Network response was not ok');
