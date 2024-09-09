@@ -8,15 +8,24 @@ export default async function Dashboard() {
     //Fetch all orders from Shopify
     let orderString: any[] = [];
         try{
-            const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/ShopifyOrders`);
+          const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/ShopifyOrders`, {
+            method: 'GET',
+            headers: {
+                'Cache-Control': 'no-cache'
+            }
+            });
             if (!res.ok) throw new Error('Network response was not ok');
             orderString = await res.json();
-            console.log(orderString);
+            console.log("orders: " + JSON.stringify(orderString));
+            
         } catch (error) {
         console.error(error);
         return null;
       }
 
+      //console.log("ORDERS:")
+      //console.log(orderString);
+      
     //Group orders by order number.
     const groupedByOrderNumber = orderString.reduce((acc, item) => {
       if (!acc[item.order_number]) {
@@ -30,7 +39,7 @@ export default async function Dashboard() {
     }, {});
 
     Object.keys(groupedByOrderNumber).forEach(order_number => {console.log(order_number)});
-    console.log(groupedByOrderNumber["#1001"]);
+    //console.log(groupedByOrderNumber["#1001"]);
 
   return (
     <div className="flex-1 w-full flex flex-col gap-12 items-center p-6">
