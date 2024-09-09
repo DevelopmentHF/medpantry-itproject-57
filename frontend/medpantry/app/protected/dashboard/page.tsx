@@ -44,9 +44,11 @@ export default async function Dashboard() {
           <h1 className="font-bold text-4xl">Dashboard</h1>
         </div>
       </div>
+      <div className="flex flex-wrap gap-10">
             {Object.keys(groupedByOrderNumber).map(order_number => (
                 <Order key={order_number} orderNumber={order_number} cards={groupedByOrderNumber[order_number]}/>
             ))}
+      </div>
     </div>
   );
 }

@@ -33,11 +33,10 @@ export default function Order({ orderNumber, cards }: OrderProps) {
 
 
   return (
-    <div className={`${'#FF0000'} border-solid border-border rounded-md p-4 flex flex-col gap-2`}>
+    <div className={`bg-red-400 text-black border-solid border-border rounded-md p-4 flex flex-col gap-2`}>
       <div>
-        <h1 className="text-2xl">Order {orderNumber}</h1>
+        <h1 className="text-2xl font-bold">Order {orderNumber}</h1>
       </div>
-      <Separator className='bg-secondary-foreground' />
       {cards.map((card, index) => (
         <OrderLine
           key={card.sku}

@@ -14,12 +14,13 @@ export default function OrderLine({ name, quantity, boxNumber }: CardProps) {
 
   return (
 
-    <div className={`bg-card border-solid border-border rounded-md p-4 flex flex-col gap-2`}>
+    <div className={`flex gap-4`}>
         <div className="">
-            <h1 className="text-2xl">x{quantity} {name}</h1>
-            <h2 className='text-card-foreground'>Baxter box #{boxNumber}</h2>
+            <h1 className="">x{quantity} {name}</h1>
         </div>
-        <Separator className='bg-secondary-foreground'></Separator>
+        <div className="">
+            <h2 className='text-black'>Box #{boxNumber}</h2>
+        </div>
     </div>
   );
 }
