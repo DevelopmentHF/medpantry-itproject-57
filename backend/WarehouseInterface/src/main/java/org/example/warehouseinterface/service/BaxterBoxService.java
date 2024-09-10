@@ -120,7 +120,6 @@ public class BaxterBoxService {
      * @throws Exception
      */
     public BaxterBox updateBaxterBox(BaxterBox baxterBox, int units) throws Exception {
-        // TODO: We should update our schema to count stock levels so that we can update
         baxterBox.setUnits(baxterBox.getUnits() + units);
         HttpClient client = HttpClient.newHttpClient();
         ObjectMapper objectMapper = new ObjectMapper();
