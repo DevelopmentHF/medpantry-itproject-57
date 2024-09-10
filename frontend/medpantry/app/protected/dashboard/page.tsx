@@ -2,6 +2,8 @@ import React from 'react';
 import Taskbar from './Taskbar';
 import AuthButton from '@/components/AuthButton';
 import Order from '@/components/Order';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 
 export default async function Dashboard() {
 
@@ -43,16 +45,22 @@ export default async function Dashboard() {
 
   return (
     <div className="flex-1 w-full flex flex-col gap-12 items-center p-6">
-      <nav className="flex gap-4 border-b border-b-foreground/10 h-16 w-full items-center">
+      <nav className="flex gap-4 border-b border-b-foreground/10 h-16 w-full items-center justify-between">
         <AuthButton />
-        <a href="../protected">Go back</a>
+        <Button>
+          <a href="../protected">Home</a>
+        </Button>
+        
       </nav>
-      <div className="flex w-full">
-        <Taskbar />
-        <div className="flex-1 p-6">
+      <div className="">
+        <div className='flex flex-col gap-4'>
           <h1 className="font-bold text-4xl">Dashboard</h1>
+          <Taskbar />
         </div>
       </div>
+
+      <Separator></Separator>
+
       <div className="flex flex-wrap gap-10">
             {Object.keys(groupedByOrderNumber).map(order_number => (
                 <Order key={order_number} orderNumber={order_number} cards={groupedByOrderNumber[order_number]}/>

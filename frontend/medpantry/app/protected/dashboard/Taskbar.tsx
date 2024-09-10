@@ -1,13 +1,13 @@
 import React from "react";
 import Link from "next/link";
-
+import { Button } from "@/components/ui/button";
 const Taskbar: React.FC = () => {
   return (
     <div className="taskbar">
-      <ul>
+      <ul className="flex gap-4 items-center">
         <li>
           <Link href="/orders">
-            <button>Current Orders</button>
+            <Button className="">Current Orders</Button>
           </Link>
         </li>
         <li>
