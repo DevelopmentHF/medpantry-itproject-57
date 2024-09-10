@@ -2,8 +2,7 @@ import React from 'react';
 import Taskbar from './Taskbar';
 import AuthButton from '@/components/AuthButton';
 import Order from '@/components/Order';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+import OverviewCard from '@/components/OverviewCard';
 
 export default async function Dashboard() {
 
@@ -45,26 +44,53 @@ export default async function Dashboard() {
 
   return (
     <div className="flex-1 w-full flex flex-col gap-12 items-center p-6">
-      <nav className="flex gap-4 border-b border-b-foreground/10 h-16 w-full items-center justify-between">
-        <AuthButton />
-        <Button>
-          <a href="../protected">Home</a>
-        </Button>
-        
+      <nav className="flex gap-4 border-b border-b-foreground/10 h-16 w-full items-center">
+        <a href="../protected">Go back</a>
+        <div className="ml-auto">
+          <AuthButton />
+        </div>
       </nav>
-      <div className="">
-        <div className='flex flex-col gap-4 items-center'>
-          <h1 className="font-bold text-4xl">Dashboard</h1>
-          <Taskbar />
+      <div className="flex w-full">
+        <div className="flex-1 p-6">
+          <h1 className="font-bold text-4xl">Medical Pantry Dashboard</h1>
         </div>
       </div>
 
-      <Separator></Separator>
+      <div className="flex justify-between">
+        <h1 className="text-2xl font-bold">Overview</h1>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 w-full text-black">
+        <OverviewCard
+          title="Current Orders"
+          count={Object.keys(groupedByOrderNumber).length}
+          description="Pending orders"
+        />
+        <OverviewCard
+          title="Inventory Updates"
+          count={0}
+          description="Today"
+        />
+        <OverviewCard
+          title="Packages Received"
+          count={0}
+          description="This week"
+        />
+        <OverviewCard
+          title="People"
+          count={0}
+          description="On warehouse"
+        />
+      </div>
 
       <div className="flex flex-wrap gap-10">
-            {Object.keys(groupedByOrderNumber).map(order_number => (
-                <Order key={order_number} orderNumber={order_number} cards={groupedByOrderNumber[order_number]}/>
-            ))}
+        {Object.keys(groupedByOrderNumber).map((order_number) => (
+          <Order
+            key={order_number}
+            orderNumber={order_number}
+            cards={groupedByOrderNumber[order_number]}
+          />
+        ))}
       </div>
     </div>
   );

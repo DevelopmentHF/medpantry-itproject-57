@@ -52,12 +52,12 @@ export default function Login({
   };
 
 return (
-  <div className="flex items-center justify-center min-h-screen w-full bg-white">
+  <div className="flex items-center justify-center min-h-screen w-full">
     <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2">
       {/* Back button */}
       <Link
         href="/"
-        className="absolute left-8 top-8 py-2 px-4 rounded-md no-underline text-background bg-btn-background hover:bg-btn-background-hover flex items-center group text-sm "
+        className="absolute left-8 top-8 py-2 px-4 rounded-md no-underline text-foreground bg-btn-background hover:bg-btn-background-hover flex items-center group text-sm "
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -77,18 +77,18 @@ return (
       </Link>
       {/* Form */}
       <form className="flex-1 flex flex-col justify-center gap-4 bg-white">
-        <h1 className="text-3xl font-bold text-center text-background">
+        <h1 className="text-3xl font-bold text-center text-foreground">
           Log In
         </h1>
         <p className="text-muted-foreground text-center">
           Enter your provided account to access Medical Pantry
         </p>
         {/* Email */}
-        <label className="text-md text-background" htmlFor="email">
+        <label className="text-md text-foreground" htmlFor="email">
           Email address*
         </label>
         <input
-          className="border border-background/20 rounded-md px-4 py-2 text-background mb-0"
+          className="border border-background/20 rounded-md px-4 py-2 text-foreground mb-0"
           name="email"
           placeholder="Email"
           required
@@ -99,13 +99,13 @@ return (
         
         {/* Password */}
         <label
-          className="text-md flex justify-between items-center text-background"
+          className="text-md flex justify-between items-center text-foreground"
           htmlFor="password"
         >
           Password*
           <Link
             href="#"
-            className="text-sm font-medium text-muted-foreground hover:text-background"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground"
             prefetch={false}
           >
             Forgot password?
@@ -126,7 +126,7 @@ return (
         <div className="flex flex-row justify-between">
           <SubmitButton
             formAction={signIn}
-            className="bg-red-700 rounded-md px-4 py-2 text-card-foreground mb-2 min-w-full"
+            className="bg-red-600 hover:bg-red-700 rounded-md px-4 py-2 text-card-foreground mb-2 min-w-full"
             pendingText="Logging In..."
           >
             Log In
