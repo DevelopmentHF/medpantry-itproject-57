@@ -42,7 +42,7 @@ export default function Order({ orderNumber, cards }: OrderProps) {
 
 
   return (
-    <div className={`bg-gray-300 text-black border-solid border-border rounded-md p-4 flex flex-col gap-2`}>
+    <div className={`border-solid border-border rounded-md p-4 flex flex-col gap-2`}>
       <div className="flex flex-row gap-4 w-full items-center">
         <h1 className="text-2xl font-bold">Order {orderNumber}</h1>
         <Button className='bg-red-600 text-white p-2'>Take Order</Button>

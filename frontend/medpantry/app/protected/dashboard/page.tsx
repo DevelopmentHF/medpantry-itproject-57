@@ -3,6 +3,7 @@ import Taskbar from './Taskbar';
 import AuthButton from '@/components/AuthButton';
 import Order from '@/components/Order';
 import OverviewCard from '@/components/OverviewCard';
+import { Button } from '@/components/ui/button';
 
 export default async function Dashboard() {
 
@@ -45,7 +46,9 @@ export default async function Dashboard() {
   return (
     <div className="flex-1 w-full flex flex-col gap-12 items-center p-6">
       <nav className="flex gap-4 border-b border-b-foreground/10 h-16 w-full items-center">
-        <a href="../protected">Go back</a>
+      <Button>
+            <a href="../protected">Back</a>
+      </Button>
         <div className="ml-auto">
           <AuthButton />
         </div>
@@ -61,15 +64,18 @@ export default async function Dashboard() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 w-full text-black">
-        <OverviewCard
-          title="Current Orders"
-          count={Object.keys(groupedByOrderNumber).length}
-          description="Pending orders"
-        />
+        <a href="current-orders">
+          <OverviewCard
+            title="Current Orders"
+            count={Object.keys(groupedByOrderNumber).length}
+            description="Pending orders"
+          />
+        </a>
+        
         <OverviewCard
           title="Inventory Updates"
           count={0}
-          description="Today"
+          description="Pending"
         />
         <OverviewCard
           title="Packages Received"
@@ -81,16 +87,6 @@ export default async function Dashboard() {
           count={0}
           description="On warehouse"
         />
-      </div>
-
-      <div className="flex flex-wrap gap-10">
-        {Object.keys(groupedByOrderNumber).map((order_number) => (
-          <Order
-            key={order_number}
-            orderNumber={order_number}
-            cards={groupedByOrderNumber[order_number]}
-          />
-        ))}
       </div>
     </div>
   );
