@@ -1,11 +1,11 @@
 package org.example.warehouseinterface.api.controller;
 
+import org.example.warehouseinterface.api.model.ManagerLogEntry;
 import org.example.warehouseinterface.service.ManagerLogService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.http.HttpResponse;
 
 @RestController
 public class ManagerLogController {
@@ -38,6 +38,16 @@ public class ManagerLogController {
             e.printStackTrace();
             // Return an appropriate error response
             return "Failed to handle proposed change";
+        }
+    }
+
+    @GetMapping("/logEntries")
+    public ManagerLogEntry[] getManagerLogEntries() {
+        try {
+            return managerLogService.getAllLogEntries();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

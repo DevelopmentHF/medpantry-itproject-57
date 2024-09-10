@@ -5,6 +5,7 @@ import AddToStockForm from '@/components/AddToStockForm';
 import QRScanner from '@/components/QRScanner';
 import { useState } from 'react';
 import AddStock from '@/components/AddStock';
+import ManagerLog from '@/components/ManagerLog';
 
 export default function ManagerLogPage() {
 
@@ -17,6 +18,7 @@ export default function ManagerLogPage() {
                 </a>
             </nav>
             <h1 className="font-bold text-4xl">Manager Log</h1>
+            <ManagerLog></ManagerLog>
         </div>
     );
 }

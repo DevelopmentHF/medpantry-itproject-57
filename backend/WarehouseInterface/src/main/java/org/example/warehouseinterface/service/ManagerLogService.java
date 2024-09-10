@@ -71,7 +71,7 @@ public class ManagerLogService {
      * @return
      * @throws Exception
      */
-    private ManagerLogEntry[] getAllLogEntries() throws Exception {
+    public ManagerLogEntry[] getAllLogEntries() throws Exception {
         // get all  rows from supabase
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
