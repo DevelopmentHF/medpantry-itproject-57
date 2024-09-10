@@ -1,5 +1,7 @@
 package org.example.warehouseinterface.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.example.warehouseinterface.api.model.BaxterBox;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -230,7 +232,10 @@ public class BaxterBoxService {
         }
 
         String rawProductsListJson = response.body();
+        System.out.println(rawProductsListJson);
         // clean up response so we get skus mapping to product variants ids
+        HashMap<String, String> variants = extractVariantIds(rawProductsListJson, boxes);
+        System.out.println(variants);
 
         // actually sync
         // TODO: This could be incredibly inefficient. I.e its going to be like 5000 requests to shopify each time...
@@ -238,7 +243,7 @@ public class BaxterBoxService {
         // if the quantity is different, send a PATCH. so if all products are different, then yes, it would be an
         // excessive amount of PATCHes, but it probably (?) won't be. Something to think about though.
         for (String key : quantities.keySet()) {
-            syncSku(key, quantities.get(key));
+            syncSku(key, quantities.get(key), variants);
         }
 
         return "Synced successfully";
@@ -248,11 +253,49 @@ public class BaxterBoxService {
      * Syncs 1 SKUs values with shopify
      * @param sku
      * @param units
+     * @param variantMap hashmap of sku : product variant id
      * @throws Exception
      */
-    private void syncSku(String sku, int units) throws Exception {
-        // GET the product variant
+    private void syncSku(String sku, int units, HashMap<String, String> variantMap) throws Exception {
+        // find the product variant from hashmap
 
         // conditionally PATCH inventory level for this id https://shopify.dev/docs/api/admin-rest/2024-07/resources/inventorylevel#post-inventory-levels-set
+    }
+
+    /**
+     * Creates a hashmap of Sku : ProductVariantId
+     * @param rawProductsListJson
+     * @param boxes
+     * @return
+     * @throws Exception
+     */
+    private HashMap<String, String> extractVariantIds(String rawProductsListJson, BaxterBox[] boxes) throws Exception {
+        // init map
+        HashMap<String, String> variants = new HashMap<>();
+
+        // find associated id
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode rootNode = objectMapper.readTree(rawProductsListJson);
+        JsonNode productsNode = rootNode.path("products");
+
+        for (JsonNode productNode : productsNode) {
+            JsonNode variantNode = productNode.path("variants");
+            for (JsonNode variant : variantNode) {
+                // we've got this variants sku :)
+                String variantSku = variant.path("sku").asText();
+                String variantId = variant.path("id").asText();
+
+                // find an associated box. Nested loops here -> potentially inefficient
+                // we just need to link skus and variant ids
+                for (BaxterBox box : boxes) {
+                    if (box.getSKU() == null) continue;
+                    if (box.getSKU().equals(variantSku)) {
+                        variants.put(box.getSKU(), variantId);
+                    }
+                }
+            }
+        }
+
+        return variants;
     }
 }

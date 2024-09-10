@@ -40,7 +40,7 @@ public class BaxterBox {
     }
 
     public String getSKU() {
-        return sku;
+        return this.sku;
     }
 
     public void setSKU(String SKU) {
@@ -62,5 +62,16 @@ public class BaxterBox {
 
     public void setFull(boolean full) {
          this.full = full;
+    }
+
+    @Override
+    public String toString() {
+        return "BaxterBox{" +
+                "id=" + id +
+                ", warehouseId=" + warehouseId +
+                ", sku='" + sku + '\'' +
+                ", units=" + units +
+                ", full=" + full +
+                '}';
     }
 }
