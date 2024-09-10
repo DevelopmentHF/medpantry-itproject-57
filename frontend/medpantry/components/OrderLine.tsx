@@ -16,10 +16,10 @@ export default function OrderLine({ name, quantity, boxNumber }: OrderLineProps)
 
     <div className={`flex gap-4`}>
         <div className="">
-            <h1 className="">x{quantity} {name}</h1>
+            <h1 className="">{name} <span className='text-gray-500'>x{quantity}</span></h1>
         </div>
         <div className="">
-            <h2 className='text-black'>Box #{boxNumber}</h2>
+            <h2 className='text-black'>Box <span className='text-gray-500'>#{boxNumber}</span></h2>
         </div>
     </div>
   );

@@ -53,7 +53,7 @@ export default async function Dashboard() {
         
       </nav>
       <div className="">
-        <div className='flex flex-col gap-4'>
+        <div className='flex flex-col gap-4 items-center'>
           <h1 className="font-bold text-4xl">Dashboard</h1>
           <Taskbar />
         </div>
