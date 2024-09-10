@@ -47,24 +47,35 @@ export default async function ProtectedPage({ searchParams }: { searchParams: { 
   return (
     <div className="flex-1 w-full flex flex-col gap-12 items-center p-6">
       <nav className="flex gap-4 border-b border-b-foreground/10 h-16 w-full items-center">
-        <AuthButton />
-        <a href="protected/dashboard">
-          Dashboard
-        </a>
-        <a href="protected/add-to-stock">
-          Go to Add to Stock
-        </a>
-        
+        <a href="protected/dashboard">Dashboard</a>
+        <a href="protected/add-to-stock">Add to Stock</a>
+        <div className="ml-auto">
+          <AuthButton />
+        </div>
       </nav>
 
       <div className="flex flex-col gap-4 w-full">
-        <h1 className="font-bold text-4xl justify-start">Backend API Connection Test</h1>
+        <h1 className="font-bold text-4xl justify-start">
+          Backend API Connection Test
+        </h1>
         <form action="" method="get" className="flex gap-2">
-          <Input name="id" placeholder="Enter BaxterBox ID" defaultValue={searchParams.id || ''} />
-          <button type="submit" className="btn-primary">Fetch</button>
+          <Input
+            name="id"
+            placeholder="Enter BaxterBox ID"
+            defaultValue={searchParams.id || ""}
+          />
+          <button type="submit" className="btn-primary">
+            Fetch
+          </button>
         </form>
         {box ? (
-          <BaxterBox id={box.id} sku={box.sku} warehouseId={box.warehouseId} units={box.units} isFull={box.full}/>
+          <BaxterBox
+            id={box.id}
+            sku={box.sku}
+            warehouseId={box.warehouseId}
+            units={box.units}
+            isFull={box.full}
+          />
         ) : (
           <p>No BaxterBox data found.</p>
         )}
