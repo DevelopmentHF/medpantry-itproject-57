@@ -21,40 +21,21 @@ export default function AddToStockForm({extractedSku} : AddToStockFormProps) {
     const [sku, setSku] = useState('');
     const [unitsPacked, setUnitsPacked] = useState('');
 
-    const [box, setBox] = useState<BaxterBox | null>(null);
+    const [boxes, setBoxes] = useState<BaxterBox[] | null>(null);
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         console.log('SKU to add:', sku);
         
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/addToBaxterBox?SKU=${sku}&units=${unitsPacked}`, {
-                method: 'POST',
-            });
-
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-
-            const result = await response.json();
-            console.log('Success:', result);
-
-            try {
-                // NEED A .env see discord
-                const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/baxterbox?sku=${sku}`);
-                if (!res.ok) throw new Error('Network response was not ok');
-                const fetchedBox: BaxterBox = await res.json();
-                console.log(fetchedBox);
-                setBox(fetchedBox); // Update state with fetched data
-              } catch (error) {
-                console.error(error);
-                return null;
-              }
-
-            setSku('');
-            setUnitsPacked('');
+            const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/allBaxterBoxesBySKU?sku=${sku}`);
+            if (!res.ok) throw new Error('Network response was not ok');
+            const fetchedBoxes: BaxterBox[] = await res.json();
+            console.log(fetchedBoxes);
+            setBoxes(fetchedBoxes); // Update state with fetched array of boxes
         } catch (error) {
-            console.error('Error:', error);
+            console.error(error);
+            return null;
         }
     };
 
@@ -62,6 +43,25 @@ export default function AddToStockForm({extractedSku} : AddToStockFormProps) {
         setSku(extractedSku);
     }, [extractedSku]);
 
+    const handleBoxSubmit = async (event: React.FormEvent, units: number, box: number) => {
+        event.preventDefault();
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/proposeChange?box=${box}&sku=${sku}&proposedQuantityToAdd=${units}`, {
+                method: 'POST',
+            });
+    
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+    
+            const result = await response.json();
+            console.log('Success:', result);
+    
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+    
     return (
         <>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -70,19 +70,34 @@ export default function AddToStockForm({extractedSku} : AddToStockFormProps) {
                 value={sku}
                 onChange={(e) => setSku(e.target.value)}
             />
-            <Input
-                placeholder='How many units packed?'
-                value={unitsPacked}
-                onChange={(e) => setUnitsPacked(e.target.value)}
-            />
-            <Button type="submit">Add to Stock</Button>
+            <Button type="submit">Display Stock</Button>
         </form>
-        {box ? (
-            <BaxterBox id={box.id} sku={box.sku} warehouseId={box.warehouseId} units={box.units} isFull={box.full}/>
-          ) : (
+    
+        {boxes ? (
+            boxes.map((baxterBox) => {
+                let localUnitsPacked: number; // Local state for units packed per box
+                return (
+                    <div key={baxterBox.id} className="flex gap-4">
+                        <BaxterBox 
+                            id={baxterBox.id} 
+                            sku={baxterBox.sku} 
+                            warehouseId={baxterBox.warehouseId} 
+                            units={baxterBox.units} 
+                            isFull={baxterBox.full} 
+                        />
+                        <form onSubmit={(e) => handleBoxSubmit(e, localUnitsPacked, baxterBox.id)} className="flex flex-col gap-4">
+                            <Input
+                                placeholder="How many units packed?"
+                                onChange={(e) => localUnitsPacked = Number(e.target.value)}
+                            />
+                            <Button type="submit">Update Stock</Button>
+                        </form>
+                    </div>
+                );
+            })
+        ) : (
             <p>No BaxterBox data found.</p>
-          )}
+        )}
         </>
-        
     );
 }

@@ -9,6 +9,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpHeaders;
+import java.util.ArrayList;
+import java.util.List;
+
 import io.github.cdimascio.dotenv.Dotenv;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -76,6 +79,30 @@ public class BaxterBoxService {
 
         // didn't find a box
         return null;
+    }
+
+    /**
+     * Finds all baxter boxes containing this sku
+     * @param sku
+     * @return
+     * @throws Exception
+     */
+    public BaxterBox[] findAllBaxterBoxesBySKU(String sku) throws Exception {
+        // get all baxter box rows from Supabase
+        BaxterBox[] boxes = getAllBaxterBoxes();
+
+        List<BaxterBox> outputList = new ArrayList<>();
+
+        // find rows with SKU matching
+        for (BaxterBox potentialBox : boxes) {
+            if (potentialBox.getSKU().equals(sku)) {
+                outputList.add(potentialBox);
+            }
+        }
+
+        // Convert list to array before returning
+        BaxterBox[] output = new BaxterBox[outputList.size()];
+        return outputList.toArray(output);
     }
 
     /**

@@ -35,6 +35,18 @@ public class BaxterBoxController {
         }
     }
 
+    @GetMapping("/allBaxterBoxesBySKU")
+    public Object getAllBoxesBySKU( @RequestParam String sku) {
+        try {
+            return baxterBoxService.findAllBaxterBoxesBySKU(sku);
+        } catch (Exception e) {
+            // Log the exception (optional)
+            e.printStackTrace();
+            // Return an appropriate error response
+            return null;
+        }
+    }
+
     @PostMapping("/addToBaxterBox")
     public ResponseEntity<BaxterBox> addProductsToStock(@RequestParam String SKU, @RequestParam int units) {
         try {

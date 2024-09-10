@@ -2,10 +2,8 @@ package org.example.warehouseinterface.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.cdimascio.dotenv.Dotenv;
-import org.example.warehouseinterface.api.model.BaxterBox;
 import org.example.warehouseinterface.api.model.ManagerLogEntry;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -93,5 +91,18 @@ public class ManagerLogService {
         ObjectMapper objectMapper = new ObjectMapper();
         ManagerLogEntry[] entries = objectMapper.readValue(response.body(), ManagerLogEntry[].class);
         return entries;
+    }
+
+    /**
+     * Accepts/Rejects a proposed change and takes it from manager log to supabase baxter box db and shopify
+     * @param id
+     * @param accepted
+     * @throws Exception
+     */
+    public void handleChangeResolution(int id, boolean accepted) throws Exception {
+        // patch manager log entry and set pending to false and accepted to accepted
+        // then, call baxter box service and update db and do the same for shopify  
+
+
     }
 }

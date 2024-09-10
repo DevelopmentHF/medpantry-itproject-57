@@ -2,6 +2,7 @@ package org.example.warehouseinterface.api.controller;
 
 import org.example.warehouseinterface.service.ManagerLogService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,6 +26,18 @@ public class ManagerLogController {
             e.printStackTrace();
             // Return an appropriate error response
             return "Failed to log proposal change";
+        }
+    }
+
+    @PatchMapping
+    public String resolveChange(@RequestParam int id, @RequestParam boolean accepted) {
+        try {
+            managerLogService.handleChangeResolution(id, accepted);
+            return "Sucessfully handled proposed change";
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Return an appropriate error response
+            return "Failed to handle proposed change";
         }
     }
 }
