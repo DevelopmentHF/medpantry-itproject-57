@@ -208,7 +208,7 @@ public class BaxterBoxService {
         for (BaxterBox box : boxes) {
             // find if there's already a value
             int existingQuantity = 0;
-            if (quantities.containsKey(box.getId())) {
+            if (quantities.containsKey(box.getSKU())) {
                 existingQuantity = quantities.get(box.getSKU());
             }
 
@@ -233,8 +233,10 @@ public class BaxterBoxService {
 
         String rawProductsListJson = response.body();
         System.out.println(rawProductsListJson);
-        // clean up response so we get skus mapping to product variants ids
+        // clean up response so we get skus mapping to product variants inventory item ids
         HashMap<String, String> variants = extractVariantIds(rawProductsListJson, boxes);
+
+        System.out.println(quantities);
         System.out.println(variants);
 
         // actually sync
@@ -253,17 +255,59 @@ public class BaxterBoxService {
      * Syncs 1 SKUs values with shopify
      * @param sku
      * @param units
-     * @param variantMap hashmap of sku : product variant id
+     * @param variantMap hashmap of sku : product variant inventory item ids
      * @throws Exception
      */
     private void syncSku(String sku, int units, HashMap<String, String> variantMap) throws Exception {
         // find the product variant from hashmap
-
         // conditionally PATCH inventory level for this id https://shopify.dev/docs/api/admin-rest/2024-07/resources/inventorylevel#post-inventory-levels-set
+
+        // Find inventory level for each product variant
+        int shopifyAvailableQuantity = getInventoryLevel(variantMap.get(sku));
+        System.out.println(shopifyAvailableQuantity);
+
+        // TODO: Consider the fact we have outstanding orders. Shopify auto reduces the stock level but supabase requires volunteer input
+        // TODO: ... so if we had an outstanding order, and a volunteer packed for that same sku and we synced, the shopify would be updated
+        // TODO: ... to a value greater than what it should be by the outstanding order amount, as that hasn't been subtracted from db yet.
+        // TODO: Thus, account for outstanding order quantity when syncing?
+
+    }
+
+    // THIS RETURNS THE "AVAILABLE" NUMBER, so if there is an order, that's subtracted automagically
+    // Thus, we don't want to force a sync when we've updated supabase after an order, only after packing.
+    private int getInventoryLevel(String inventory_id) throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://team57-itproject.myshopify.com/admin/api/2024-07/inventory_levels.json?inventory_item_ids=" + inventory_id))
+                .header("X-Shopify-Access-Token", SHOPIFY_ADMIN_KEY)
+                .header("Accept", "application/json")
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+
+        if (response.statusCode() != 200) {
+            throw new Exception("Failed to get inventory level: " + response.statusCode());
+
+        }
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode rootNode = objectMapper.readTree(response.body());
+        JsonNode levelsNode = rootNode.path("inventory_levels");
+
+        for (JsonNode level : levelsNode) {
+            int available = level.path("available").asInt();
+
+            if (level.path("inventory_item_id").asText().equals(inventory_id)) {
+                return available;
+            }
+        }
+
+        return -1;
     }
 
     /**
-     * Creates a hashmap of Sku : ProductVariantId
+     * Creates a hashmap of Sku : ProductVariant's inventory item id
      * @param rawProductsListJson
      * @param boxes
      * @return
@@ -284,13 +328,14 @@ public class BaxterBoxService {
                 // we've got this variants sku :)
                 String variantSku = variant.path("sku").asText();
                 String variantId = variant.path("id").asText();
+                String inventory_item_id = variant.path("inventory_item_id").asText();
 
                 // find an associated box. Nested loops here -> potentially inefficient
                 // we just need to link skus and variant ids
                 for (BaxterBox box : boxes) {
                     if (box.getSKU() == null) continue;
                     if (box.getSKU().equals(variantSku)) {
-                        variants.put(box.getSKU(), variantId);
+                        variants.put(box.getSKU(), inventory_item_id);
                     }
                 }
             }
