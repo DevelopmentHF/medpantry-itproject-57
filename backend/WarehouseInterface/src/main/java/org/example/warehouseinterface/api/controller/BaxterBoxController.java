@@ -24,7 +24,7 @@ public class BaxterBoxController {
                 return baxterBoxService.getBaxterBox(id);
             }
             if (sku != null) {
-                return baxterBoxService.findBaxterBoxBySKU(sku);
+                return baxterBoxService.findBaxterBoxBySKU(sku, false);
             }
             return baxterBoxService.getAllBaxterBoxes();
         } catch (Exception e) {
@@ -39,7 +39,7 @@ public class BaxterBoxController {
     public ResponseEntity<BaxterBox> addProductsToStock(@RequestParam String SKU, @RequestParam int units) {
         try {
             // products of this type might already be packed somewhere
-            BaxterBox existingBaxterBox = baxterBoxService.findBaxterBoxBySKU(SKU);
+            BaxterBox existingBaxterBox = baxterBoxService.findBaxterBoxBySKU(SKU, false);
 
             if (existingBaxterBox != null) {
                 // update existing BaxterBox with new information

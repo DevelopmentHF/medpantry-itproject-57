@@ -9,6 +9,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpHeaders;
+import java.util.ArrayList;
+import java.util.List;
+
 import io.github.cdimascio.dotenv.Dotenv;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -18,8 +21,15 @@ public class BaxterBoxService {
     // REQUIRES A .env FILE IN resources/
     // backend/WarehouseInterface/src/main/resources/.env
     private static final Dotenv dotenv = Dotenv.configure().directory(".env").load();
-    private static final String SUPABASE_URL = dotenv.get("SUPABASE_URL");
-    private static final String SUPABASE_API_KEY = dotenv.get("SUPABASE_API_KEY");
+    private static String SUPABASE_URL = dotenv.get("SUPABASE_URL");
+    private static String SUPABASE_API_KEY = dotenv.get("SUPABASE_API_KEY");
+    private static HttpClient httpClient;
+    private static ObjectMapper objectMapper;
+
+    public BaxterBoxService(HttpClient httpClient, ObjectMapper objectMapper) {
+        this.httpClient = httpClient;
+        this.objectMapper = objectMapper;
+    }
 
     /** Returns information about the BaxterBox#id
      * @param id Id of specified baxter box
@@ -58,9 +68,22 @@ public class BaxterBoxService {
      * @param sku - unique product identifier
      * @return BaxterBox that currently exists
      */
-    public BaxterBox findBaxterBoxBySKU(String sku) throws Exception {
+    public BaxterBox findBaxterBoxBySKU(String sku, boolean test) throws Exception {
+        BaxterBox[] boxes;
+
         // get all baxter box rows from supabase
-        BaxterBox[] boxes = getAllBaxterBoxes();
+        if(test == true){
+            boxes = new BaxterBox[5];
+            // add in your test baxter boxes, check out the confluence testing page for some use cases!
+            boxes[0] = new BaxterBox(0, 1, "ABC", 3, true);
+            boxes[1] = new BaxterBox(1, 1, "CAB", 3, true);
+            boxes[2] = new BaxterBox(2, 1, "CPU", 3, true);
+            boxes[3] = new BaxterBox(3, 1, "ABC", 3, false);
+            boxes[4] = new BaxterBox(4, 1, "ABC", 3, true);
+        } else {
+            boxes = getAllBaxterBoxes();
+        }
+
 
         // TODO: This should be more robust. At present, it finds the first box with a matching SKU, but it should be the box with least amount of stock.
         // TODO: Implement stock checking private method
@@ -122,8 +145,6 @@ public class BaxterBoxService {
     public BaxterBox updateBaxterBox(BaxterBox baxterBox, int units) throws Exception {
         // TODO: We should update our schema to count stock levels so that we can update
         baxterBox.setUnits(baxterBox.getUnits() + units);
-        HttpClient client = HttpClient.newHttpClient();
-        ObjectMapper objectMapper = new ObjectMapper();
 
         // Convert BaxterBox to JSON
         String jsonRequestBody = objectMapper.writeValueAsString(baxterBox);
@@ -137,7 +158,7 @@ public class BaxterBoxService {
                 .method("PATCH", HttpRequest.BodyPublishers.ofString(jsonRequestBody))
                 .build();
 
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() != 200 && response.statusCode() != 204) {
             throw new Exception("Failed to update BaxterBox: " + response.statusCode() + " " + response.body());
