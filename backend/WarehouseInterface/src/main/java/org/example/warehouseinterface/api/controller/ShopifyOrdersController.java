@@ -1,5 +1,6 @@
 package org.example.warehouseinterface.api.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.warehouseinterface.service.ShopifyOrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +20,9 @@ public class ShopifyOrdersController {
     @GetMapping("/ShopifyOrders")
     public String getAllOrders() {
         try {
-            return service.getAllOrders().toString();
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            return objectMapper.writeValueAsString(service.getAllOrders());
         } catch (Exception e) {
             // Log the exception (optional)
             e.printStackTrace();
