@@ -28,6 +28,16 @@ public class ShopifyOrdersController {
         }
     }
 
+    @GetMapping("/RequiredBaxterBoxes")
+    public String getRequiredBaxterBoxes(@RequestParam String orderNumber) {
+        try {
+            return service.getRequiredBaxterBoxes(orderNumber);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     @PatchMapping("/HandleOrderAccept")
     public void handleOrderAccept(@RequestParam String orderNumber) {
         try {

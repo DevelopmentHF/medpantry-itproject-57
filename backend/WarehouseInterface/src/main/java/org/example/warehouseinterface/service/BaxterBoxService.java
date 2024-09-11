@@ -168,7 +168,7 @@ public class BaxterBoxService {
 
     public void freeBaxterBox(BaxterBox baxterBox) throws Exception {
         baxterBox.setUnits(0);
-        baxterBox.setSKU(null);
+        // baxterBox.setSKU(null); this messes things up
         baxterBox.setFull(false);
 
         HttpClient client = HttpClient.newHttpClient();

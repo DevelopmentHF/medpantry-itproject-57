@@ -58,12 +58,14 @@ public class ShopifyOrdersService {
             String sku = null;
             int quantity = 0;
             String orderNumber = orderNode.path("name").asText();
+            String itemName = null;
             System.out.println("Order Number: " + orderNumber);
 
             JsonNode lineItemNodes = orderNode.path("line_items");
             for (JsonNode lineItemNode : lineItemNodes) {
                 sku = lineItemNode.path("sku").asText();
                 quantity = lineItemNode.path("quantity").asInt();
+                itemName = lineItemNode.path("name").asText();
                 System.out.println("SKU:" + sku);
                 System.out.println("Quantity: " + quantity);
             }
@@ -72,6 +74,7 @@ public class ShopifyOrdersService {
             cleanedOrder.put("sku", sku);
             cleanedOrder.put("quantity", quantity);
             cleanedOrder.put("order_number", orderNumber);
+            cleanedOrder.put("item_name", itemName);
 
             cleanedOrders.add(cleanedOrder);
         }
@@ -111,29 +114,73 @@ public class ShopifyOrdersService {
         return requiredBoxes;
     }
 
+    /**
+     * Given an order number, this function should be called when an order is confirmed to be packed. It updates the BaxterBox DB.
+     * @param orderNumber
+     * @throws Exception
+     */
     public void handleOrderAccept(String orderNumber) throws Exception {
         Order order = findOrderByOrderNumber(orderNumber);
         int requiredQuantityRemaining = order.getQuantity();
         List<BaxterBox> matchingBoxes = findCorrectBaxterBoxes(order);
+        //System.out.println("Num matching boxes: " + matchingBoxes.size());
 
         for (BaxterBox box : matchingBoxes) {
             if (box.getUnits() > requiredQuantityRemaining) {
                 // there are more than enough units in this box to satisfy the order
 
-                System.out.println("Required quant:" + requiredQuantityRemaining);
+                //System.out.println("Required quant:" + requiredQuantityRemaining);
                 baxterBoxService.updateBaxterBox(box, -requiredQuantityRemaining);
                 break;
             } else {
                 // Baxter box will be depleted, so it needs to be marked as free in the system
-                System.out.println("freed");
+
                 requiredQuantityRemaining -= box.getUnits();
                 baxterBoxService.freeBaxterBox(box);
-
+                // System.out.println(box.getSKU());
                 if (requiredQuantityRemaining == 0) {
                     break;
                 }
             }
         }
+    }
+
+    /**
+     * Returns a json containing information of which baxter boxes to get and how many units from each are required
+     * @param orderNumber
+     * @return
+     */
+    public String getRequiredBaxterBoxes(String orderNumber) throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        Order order = findOrderByOrderNumber(orderNumber);
+        int requiredQuantityRemaining = order.getQuantity();
+        List<BaxterBox> matchingBoxes = findCorrectBaxterBoxes(order);
+
+        ArrayNode requiredBaxterBoxes = objectMapper.createArrayNode();
+
+        for (BaxterBox box : matchingBoxes) {
+            if (box.getUnits() >= requiredQuantityRemaining && box.getUnits() > 0) {
+                // there are more than enough units in this box to satisfy the order
+                ObjectNode requiredBaxterBox = objectMapper.createObjectNode();
+
+                requiredBaxterBox.put("box_id", box.getId());
+                requiredBaxterBox.put("required_quantity", requiredQuantityRemaining);
+                requiredBaxterBoxes.add(requiredBaxterBox);
+                break;
+            } else if (box.getUnits() < requiredQuantityRemaining && box.getUnits() > 0) {
+                // Baxter box has some units but not enough
+                ObjectNode requiredBaxterBox = objectMapper.createObjectNode();
+                requiredBaxterBox.put("box_id", box.getId());
+                requiredBaxterBox.put("required_quantity", box.getUnits());
+                requiredBaxterBoxes.add(requiredBaxterBox);
+
+                requiredQuantityRemaining -= box.getUnits();
+
+            }
+        }
+
+        return objectMapper.writeValueAsString(requiredBaxterBoxes);
     }
 
     /**

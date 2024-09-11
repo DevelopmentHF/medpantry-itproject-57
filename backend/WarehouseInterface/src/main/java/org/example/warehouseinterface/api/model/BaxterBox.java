@@ -48,7 +48,7 @@ public class BaxterBox implements Comparable<BaxterBox> {
         return sku;
     }
 
-    public void setSKU(String SKU) {
+    public void setSKU(String sku) {
         this.sku = sku;
     }
 
