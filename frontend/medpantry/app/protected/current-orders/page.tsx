@@ -45,7 +45,7 @@ export default async function CurrentOrders() {
     <div className="flex-1 w-full flex flex-col gap-12 items-center p-6">
       <nav className="flex gap-4 border-b border-b-foreground/10 h-16 w-full items-center">
           <Button>
-            <a href="../protected/dashboard">Back</a>
+            <a href="../protected">Home</a>
           </Button>
           
           <div className="ml-auto">
