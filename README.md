@@ -80,12 +80,35 @@
 
 ### Frontend
 
-To run the web-app component of this project, please connect the supabase variables to the `.env.local` file as outlined in the frontend/medpantry/README.md, then:
+To run the web-app component of this project, please connect the supabase variables to the `.env.local` file as outlined in the frontend/medpantry/README.md.
+
+Also in `.env.local`, add the server backend link. The server, which hasn't been deployed yet, is hosted on `https://localhost:8080`.
+
+Thus, the `.env.local` file should appear as so:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://XXXXXX.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=XXXXXX
+NEXT_PUBLIC_BACKEND_LINK=http://localhost:8080
+```
+
+
+Once this has been filled out, naviagate to `frontend/medpantry/` then execute the following to start the dev server:
+
 ```npm run dev```
 
 ### Backend
 
 To run the server which hosts the custom API, please create a `.env` file in `backend/WarehouseInterface/main/resources` and populate it with the same API keys as in *frontend/*.
+
+Furthermore, you need to fill in the *Shopify* admin key extracted from the owners page. Thus the `.env` file should appear as so:
+
+```
+SUPABASE_URL=XXXXX.supabase.co
+SUPABASE_API_KEY=XXXXX
+
+SHOPIFY_ADMIN_KEY=XXXXX
+```
 
 To test the API, please use the Postman service, and execute a command like so:
 ```
