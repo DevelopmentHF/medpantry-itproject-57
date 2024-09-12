@@ -1,7 +1,7 @@
 package org.example.warehouseinterface.api.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class BaxterBox {
+public class BaxterBox implements Comparable<BaxterBox> {
     /* NOTE: This should match our schema for a 'baxter box' */
     private int id; // Unique number of the baxter box
     private int warehouseId = 1; // Unique number of which warehouse the baxter box is present in. Default = 1 as there is only 1 warehouse
@@ -21,6 +21,11 @@ public class BaxterBox {
         this.sku = SKU;
         this.units = units;
         this.full = full;
+    }
+
+    @Override
+    public int compareTo(BaxterBox other) {
+        return Integer.compare(this.units, other.units);
     }
 
     public int getId() {
@@ -43,7 +48,7 @@ public class BaxterBox {
         return sku;
     }
 
-    public void setSKU(String SKU) {
+    public void setSKU(String sku) {
         this.sku = sku;
     }
 

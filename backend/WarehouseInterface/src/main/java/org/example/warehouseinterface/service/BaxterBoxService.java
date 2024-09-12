@@ -81,6 +81,23 @@ public class BaxterBoxService {
         return null;
     }
 
+    // TODO: Edge case when there are multiple orders for the same SKU
+    // If they just pack orders one at a time this won't matter
+    public List<BaxterBox> findAllBaxterBoxesBySKU(String sku) throws Exception {
+        List<BaxterBox> matchingBoxes = new ArrayList<>();
+
+        // get all baxter box rows from supabase
+        BaxterBox[] boxes = getAllBaxterBoxes();
+
+        for (BaxterBox box : boxes) {
+            if (box.getSKU().equals(sku)) {
+                matchingBoxes.add(box);
+            }
+        }
+
+        return matchingBoxes;
+    }
+
     /**
      * Finds all baxter boxes containing this sku
      * @param sku
@@ -170,6 +187,33 @@ public class BaxterBoxService {
         }
 
         return baxterBox;
+    }
+
+    public void freeBaxterBox(BaxterBox baxterBox) throws Exception {
+        baxterBox.setUnits(0);
+        // baxterBox.setSKU(null); this messes things up
+        baxterBox.setFull(false);
+
+        HttpClient client = HttpClient.newHttpClient();
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // Convert BaxterBox to JSON
+        String jsonRequestBody = objectMapper.writeValueAsString(baxterBox);
+
+        // Create PATCH request
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(SUPABASE_URL + "/rest/v1/BaxterBoxes?id=eq." + baxterBox.getId()))
+                .header("apikey", SUPABASE_API_KEY)
+                .header("Authorization", "Bearer " + SUPABASE_API_KEY)
+                .header("Content-Type", "application/json")
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(jsonRequestBody))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200 && response.statusCode() != 204) {
+            throw new Exception("Failed to update BaxterBox: " + response.statusCode() + " " + response.body());
+        }
     }
 
     /**
