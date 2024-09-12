@@ -53,13 +53,13 @@ export default async function Dashboard() {
           <AuthButton />
         </div>
       </nav>
-      <div className="flex w-full">
+      <div className="flex">
         <div className="flex-1 p-6">
           <h1 className="font-bold text-4xl">Medical Pantry Dashboard</h1>
         </div>
       </div>
 
-      <div className="flex justify-between">
+      <div className="flex w-full">
         <h1 className="text-2xl font-bold">Overview</h1>
       </div>
 
@@ -71,7 +71,6 @@ export default async function Dashboard() {
             description="Pending orders"
           />
         </a>
-        
         <OverviewCard
           title="Inventory Updates"
           count={0}
