@@ -1,84 +1,94 @@
-import { createClient } from "@/utils/supabase/server";
-import { notFound, redirect } from "next/navigation";
-import BaxterBox from "@/components/BaxterBox";
-import { Input } from "@/components/ui/input";
-import AuthButton from "@/components/AuthButton";
-import { Button } from "@/components/ui/button";
+import React from 'react';
+import Taskbar from './dashboard/Taskbar';
+import AuthButton from '@/components/AuthButton';
+import Order from '@/components/Order';
+import OverviewCard from '@/components/OverviewCard';
+import { Button } from '@/components/ui/button';
 
-type BaxterBox = {
-  id: number;
-  sku: string;
-  warehouseId: number;
-  units: number;
-  full: boolean;
-};
+export default async function Dashboard() {
 
-export default async function ProtectedPage({ searchParams }: { searchParams: { id?: string } }) {
-  const supabase = createClient();
+    //Fetch all orders from Shopify
+    let orderString: any[] = [];
+        try{
+          const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/ShopifyOrders`, {
+            method: 'GET',
+            headers: {
+                'Cache-Control': 'no-cache'
+            }
+            });
+            if (!res.ok) throw new Error('Network response was not ok');
+            orderString = await res.json();
+            console.log("orders: " + JSON.stringify(orderString));
+            
+        } catch (error) {
+        console.error(error);
+        return null;
+      }
 
-  // Authentication
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  
-  if (!user) {
-    redirect("/login");
-    return null;
-  }
+      //console.log("ORDERS:")
+      //console.log(orderString);
+      
+    //Group orders by order number.
+    const groupedByOrderNumber = orderString.reduce((acc, item) => {
+      if (!acc[item.order_number]) {
+        acc[item.order_number] = []; // Initialize array for new order_number
+      }
+      acc[item.order_number].push({
+        quantity: item.quantity,
+        sku: item.sku,
+      })
+      return acc;
+    }, {});
 
-  // Fetch BaxterBox data if ID is provided
-  let box: BaxterBox | null = null;
-  const boxId = searchParams.id ? parseInt(searchParams.id, 10) : null;
-  
-  if (boxId) {
-    try {
-      // NEED A .env see discord
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/baxterbox?id=${boxId}`);
-      if (!res.ok) throw new Error('Network response was not ok');
-      box = await res.json();
-      console.log(box)
-    } catch (error) {
-      console.error(error);
-      notFound();
-      return null;
-    }
-  }
+    Object.keys(groupedByOrderNumber).forEach(order_number => {console.log(order_number)});
+    //console.log(groupedByOrderNumber["#1001"]);
 
   return (
     <div className="flex-1 w-full flex flex-col gap-12 items-center p-6">
       <nav className="flex gap-4 border-b border-b-foreground/10 h-16 w-full items-center">
-        <a href="protected/dashboard">Dashboard</a>
-        <a href="protected/add-to-stock">Add to Stock</a>
         <div className="ml-auto">
           <AuthButton />
         </div>
       </nav>
+      <div className="flex">
+        <div className="flex-1 p-6">
+          <h1 className="font-bold text-4xl">Medical Pantry Dashboard</h1>
+        </div>
+      </div>
 
-      <div className="flex flex-col gap-4 w-full">
-        <h1 className="font-bold text-4xl justify-start">
-          Backend API Connection Test
-        </h1>
-        <form action="" method="get" className="flex gap-2">
-          <Input
-            name="id"
-            placeholder="Enter BaxterBox ID"
-            defaultValue={searchParams.id || ""}
+      <div className="flex w-full">
+        <h1 className="text-2xl font-bold">Overview</h1>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 w-full text-black">
+        <a href="protected/current-orders">
+          <OverviewCard
+            title="Current Orders"
+            count={Object.keys(groupedByOrderNumber).length}
+            description="Pending orders"
           />
-          <button type="submit" className="btn-primary">
-            Fetch
-          </button>
-        </form>
-        {box ? (
-          <BaxterBox
-            id={box.id}
-            sku={box.sku}
-            warehouseId={box.warehouseId}
-            units={box.units}
-            isFull={box.full}
+        </a>
+        <a href="protected/manager-log">
+          <OverviewCard
+            title="Inventory Updates"
+            count={0}
+            description="Pending"
           />
-        ) : (
-          <p>No BaxterBox data found.</p>
-        )}
+        </a>
+        
+        <a href="protected/add-to-stock">
+          <OverviewCard
+            title="Stock packed"
+            count={0}
+            description="This week"
+          />
+        </a>
+        
+        <OverviewCard
+          title="People"
+          count={0}
+          description="On warehouse"
+        />
       </div>
     </div>
   );
