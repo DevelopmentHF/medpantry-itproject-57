@@ -10,8 +10,6 @@ interface OrderLineProps {
 }
 
 export default function OrderLine({ name, quantity, boxNumber }: OrderLineProps) {
-
-
   return (
 
     <div className={`flex gap-4`}>

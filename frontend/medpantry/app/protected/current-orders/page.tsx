@@ -1,6 +1,15 @@
 import Order from "@/components/Order";
 import AuthButton from "@/components/AuthButton";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/TableCard";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/Table";
 
 export default async function CurrentOrders() {
 
@@ -44,7 +53,7 @@ export default async function CurrentOrders() {
     <>
     <div className="flex-1 w-full flex flex-col gap-12 items-center p-6">
       <nav className="flex gap-4 border-b border-b-foreground/10 h-16 w-full items-center">
-          <Button>
+          <Button className="hover:bg-slate-200">
             <a href="../protected">Home</a>
           </Button>
           
