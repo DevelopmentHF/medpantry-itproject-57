@@ -129,7 +129,7 @@ public class WarehouseInterfaceApplicationTests {
         when(mockHttpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
                 .thenReturn(mockHttpResponse);
 
-        BaxterBox[] baxterBoxes = {};
+        BaxterBox[] baxterBoxes = {new BaxterBox(2, 1, "ABC", 7, true)};
         when(mockObjectMapper.readValue(jsonResponse, BaxterBox[].class)).thenReturn(baxterBoxes);
 
         Exception exception = assertThrows(Exception.class, () -> {

@@ -46,8 +46,6 @@ public class BaxterBoxService {
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() == 200) {
-            // Use Jackson to parse the JSON response
-            ObjectMapper objectMapper = new ObjectMapper();
             // Assuming the response body contains a JSON array with a single object
             BaxterBox[] boxes = objectMapper.readValue(response.body(), BaxterBox[].class);
 
