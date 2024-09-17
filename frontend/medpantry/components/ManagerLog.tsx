@@ -27,20 +27,22 @@ export default async function ManagerLog({} : props) {
       }
     
 
-    return (
+      return (
         <>
             {logEntries.length > 0 ? (
-                logEntries.map((entry) => (
-                <LogEntry
-                    key={entry.id}
-                    id={entry.id}
-                    box={entry.box}
-                    sku={entry.sku}
-                    proposedQuantityToAdd={entry.proposedQuantityToAdd}
-                    pending={entry.pending}
-                    accepted={entry.accepted}
-                />
-                ))
+                logEntries
+                    .filter((entry) => entry.pending) // Only include entries where pending is true
+                    .map((entry) => (
+                        <LogEntry
+                            key={entry.id}
+                            id={entry.id}
+                            box={entry.box}
+                            sku={entry.sku}
+                            proposedQuantityToAdd={entry.proposedQuantityToAdd}
+                            pending={entry.pending}
+                            accepted={entry.accepted}
+                        />
+                    ))
             ) : (
                 <p>No log entries found.</p>
             )}
