@@ -65,22 +65,11 @@ public class BaxterBoxService {
      * @param sku - unique product identifier
      * @return BaxterBox that currently exists
      */
-    public BaxterBox findBaxterBoxBySKU(String sku, boolean test) throws Exception {
+    public BaxterBox findBaxterBoxBySKU(String sku) throws Exception {
         BaxterBox[] boxes;
 
         // get all baxter box rows from supabase
-        if(test == true){
-            boxes = new BaxterBox[5];
-            // add in your test baxter boxes, check out the confluence testing page for some use cases!
-            boxes[0] = new BaxterBox(0, 1, "ABC", 3, true);
-            boxes[1] = new BaxterBox(1, 1, "CAB", 3, true);
-            boxes[2] = new BaxterBox(2, 1, "CPU", 3, true);
-            boxes[3] = new BaxterBox(3, 1, "ABC", 3, false);
-            boxes[4] = new BaxterBox(4, 1, "ABC", 3, true);
-        } else {
-            boxes = getAllBaxterBoxes();
-        }
-
+        boxes = getAllBaxterBoxes();
 
         // TODO: This should be more robust. At present, it finds the first box with a matching SKU, but it should be the box with least amount of stock.
         // TODO: Implement stock checking private method
@@ -168,7 +157,7 @@ public class BaxterBoxService {
      * Finds a unique location id for a new database entry to use
      * @return integer location id
      */
-    private int findNextId() throws Exception {
+    public int findNextId() throws Exception {
         BaxterBox[] boxes = getAllBaxterBoxes();
 
         int lowestFreeId = -1;
@@ -182,7 +171,6 @@ public class BaxterBoxService {
 
     public BaxterBox[] getAllBaxterBoxes() throws Exception {
         // get all baxter box rows from supabase
-        HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(SUPABASE_URL + "/rest/v1/BaxterBoxes"))
                 .header("apikey", SUPABASE_API_KEY)
@@ -190,14 +178,13 @@ public class BaxterBoxService {
                 .header("Accept", "application/json")
                 .build();
 
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() != 200) {
             throw new Exception("Failed to fetch BaxterBoxes: " + response.statusCode());
 
         }
 
-        ObjectMapper objectMapper = new ObjectMapper();
         BaxterBox[] boxes = objectMapper.readValue(response.body(), BaxterBox[].class);
         return boxes;
     }

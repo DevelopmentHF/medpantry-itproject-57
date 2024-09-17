@@ -46,8 +46,30 @@ public class WarehouseInterfaceApplicationTests {
     @DisplayName("testing SKU search for baxter boxes")
     @ValueSource(strings = "ABC")
     void TestFindBaxterBoxBySKU(String InputSKU) throws Exception{
+        String jsonResponse = "[\n" +
+                "    {\"id\": 0, \"warehouseId\": 1, \"SKU\": \"ABC\", \"units\": 3, \"isAvailable\": true},\n" +
+                "    {\"id\": 1, \"warehouseId\": 1, \"SKU\": \"CAB\", \"units\": 3, \"isAvailable\": true},\n" +
+                "    {\"id\": 2, \"warehouseId\": 1, \"SKU\": \"CPU\", \"units\": 3, \"isAvailable\": true},\n" +
+                "    {\"id\": 3, \"warehouseId\": 1, \"SKU\": \"ABC\", \"units\": 3, \"isAvailable\": false}\n" +
+                "    {\"id\": 4, \"warehouseId\": 1, \"SKU\": \"ABC\", \"units\": 3, \"isAvailable\": true}\n" +
+                "]";
 
-        BaxterBox OutputBox = serviceTest.findBaxterBoxBySKU(InputSKU, true);
+        when(mockHttpResponse.statusCode()).thenReturn(200);
+        when(mockHttpResponse.body()).thenReturn(jsonResponse);
+
+        when(mockHttpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
+                .thenReturn(mockHttpResponse);
+
+        BaxterBox[] baxterBoxes = new BaxterBox[] {
+                new BaxterBox(0, 1, "ABC", 3, true),
+                new BaxterBox(1, 1, "CAB", 3, true),
+                new BaxterBox(2, 1, "CPU", 3, true),
+                new BaxterBox(3, 1, "ABC", 3, false),
+                new BaxterBox(4, 1, "ABC", 3, true)
+        };
+        when(mockObjectMapper.readValue(jsonResponse, BaxterBox[].class)).thenReturn(baxterBoxes);
+
+        BaxterBox OutputBox = serviceTest.findBaxterBoxBySKU(InputSKU);
         Assertions.assertAll(() -> assertEquals(3, OutputBox.getId()),
                 () -> assertEquals(InputSKU, OutputBox.getSKU()),
                 () -> assertEquals(1, OutputBox.getWarehouseId()));
@@ -153,5 +175,48 @@ public class WarehouseInterfaceApplicationTests {
         assertTrue(exception.getMessage().contains("Failed to fetch BaxterBox: " + mockHttpResponse.statusCode()));
     }
 
+    @Test
+    @DisplayName("find next ID, Success")
+    void findNextIdTestSuccess() throws Exception{
+        String jsonResponse = "[\n" +
+                "    {\"id\": 1, \"warehouseId\": 1, \"SKU\": \"Box1\", \"units\": 7, \"isAvailable\": true},\n" +
+                "    {\"id\": 2, \"warehouseId\": 1, \"SKU\": \"Box2\", \"units\": 5, \"isAvailable\": false},\n" +
+                "    {\"id\": 3, \"warehouseId\": 1, \"SKU\": \"Box3\", \"units\": 9, \"isAvailable\": true},\n" +
+                "    {\"id\": 4, \"warehouseId\": 1, \"SKU\": \"Box4\", \"units\": 4, \"isAvailable\": true}\n" +
+                "]";
+
+        when(mockHttpResponse.statusCode()).thenReturn(200);
+        when(mockHttpResponse.body()).thenReturn(jsonResponse);
+
+        when(mockHttpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
+                .thenReturn(mockHttpResponse);
+
+        BaxterBox[] baxterBoxes = new BaxterBox[] {
+                new BaxterBox(1, 1, "Box1", 7, true),
+                new BaxterBox(2, 1, "Box2", 5, false),
+                new BaxterBox(3, 1, "Box3", 9, true),
+                new BaxterBox(4, 1, "Box4", 4, true)
+        };
+        when(mockObjectMapper.readValue(jsonResponse, BaxterBox[].class)).thenReturn(baxterBoxes);
+
+        int Result = serviceTest.findNextId();
+        assertEquals(5, Result);
+
+    }
+
+    @Test
+    @DisplayName("find next ID, Failure")
+    void findNextIdTestFailure() throws Exception{
+        when(mockHttpResponse.statusCode()).thenReturn(500);
+        when(mockHttpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
+                .thenReturn(mockHttpResponse);
+
+        Exception exception = assertThrows(Exception.class, () -> {
+            serviceTest.findNextId();
+        });
+
+        assertTrue(exception.getMessage().contains("Failed to fetch BaxterBoxes: " + mockHttpResponse.statusCode()));
+
+    }
 
 }
