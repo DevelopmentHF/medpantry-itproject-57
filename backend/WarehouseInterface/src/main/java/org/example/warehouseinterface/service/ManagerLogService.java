@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.example.warehouseinterface.api.model.ManagerLogEntry;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -18,6 +19,9 @@ public class ManagerLogService {
     private static final Dotenv dotenv = Dotenv.configure().directory(".env").load();
     private static final String SUPABASE_URL = dotenv.get("SUPABASE_URL");
     private static final String SUPABASE_API_KEY = dotenv.get("SUPABASE_API_KEY");
+
+    @Autowired
+    private BaxterBoxService baxterBoxService;
 
     /**
      * Creates a new manager log entry in the supabase
@@ -121,6 +125,11 @@ public class ManagerLogService {
 
         entryToUpdate.setAccepted(accepted);
         entryToUpdate.setPending(false);
+
+        if (accepted) {
+            // now update the box
+            baxterBoxService.updateBaxterBox(baxterBoxService.getBaxterBox(entryToUpdate.getBox()), entryToUpdate.getProposedQuantityToAdd());
+        }
 
 
         HttpClient client = HttpClient.newHttpClient();
