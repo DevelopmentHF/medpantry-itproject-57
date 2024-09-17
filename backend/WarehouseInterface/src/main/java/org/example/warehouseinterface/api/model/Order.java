@@ -29,4 +29,8 @@ public class Order {
     public int getQuantity() {
         return quantity;
     }
+
+    public String getItemName() {
+        return itemName;
+    }
 }
