@@ -36,7 +36,6 @@ public class BaxterBoxService {
      * @return The box itself, containing its information
      */
     public BaxterBox getBaxterBox(int id) throws Exception {
-        HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(SUPABASE_URL + "/rest/v1/BaxterBoxes?id=eq." + id))
                 .header("apikey", SUPABASE_API_KEY)
@@ -44,7 +43,7 @@ public class BaxterBoxService {
                 .header("Accept", "application/json")
                 .build();
 
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() == 200) {
             // Use Jackson to parse the JSON response

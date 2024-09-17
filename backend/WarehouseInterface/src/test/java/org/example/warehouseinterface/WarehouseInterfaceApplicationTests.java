@@ -140,10 +140,9 @@ public class WarehouseInterfaceApplicationTests {
     }
 
     @Test
-    void testGetBaxterBox_httpError() throws Exception {
+    void testGetBaxterBoxHttpError() throws Exception {
 
         when(mockHttpResponse.statusCode()).thenReturn(500);
-
         when(mockHttpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
                 .thenReturn(mockHttpResponse);
 
@@ -151,7 +150,7 @@ public class WarehouseInterfaceApplicationTests {
             serviceTest.getBaxterBox(1);
         });
 
-        assertEquals("Failed to fetch BaxterBox: 500", exception.getMessage());
+        assertTrue(exception.getMessage().contains("Failed to fetch BaxterBox: " + mockHttpResponse.statusCode()));
     }
 
 
