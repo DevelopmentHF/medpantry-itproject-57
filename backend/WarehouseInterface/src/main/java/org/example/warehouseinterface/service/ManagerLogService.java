@@ -102,7 +102,49 @@ public class ManagerLogService {
     public void handleChangeResolution(int id, boolean accepted) throws Exception {
         // patch manager log entry and set pending to false and accepted to accepted
         // then, call baxter box service and update db and do the same for shopify  
+        // convert to json to ready to ship off
 
+        ManagerLogEntry[] logEntries = getAllLogEntries();
+        ManagerLogEntry entryToUpdate = null;
+
+        // find the entry
+        for (ManagerLogEntry entry : logEntries) {
+            if (entry.getId() == id) {
+                entryToUpdate = entry;
+            }
+        }
+
+        // now chnage its state
+        if (entryToUpdate == null) {
+            throw new Exception("Failed to update log entry: " + id);
+        }
+
+        entryToUpdate.setAccepted(accepted);
+        entryToUpdate.setPending(false);
+
+
+        HttpClient client = HttpClient.newHttpClient();
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // Convert BaxterBox to JSON
+        String jsonRequestBody = objectMapper.writeValueAsString(entryToUpdate);
+
+        // Create PATCH request
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(SUPABASE_URL + "/rest/v1/ManagerLog?id=eq." + entryToUpdate.getId()))
+                .header("apikey", SUPABASE_API_KEY)
+                .header("Authorization", "Bearer " + SUPABASE_API_KEY)
+                .header("Content-Type", "application/json")
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(jsonRequestBody))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200 && response.statusCode() != 204) {
+            throw new Exception("Failed to update ManagerLogEntry: " + response.statusCode() + " " + response.body());
+        }
+
+        System.out.println("Updated manager log entry");
 
     }
 }
