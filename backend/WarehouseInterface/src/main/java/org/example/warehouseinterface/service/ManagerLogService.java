@@ -162,6 +162,9 @@ public class ManagerLogService {
             throw new Exception("Failed to update ManagerLogEntry: " + response.statusCode() + " " + response.body());
         }
 
+        // don't make any changes to shopify if not accepted.
+        if (!accepted) return;
+
         // GET all existing products to save on individual requests
         // TODO: Handle paginiation. Shopify limits to 50 (or if we ask, 250) products per response.
         request = HttpRequest.newBuilder()
