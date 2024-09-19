@@ -21,26 +21,29 @@ export default async function ManagerLog({} : props) {
         if (!res.ok) throw new Error('Network response was not ok');
         logEntries = await res.json();
         console.log(logEntries);
+        logEntries = logEntries.filter((entry) => entry.pending);
+        console.log(logEntries);
       } catch (error) {
         console.error(error);
         return null;
       }
     
 
-    return (
+      return (
         <>
             {logEntries.length > 0 ? (
-                logEntries.map((entry) => (
-                <LogEntry
-                    key={entry.id}
-                    id={entry.id}
-                    box={entry.box}
-                    sku={entry.sku}
-                    proposedQuantityToAdd={entry.proposedQuantityToAdd}
-                    pending={entry.pending}
-                    accepted={entry.accepted}
-                />
-                ))
+                logEntries
+                    .map((entry) => (
+                        <LogEntry
+                            key={entry.id}
+                            id={entry.id}
+                            box={entry.box}
+                            sku={entry.sku}
+                            proposedQuantityToAdd={entry.proposedQuantityToAdd}
+                            pending={entry.pending}
+                            accepted={entry.accepted}
+                        />
+                    ))
             ) : (
                 <p>No log entries found.</p>
             )}

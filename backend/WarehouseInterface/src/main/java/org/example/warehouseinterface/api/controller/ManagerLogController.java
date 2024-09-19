@@ -29,7 +29,7 @@ public class ManagerLogController {
         }
     }
 
-    @PatchMapping
+    @PatchMapping("/resolveChange")
     public String resolveChange(@RequestParam int id, @RequestParam boolean accepted) {
         try {
             managerLogService.handleChangeResolution(id, accepted);

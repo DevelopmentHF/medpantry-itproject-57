@@ -84,7 +84,7 @@ public class ShopifyOrdersService {
 
         List<Order> orders = objectMapper.readValue(cleanedOrdersString, new TypeReference<List<Order>>() {});
         // Order[] orders = objectMapper.readValue(cleanedOrdersString, Order[].class);
-        System.out.println(orders.get(0).getOrderNumber());
+        // System.out.println(orders.get(0).getItemName());
 
         // find required baxter boxes
 //        List<BaxterBox> requiredBoxes = findCorrectBaxterBoxes(orders.get(0));
