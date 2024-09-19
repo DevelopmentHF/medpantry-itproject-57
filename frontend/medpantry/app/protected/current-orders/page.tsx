@@ -10,44 +10,47 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/Table";
+import { Package } from "lucide-react";
 
 export default async function CurrentOrders() {
 
     //Fetch all orders from Shopify
-    let orderString: any[] = [];
-        try{
-          const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/ShopifyOrders`, {
-            method: 'GET',
-            headers: {
-                'Cache-Control': 'no-cache'
-            }
-            });
-            if (!res.ok) throw new Error('Network response was not ok');
-            orderString = await res.json();
-            console.log("orders: " + JSON.stringify(orderString));
-            
-        } catch (error) {
-        console.error(error);
-        return null;
-      }
+    // Fetch all orders from Shopify
+    let orderArray: any[] = [];
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_LINK}/ShopifyOrders`,
+        {
+          method: "GET",
+        }
+      );
+      if (!res.ok) throw new Error("Network response was not ok");
+      const orderString = await res.json();
+      console.log("orders: " + JSON.stringify(orderString));
 
-      //console.log("ORDERS:")
-      //console.log(orderString);
-      
-    //Group orders by order number.
-    const groupedByOrderNumber = orderString.reduce((acc, item) => {
-      if (!acc[item.order_number]) {
-        acc[item.order_number] = []; // Initialize array for new order_number
-      }
-      acc[item.order_number].push({
-        quantity: item.quantity,
-        sku: item.sku,
-      })
-      return acc;
-    }, {});
+      // Fill the array of orders and group items by orderNumber
+      const orders = orderString.reduce((acc: any, item: any) => {
+        if (!acc[item.orderNumber]) {
+          acc[item.orderNumber] = {
+            orderNumber: item.orderNumber,
+            cards: [],
+          };
+        }
+        acc[item.orderNumber].cards.push({
+          quantity: item.quantity,
+          sku: item.sku,
+          itemName: item.itemName,
+        });
+        return acc;
+      }, {});
 
-    // Object.keys(groupedByOrderNumber).forEach(order_number => {console.log(order_number)});
-    //console.log(groupedByOrderNumber["#1001"]);
+      orderArray = Object.values(orders);
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+    console.log("ORDERS ARRAY:");
+    console.log(orderArray);
 
     return (
       <>
@@ -63,30 +66,32 @@ export default async function CurrentOrders() {
           </nav>
 
           <div className="flex w-full">
-            <div className="flex-1 p-6">
-              <h1 className="font-bold text-4xl">Outstanding Orders</h1>
-            </div>
+            <h1 className="text-3xl font-bold text-gray-800 flex items-center">
+              <Package className="mr-2 h-6 w-6 text-red-600" />
+              Outstanding Orders
+            </h1>
           </div>
 
-          <div className="flex flex-wrap gap-10">
-            {Object.keys(groupedByOrderNumber).map((order_number) => (
+          {/* <div className="flex flex-wrap gap-10">
+            {orderArray.map((order) => (
               <Order
-                key={order_number}
-                orderNumber={order_number}
-                cards={groupedByOrderNumber[order_number]}
+                key={order.orderNumber}
+                orderNumber={order.orderNumber}
+                cards={order.cards}
               />
             ))}
-          </div>
+          </div> */}
 
-          {Object.keys(groupedByOrderNumber).map((order_number) => (
+          {orderArray.map((order) => (
             <Card
-              key={order_number}
-              className=" border-gray-200 shadow-sm w-full flex flex-col items-center"
+              key={order.orderNumber}
+              className=" border-gray-200 shadow-md rounded-xl w-full flex flex-col items-center"
             >
               <CardHeader className="flex flex-row items-center justify-between bg-white w-full p-6">
                 <CardTitle className="text-gray-800 flex items-center flex-wrap">
-                  <span className="text-2xl font-bold">
-                    Order {order_number}
+                  <span className="text-2xl font-bold flex items-center">
+                    <Package className="mr-2 h-6 w-6 text-red-600" />
+                    Order {order.orderNumber}
                   </span>
                 </CardTitle>
                 <Button className="bg-red-600 hover:bg-red-700 text-white">
@@ -106,36 +111,39 @@ export default async function CurrentOrders() {
                         </span>
                       </TableHead>
                       <TableHead className="text-gray-600">
-                        <span className="flex items-center">Warehouse Location</span>
+                        <span className="flex items-center">
+                          Warehouse Location
+                        </span>
                       </TableHead>
                     </TableRow>
                   </TableHeader>
 
                   <TableBody>
-                    {groupedByOrderNumber[order_number].map((card) => (
-                      <TableRow
-                        key={card.sku}
-                        className="bg-white hover:bg-gray-50 border-b border-gray-100"
-                      >
-                        <TableCell className="font-medium text-gray-700 w-1/3">
-                          <span className="flex items-center">
-                            item names go here
-                          </span>
-                        </TableCell>
-
-                        <TableCell className="text-gray-700 w-1/3 text-center">
-                          <span className="flex items-center">
-                            {card.quantity}
-                          </span>
-                        </TableCell>
-
-                        <TableCell className="text-gray-700 w-1/3">
-                          <span className="flex items-center">
-                            Box #{card.sku}
-                          </span>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {order.cards.map(
+                      (order: {
+                        itemName: string;
+                        quantity: number;
+                        sku: string;
+                      }) => (
+                        <TableRow className="border-gray-100 hover:bg-gray-50">
+                          <TableCell className="text-gray-600">
+                            <span className="flex items-center">
+                              {order.itemName}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-gray-600 text-center">
+                            <span className="flex items-center">
+                              {order.quantity}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-gray-600">
+                            <span className="flex items-center">
+                              Box #{order.sku}
+                            </span>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    )}
                   </TableBody>
                 </Table>
               </CardContent>
