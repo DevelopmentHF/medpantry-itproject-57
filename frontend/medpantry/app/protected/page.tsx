@@ -1,5 +1,4 @@
 import React from 'react';
-import Taskbar from './dashboard/Taskbar';
 import AuthButton from '@/components/AuthButton';
 import Order from '@/components/Order';
 import OverviewCard from '@/components/OverviewCard';
