@@ -21,6 +21,8 @@ export default async function ManagerLog({} : props) {
         if (!res.ok) throw new Error('Network response was not ok');
         logEntries = await res.json();
         console.log(logEntries);
+        logEntries = logEntries.filter((entry) => entry.pending);
+        console.log(logEntries);
       } catch (error) {
         console.error(error);
         return null;
@@ -31,7 +33,6 @@ export default async function ManagerLog({} : props) {
         <>
             {logEntries.length > 0 ? (
                 logEntries
-                    .filter((entry) => entry.pending) // Only include entries where pending is true
                     .map((entry) => (
                         <LogEntry
                             key={entry.id}
