@@ -21,15 +21,21 @@ public class BaxterBoxService {
     // REQUIRES A .env FILE IN resources/
     // backend/WarehouseInterface/src/main/resources/.env
     private static final Dotenv dotenv = Dotenv.configure().directory(".env").load();
-    private static final String SUPABASE_URL = dotenv.get("SUPABASE_URL");
-    private static final String SUPABASE_API_KEY = dotenv.get("SUPABASE_API_KEY");
+    private static String SUPABASE_URL = dotenv.get("SUPABASE_URL");
+    private static String SUPABASE_API_KEY = dotenv.get("SUPABASE_API_KEY");
+    private static HttpClient httpClient;
+    private static ObjectMapper objectMapper;
+
+    public BaxterBoxService(HttpClient httpClient, ObjectMapper objectMapper) {
+        this.httpClient = httpClient;
+        this.objectMapper = objectMapper;
+    }
 
     /** Returns information about the BaxterBox#id
      * @param id Id of specified baxter box
      * @return The box itself, containing its information
      */
     public BaxterBox getBaxterBox(int id) throws Exception {
-        HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(SUPABASE_URL + "/rest/v1/BaxterBoxes?id=eq." + id))
                 .header("apikey", SUPABASE_API_KEY)
@@ -37,11 +43,9 @@ public class BaxterBoxService {
                 .header("Accept", "application/json")
                 .build();
 
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() == 200) {
-            // Use Jackson to parse the JSON response
-            ObjectMapper objectMapper = new ObjectMapper();
             // Assuming the response body contains a JSON array with a single object
             BaxterBox[] boxes = objectMapper.readValue(response.body(), BaxterBox[].class);
 
@@ -62,8 +66,10 @@ public class BaxterBoxService {
      * @return BaxterBox that currently exists
      */
     public BaxterBox findBaxterBoxBySKU(String sku) throws Exception {
+        BaxterBox[] boxes;
+
         // get all baxter box rows from supabase
-        BaxterBox[] boxes = getAllBaxterBoxes();
+        boxes = getAllBaxterBoxes();
 
         // TODO: This should be more robust. At present, it finds the first box with a matching SKU, but it should be the box with least amount of stock.
         // TODO: Implement stock checking private method
@@ -141,8 +147,6 @@ public class BaxterBoxService {
      */
     public BaxterBox updateBaxterBox(BaxterBox baxterBox, int units) throws Exception {
         baxterBox.setUnits(baxterBox.getUnits() + units);
-        HttpClient client = HttpClient.newHttpClient();
-        ObjectMapper objectMapper = new ObjectMapper();
 
         // Convert BaxterBox to JSON
         String jsonRequestBody = objectMapper.writeValueAsString(baxterBox);
@@ -156,7 +160,7 @@ public class BaxterBoxService {
                 .method("PATCH", HttpRequest.BodyPublishers.ofString(jsonRequestBody))
                 .build();
 
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() != 200 && response.statusCode() != 204) {
             throw new Exception("Failed to update BaxterBox: " + response.statusCode() + " " + response.body());
@@ -196,7 +200,7 @@ public class BaxterBoxService {
      * Finds a unique location id for a new database entry to use
      * @return integer location id
      */
-    private int findNextId() throws Exception {
+    public int findNextId() throws Exception {
         BaxterBox[] boxes = getAllBaxterBoxes();
 
         int lowestFreeId = -1;
@@ -210,7 +214,6 @@ public class BaxterBoxService {
 
     public BaxterBox[] getAllBaxterBoxes() throws Exception {
         // get all baxter box rows from supabase
-        HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(SUPABASE_URL + "/rest/v1/BaxterBoxes"))
                 .header("apikey", SUPABASE_API_KEY)
@@ -218,14 +221,13 @@ public class BaxterBoxService {
                 .header("Accept", "application/json")
                 .build();
 
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() != 200) {
             throw new Exception("Failed to fetch BaxterBoxes: " + response.statusCode());
 
         }
 
-        ObjectMapper objectMapper = new ObjectMapper();
         BaxterBox[] boxes = objectMapper.readValue(response.body(), BaxterBox[].class);
         return boxes;
     }
