@@ -24,8 +24,6 @@ export default function ManagerLog({logEntries, isManagerAccount} : props) {
                             box={entry.box}
                             sku={entry.sku}
                             proposedQuantityToAdd={entry.proposedQuantityToAdd}
-                            pending={entry.pending}
-                            accepted={entry.accepted}
                             isManagerAccount={isManagerAccount}
                         />
                     ))

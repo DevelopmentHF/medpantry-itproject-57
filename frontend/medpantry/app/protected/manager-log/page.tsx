@@ -17,7 +17,7 @@ export default async function ManagerLogPage() {
         const { data: { user } } = await createClient().auth.getUser();
         console.log("User:", user?.id);  // Check if user data is correct
         // manager account ID is HARDCODED
-        if (user?.id === "3915c954-4bfc-439f-8884-320b3d48e083") {
+        if (user?.id === "supabase user id goes here") {
             isManagerAccount = true;
         }
     } catch (error) {
@@ -32,7 +32,7 @@ export default async function ManagerLogPage() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/logEntries`);
         if (!res.ok) throw new Error('Network response was not ok');
         logEntries = await res.json();
-        logEntries = logEntries.filter((entry) => entry.pending);
+        //logEntries = logEntries.filter((entry) => entry.pending);
         console.log(logEntries);
     } catch (error) {
         console.error(error);
