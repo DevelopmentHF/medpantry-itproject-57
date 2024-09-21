@@ -7,29 +7,13 @@ import LogEntry from "./LogEntry";
 
 
 interface props {
-    
+    logEntries: any[];
+    isManagerAccount: boolean;
 }
 
-export default async function ManagerLog({} : props) {
+export default function ManagerLog({logEntries, isManagerAccount} : props) {
 
-
-    let logEntries: any[] = [];
-
-    try {
-        // NEED A .env see discord
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/logEntries`);
-        if (!res.ok) throw new Error('Network response was not ok');
-        logEntries = await res.json();
-        console.log(logEntries);
-        logEntries = logEntries.filter((entry) => entry.pending);
-        console.log(logEntries);
-      } catch (error) {
-        console.error(error);
-        return null;
-      }
-    
-
-      return (
+    return (
         <>
             {logEntries.length > 0 ? (
                 logEntries
@@ -42,6 +26,7 @@ export default async function ManagerLog({} : props) {
                             proposedQuantityToAdd={entry.proposedQuantityToAdd}
                             pending={entry.pending}
                             accepted={entry.accepted}
+                            isManagerAccount={isManagerAccount}
                         />
                     ))
             ) : (

@@ -9,9 +9,10 @@ interface LogEntryProps {
     proposedQuantityToAdd: number;
     pending: boolean;
     accepted: boolean;
+    isManagerAccount: boolean;
 }
 
-export default function LogEntry({ id, box, sku, proposedQuantityToAdd }: LogEntryProps) {
+export default function LogEntry({ id, box, sku, proposedQuantityToAdd, pending, accepted, isManagerAccount }: LogEntryProps) {
 
     const handleAccept = async () => {
         try {
@@ -63,8 +64,10 @@ export default function LogEntry({ id, box, sku, proposedQuantityToAdd }: LogEnt
             <Separator />
 
             <div className="flex gap-4">
-                <Button className="bg-green-500" onClick={handleAccept}>Accept</Button>
-                <Button className="bg-red-500" onClick={handleReject}>Reject</Button>
+                {isManagerAccount && <div>
+                    <Button className="bg-green-500" onClick={handleAccept}>Accept</Button>
+                    <Button className="bg-red-500" onClick={handleReject}>Reject</Button>
+                </div>}
             </div>
         </div>
     );
