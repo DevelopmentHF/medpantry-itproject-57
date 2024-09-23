@@ -37,7 +37,9 @@ public class WarehouseInterfaceApplicationTests {
     @BeforeEach
     void setUp(){
         MockitoAnnotations.openMocks(this);
-        serviceTest = new BaxterBoxService(mockHttpClient, mockObjectMapper);
+        serviceTest = new BaxterBoxService();
+        BaxterBoxService.httpClient = mockHttpClient;
+        BaxterBoxService.objectMapper = mockObjectMapper;
     }
 
 
