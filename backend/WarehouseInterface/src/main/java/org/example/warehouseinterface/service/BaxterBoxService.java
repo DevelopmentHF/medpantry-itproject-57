@@ -1,6 +1,7 @@
 package org.example.warehouseinterface.service;
 
 import org.example.warehouseinterface.api.model.BaxterBox;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,13 +24,9 @@ public class BaxterBoxService {
     private static final Dotenv dotenv = Dotenv.configure().directory(".env").load();
     private static String SUPABASE_URL = dotenv.get("SUPABASE_URL");
     private static String SUPABASE_API_KEY = dotenv.get("SUPABASE_API_KEY");
-    private static HttpClient httpClient;
-    private static ObjectMapper objectMapper;
 
-    public BaxterBoxService(HttpClient httpClient, ObjectMapper objectMapper) {
-        this.httpClient = httpClient;
-        this.objectMapper = objectMapper;
-    }
+    public static HttpClient httpClient;
+    public static ObjectMapper objectMapper;
 
     /** Returns information about the BaxterBox#id
      * @param id Id of specified baxter box
