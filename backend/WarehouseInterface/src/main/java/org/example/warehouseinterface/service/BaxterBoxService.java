@@ -25,7 +25,7 @@ public class BaxterBoxService {
     private static String SUPABASE_URL = dotenv.get("SUPABASE_URL");
     private static String SUPABASE_API_KEY = dotenv.get("SUPABASE_API_KEY");
 
-    public static HttpClient httpClient = HttpClient.newHttpClient();;
+    public static HttpClient httpClient = HttpClient.newHttpClient();
     public static ObjectMapper objectMapper = new ObjectMapper();
 
     /** Returns information about the BaxterBox#id

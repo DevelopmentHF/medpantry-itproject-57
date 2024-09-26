@@ -25,7 +25,7 @@ public class ShopifyOrdersService {
     private static String SUPABASE_URL = dotenv.get("SUPABASE_URL");
     private static String SUPABASE_API_KEY = dotenv.get("SUPABASE_API_KEY");
     private static final String SHOPIFY_ADMIN_KEY = dotenv.get("SHOPIFY_ADMIN_KEY");
-    public static HttpClient httpClient;
+    public static HttpClient httpClient = HttpClient.newHttpClient();
 
     @Autowired
     private BaxterBoxService baxterBoxService;
