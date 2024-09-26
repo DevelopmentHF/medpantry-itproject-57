@@ -25,6 +25,7 @@ public class ShopifyOrdersService {
     private static String SUPABASE_URL = dotenv.get("SUPABASE_URL");
     private static String SUPABASE_API_KEY = dotenv.get("SUPABASE_API_KEY");
     private static final String SHOPIFY_ADMIN_KEY = dotenv.get("SHOPIFY_ADMIN_KEY");
+    public static HttpClient httpClient;
 
     @Autowired
     private BaxterBoxService baxterBoxService;
@@ -56,6 +57,8 @@ public class ShopifyOrdersService {
 
         ArrayNode cleanedOrders = objectMapper.createArrayNode(); // array of cleaned order data in json format
 
+        List<Order> ordersCurrentlyBeingWorkedOn = getOrdersCurrentlyBeingWorkedOn();
+
         for (JsonNode orderNode : ordersNode) {
             String sku = null;
             int quantity = 0;
@@ -63,6 +66,21 @@ public class ShopifyOrdersService {
             String itemName = null;
             System.out.println("Order Number: " + orderNumber);
 
+            // Do not return and thus display this order if it is in the Order DB on supabase. This indicates that it is currently being worked on.
+            boolean doNotDisplayOrder = false;
+            for (Order order : ordersCurrentlyBeingWorkedOn) {
+                if (order.getOrderNumber().equals(orderNumber)) {
+                    // this order is currently being worked on. Don't add it to the list of orders that needs to be displayed
+                    doNotDisplayOrder = true;
+                    break;
+                }
+            }
+
+            if (doNotDisplayOrder) {
+                continue;
+            }
+
+            // order is not currently being worked on. Add the relevant information to the list of orders that need to be displayed.
             JsonNode lineItemNodes = orderNode.path("line_items");
             for (JsonNode lineItemNode : lineItemNodes) {
                 sku = lineItemNode.path("sku").asText();
@@ -234,5 +252,27 @@ public class ShopifyOrdersService {
         }
 
         return null;
+    }
+
+    public List<Order> getOrdersCurrentlyBeingWorkedOn() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // get all order rows from supabase
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(SUPABASE_URL + "/rest/v1/Order"))
+                .header("apikey", SUPABASE_API_KEY)
+                .header("Authorization", "Bearer " + SUPABASE_API_KEY)
+                .header("Accept", "application/json")
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            throw new Exception("Failed to fetch Orders currently being worked on: " + response.statusCode());
+
+        }
+
+        List<Order> ordersBeingWorkedOn = objectMapper.readValue(response.body(), new TypeReference<List<Order>>() {});
+        return ordersBeingWorkedOn;
     }
 }
