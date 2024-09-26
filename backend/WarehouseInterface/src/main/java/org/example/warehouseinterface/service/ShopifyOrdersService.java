@@ -22,6 +22,8 @@ import java.util.List;
 @Service
 public class ShopifyOrdersService {
     private static final Dotenv dotenv = Dotenv.configure().directory(".env").load();
+    private static String SUPABASE_URL = dotenv.get("SUPABASE_URL");
+    private static String SUPABASE_API_KEY = dotenv.get("SUPABASE_API_KEY");
     private static final String SHOPIFY_ADMIN_KEY = dotenv.get("SHOPIFY_ADMIN_KEY");
 
     @Autowired
@@ -142,6 +144,37 @@ public class ShopifyOrdersService {
                     break;
                 }
             }
+        }
+    }
+
+    /**
+     * Given an order number, allows a user to 'take' that order, adding the order to the list of order currently being worked on in the database.
+     * @param orderNumber
+     */
+    public void takeOrder(String orderNumber) throws Exception {
+        Order order = findOrderByOrderNumber(orderNumber);
+
+        // add this order to the list of orders currently being worked on in the DB. If an order is in that list, it should not be rendered on the incoming orders list in the frontend.
+
+        // convert order to json to add to DB
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonRequestBody = objectMapper.writeValueAsString(order);
+
+        // ... post it to the db
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(SUPABASE_URL + "/rest/v1/Order"))
+                .header("apikey", SUPABASE_API_KEY)
+                .header("Authorization", "Bearer " + SUPABASE_API_KEY)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(jsonRequestBody))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 201) { // HTTP 201 Created
+            // Parse and return the created BaxterBox
+            throw new Exception("Failed to take Order: " + response.statusCode() + " - " + response.body());
         }
     }
 

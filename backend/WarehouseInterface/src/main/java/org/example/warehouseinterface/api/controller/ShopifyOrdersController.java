@@ -3,10 +3,7 @@ package org.example.warehouseinterface.api.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.warehouseinterface.service.ShopifyOrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class ShopifyOrdersController {
@@ -47,6 +44,15 @@ public class ShopifyOrdersController {
             service.handleOrderAccept(orderNumber);
         } catch (Exception e) {
             // Log the exception (optional)
+            e.printStackTrace();
+        }
+    }
+
+    @PostMapping("/TakeOrder")
+    public void takeOrder(@RequestParam String orderNumber) {
+        try {
+            service.takeOrder(orderNumber);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
