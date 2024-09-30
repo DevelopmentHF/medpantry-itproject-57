@@ -14,17 +14,13 @@ import { Package } from "lucide-react";
 
 export default async function CurrentOrders() {
 
-    //Fetch all orders from Shopify
     // Fetch all orders from Shopify
     let orderArray: any[] = [];
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_LINK}/ShopifyOrders`,
-        {
-          method: "GET",
-        }
-      );
-      if (!res.ok) throw new Error("Network response was not ok");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/ShopifyOrders`, {
+        method: 'GET',
+      });
+      if (!res.ok) throw new Error('Network response was not ok');
       const orderString = await res.json();
       console.log("orders: " + JSON.stringify(orderString));
 
@@ -33,13 +29,13 @@ export default async function CurrentOrders() {
         if (!acc[item.orderNumber]) {
           acc[item.orderNumber] = {
             orderNumber: item.orderNumber,
-            cards: [],
+            cards: []
           };
         }
         acc[item.orderNumber].cards.push({
           quantity: item.quantity,
           sku: item.sku,
-          itemName: item.itemName,
+          itemName: item.itemName
         });
         return acc;
       }, {});
