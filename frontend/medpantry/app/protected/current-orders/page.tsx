@@ -65,6 +65,7 @@ export default async function CurrentOrders() {
                 key={order.orderNumber}
                 orderNumber={order.orderNumber}
                 cards={order.cards}
+                displayTakeOrderButton={true}
               />
             ))}
           </div>
