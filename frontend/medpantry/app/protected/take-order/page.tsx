@@ -1,20 +1,26 @@
 import Order from "@/components/Order";
 import { Button } from "@/components/ui/button";
 
-interface OrderProps {
-  orderNumber: string;
-  cards: { quantity: string; sku: string }[];
-  displayTakeOrderButton: boolean
+interface Data {
+	quantity: number;
+	itemName: string;
 }
 
-export default async function TakeOrder({orderNumber, cards, displayTakeOrderButton}: OrderProps) {
+interface OrderProps {
+	orderNumber: string;
+	datas: Data[];
+	boxes: number[];
+}
+
+export default async function TakeOrder({orderNumber, datas, boxes}: OrderProps) {
 
 
     return (
         <div>
             <Order
                 orderNumber={orderNumber}
-                cards={cards}
+                datas={datas}
+                boxes={boxes}
                 displayTakeOrderButton={false}
             />
             <Button className='bg-red-600 text-white p-2'>Done</Button>

@@ -33,9 +33,9 @@ export default function Order({ orderNumber, datas = [], boxes = [], displayTake
 			</div>
 			<Separator />
 			{datas.length > 0 ? (
-				datas.filter(isDataValid).map((data) => (
+				datas.filter(isDataValid).map((data, index) => (
 					<OrderLine
-						key={data.sku}
+                        key={index}
 						name={data.itemName}
 						quantity={data.quantity}
 						boxNumbers={boxes}

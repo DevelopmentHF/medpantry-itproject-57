@@ -5,10 +5,21 @@ import Order from '@/components/Order';
 import OverviewCard from '@/components/OverviewCard';
 import { Button } from '@/components/ui/button';
 
+interface Data {
+	quantity: number;
+	itemName: string;
+}
+
+interface OrderProps {
+	orderNumber: string;
+	datas: Data[];
+	boxes?: number[];
+}
+
 export default async function Dashboard() {
 
     // Fetch all orders from Shopify
-    let orderArray: OrderData[] = []; // Define type for orderArray
+    let orderArray: OrderProps[] = []; // Define type for orderArray
     try {
         // Force a fresh fetch by passing timestamp
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/ShopifyOrders?timestamp=${Date.now()}`, {
@@ -28,7 +39,7 @@ export default async function Dashboard() {
         }
 
         // Fill the array of orders and group items by orderNumber
-        const orders = orderString.reduce((acc: Record<string, OrderData>, item: any) => {
+        const orders = orderString.reduce((acc: Record<string, OrderProps>, item: any) => {
             if (typeof item.orderNumber !== 'string' || typeof item.quantity !== 'number' || typeof item.itemName !== 'string') {
                 console.warn('Invalid item structure:', item);
                 return acc;
@@ -47,7 +58,7 @@ export default async function Dashboard() {
             return acc;
         }, {});
 
-        orderArray = Object.values(orders) as OrderData[];
+        orderArray = Object.values(orders) as OrderProps[];
 
     } catch (error) {
         console.error("Error fetching orders:", error);
