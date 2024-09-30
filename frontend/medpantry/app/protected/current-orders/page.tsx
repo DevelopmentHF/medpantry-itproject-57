@@ -10,6 +10,7 @@ interface OrderDataItem {
 interface OrderData {
 	orderNumber: string;
 	datas: OrderDataItem[];
+	boxes?: number[];
 }
 
 export default async function CurrentOrders() {
@@ -23,12 +24,23 @@ export default async function CurrentOrders() {
 				'Cache-Control': 'no-cache',
 			},
 		});
+
 		if (!res.ok) throw new Error('Network response was not ok');
+
 		const orderString = await res.json();
-		console.log("orders", orderString);
+
+		// Validate the fetched data
+		if (!Array.isArray(orderString)) {
+			throw new Error('Fetched data is not an array');
+		}
 
 		// Fill the array of orders and group items by orderNumber
 		const orders = orderString.reduce((acc: Record<string, OrderData>, item: any) => {
+			if (typeof item.orderNumber !== 'string' || typeof item.quantity !== 'number' || typeof item.itemName !== 'string') {
+				console.warn('Invalid item structure:', item);
+				return acc;
+			}
+
 			if (!acc[item.orderNumber]) {
 				acc[item.orderNumber] = {
 					orderNumber: item.orderNumber,
@@ -45,12 +57,12 @@ export default async function CurrentOrders() {
 		orderArray = Object.values(orders) as OrderData[];
 
 	} catch (error) {
-		console.error(error);
-		return null;
+		console.error("Error fetching orders:", error);
+		return <div>Error fetching orders. Please try again later.</div>;
 	}
 
-	async function getBoxId(orderNumber: string): Promise<number[] | null> {
-		// convert # into %23 for /RequiredBaxterBoxes
+	async function getBoxId(orderNumber: string): Promise<number[]> {
+		// Convert # into %23 for /RequiredBaxterBoxes
 		const value: string = encodeURIComponent(orderNumber);
 
 		try {
@@ -60,12 +72,21 @@ export default async function CurrentOrders() {
 					'Cache-Control': 'no-cache',
 				},
 			});
+
 			if (!res.ok) throw new Error('Network response was not ok');
+
 			const boxes = await res.json();
-			return boxes.map((item: any) => item.box_id);
+
+			// Validate the box data structure
+			if (!Array.isArray(boxes)) {
+				console.warn('Fetched box data is not an array:', boxes);
+				return [];
+			}
+
+			return boxes.map((item: any) => item.box_id).filter((id: any) => typeof id === 'number'); // Filter invalid box IDs
 		} catch (error) {
-			console.error(error);
-			return null;
+			console.error("Error fetching box IDs:", error);
+			return []; // Return an empty array on error
 		}
 	}
 
@@ -105,7 +126,7 @@ export default async function CurrentOrders() {
 							key={order.orderNumber}
 							orderNumber={order.orderNumber}
 							datas={order.datas}
-							boxes={order.boxes}
+							boxes={order.boxes || []}
 							displayTakeOrderButton={true}
 						/>
 					))}

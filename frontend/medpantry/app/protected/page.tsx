@@ -7,40 +7,54 @@ import { Button } from '@/components/ui/button';
 
 export default async function Dashboard() {
 
-    //Fetch all orders from Shopify
-    let orderString: any[] = [];
-        try{
-          const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/ShopifyOrders`, {
+    // Fetch all orders from Shopify
+    let orderArray: OrderData[] = []; // Define type for orderArray
+    try {
+        // Force a fresh fetch by passing timestamp
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/ShopifyOrders?timestamp=${Date.now()}`, {
             method: 'GET',
             headers: {
-                'Cache-Control': 'no-cache'
+                'Cache-Control': 'no-cache',
+            },
+        });
+
+        if (!res.ok) throw new Error('Network response was not ok');
+
+        const orderString = await res.json();
+
+        // Validate the fetched data
+        if (!Array.isArray(orderString)) {
+            throw new Error('Fetched data is not an array');
+        }
+
+        // Fill the array of orders and group items by orderNumber
+        const orders = orderString.reduce((acc: Record<string, OrderData>, item: any) => {
+            if (typeof item.orderNumber !== 'string' || typeof item.quantity !== 'number' || typeof item.itemName !== 'string') {
+                console.warn('Invalid item structure:', item);
+                return acc;
             }
+
+            if (!acc[item.orderNumber]) {
+                acc[item.orderNumber] = {
+                    orderNumber: item.orderNumber,
+                    datas: [],
+                };
+            }
+            acc[item.orderNumber].datas.push({
+                quantity: item.quantity,
+                itemName: item.itemName,
             });
-            if (!res.ok) throw new Error('Network response was not ok');
-            orderString = await res.json();
-            console.log("orders: " + JSON.stringify(orderString));
-            
-        } catch (error) {
-        console.error(error);
-        return null;
-      }
+            return acc;
+        }, {});
 
-      //console.log("ORDERS:")
-      //console.log(orderString);
-      
-    //Group orders by order number.
-    const groupedByOrderNumber = orderString.reduce((acc, item) => {
-      if (!acc[item.order_number]) {
-        acc[item.order_number] = []; // Initialize array for new order_number
-      }
-      acc[item.order_number].push({
-        quantity: item.quantity,
-        sku: item.sku,
-      })
-      return acc;
-    }, {});
+        orderArray = Object.values(orders) as OrderData[];
 
-    Object.keys(groupedByOrderNumber).forEach(order_number => {console.log(order_number)});
+    } catch (error) {
+        console.error("Error fetching orders:", error);
+        return <div>Error fetching orders. Please try again later.</div>;
+    }
+
+    Object.keys(orderArray).forEach(order_number => {console.log(order_number)});
     //console.log(groupedByOrderNumber["#1001"]);
 
   return (
@@ -64,7 +78,7 @@ export default async function Dashboard() {
         <a href="protected/current-orders">
           <OverviewCard
             title="Current Orders"
-            count={Object.keys(groupedByOrderNumber).length}
+            count={Object.keys(orderArray).length}
             description="Pending orders"
           />
         </a>
