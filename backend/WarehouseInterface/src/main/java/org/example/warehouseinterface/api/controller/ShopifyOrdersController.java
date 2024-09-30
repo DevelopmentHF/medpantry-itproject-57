@@ -18,7 +18,7 @@ public class ShopifyOrdersController {
     public String getAllOrders() {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-
+            //return service.getAllOrders();
             return objectMapper.writeValueAsString(service.getAllOrders());
         } catch (Exception e) {
             // Log the exception (optional)
