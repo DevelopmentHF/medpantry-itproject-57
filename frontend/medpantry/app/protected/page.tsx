@@ -12,9 +12,6 @@ export default async function Dashboard() {
         try{
           const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/ShopifyOrders`, {
             method: 'GET',
-            headers: {
-                'Cache-Control': 'no-cache'
-            }
             });
             if (!res.ok) throw new Error('Network response was not ok');
             orderString = await res.json();
