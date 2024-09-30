@@ -24,9 +24,7 @@ export default async function CurrentOrders() {
 				'Cache-Control': 'no-cache',
 			},
 		});
-
 		if (!res.ok) throw new Error('Network response was not ok');
-
 		const orderString = await res.json();
 
 		// Validate the fetched data
