@@ -6,11 +6,10 @@ import { Separator } from './ui/separator';
 interface OrderLineProps {
   name: string;
   quantity: string;
-  boxNumber: string;
+  boxNumbers: number[];
 }
 
-export default function OrderLine({ name, quantity, boxNumber }: OrderLineProps) {
-
+export default function OrderLine({ name, quantity, boxNumbers }: OrderLineProps) {
 
   return (
 
@@ -19,7 +18,7 @@ export default function OrderLine({ name, quantity, boxNumber }: OrderLineProps)
             <h1 className="">{name} <span className='text-gray-500'>x{quantity}</span></h1>
         </div>
         <div className="">
-            <h2 className='text-black'>Box <span className='text-gray-500'>#{boxNumber}</span></h2>
+            <h2 className='text-black'>Box <span className='text-gray-500'>#{boxNumbers.join(', ')}</span></h2>
         </div>
     </div>
   );

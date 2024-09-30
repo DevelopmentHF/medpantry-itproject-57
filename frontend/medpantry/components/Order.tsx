@@ -6,10 +6,12 @@ import OrderLine from '@/components/OrderLine';
 interface OrderProps {
   orderNumber: string;
   cards: { quantity: string; sku: string }[];
+  boxes: number[];
   displayTakeOrderButton: boolean
 }
 
-export default function Order({ orderNumber, cards = [], displayTakeOrderButton }: OrderProps) {
+export default function Order({ orderNumber, cards = [], boxes, displayTakeOrderButton }: OrderProps) {
+
   return (
     <div className={`bg-secondary-foreground border-solid border-border rounded-md p-4 flex flex-col gap-2`}>
       <div className="flex flex-row gap-4 w-full items-center">
@@ -22,9 +24,9 @@ export default function Order({ orderNumber, cards = [], displayTakeOrderButton 
       {cards.map((card, index) => (
         <OrderLine
           key={card.sku}
-          name="Adult Oxygen Mask"
+          name={card.itemName}
           quantity={card.quantity}
-          boxNumber={card.sku}
+          boxNumbers={boxes}
         />
       ))}
     </div>
