@@ -255,6 +255,7 @@ public class ShopifyOrdersService {
 
                     requiredBaxterBox.put("box_id", box.getId());
                     requiredBaxterBox.put("required_quantity", requiredQuantityRemaining);
+                    requiredBaxterBox.put("sku", box.getSKU());
                     requiredBaxterBoxes.add(requiredBaxterBox);
                     break;
                 } else if (box.getUnits() < requiredQuantityRemaining && box.getUnits() > 0) {
@@ -262,6 +263,7 @@ public class ShopifyOrdersService {
                     ObjectNode requiredBaxterBox = objectMapper.createObjectNode();
                     requiredBaxterBox.put("box_id", box.getId());
                     requiredBaxterBox.put("required_quantity", box.getUnits());
+                    requiredBaxterBox.put("sku", box.getSKU());
                     requiredBaxterBoxes.add(requiredBaxterBox);
 
                     requiredQuantityRemaining -= box.getUnits();
