@@ -36,8 +36,9 @@ public class ManagerLogService {
      * Creates a new manager log entry in the supabase
      * @throws Exception
      */
-    public void handleChangeProposal(int box, String sku, int proposedQuantityToAdd) throws Exception {
-        ManagerLogEntry newLogEntry = new ManagerLogEntry(generateUniqueLogId(), box, sku, proposedQuantityToAdd, true, false);
+    public void handleChangeProposal(int box, String sku, int proposedQuantityToAdd, Boolean fullStatusChangedTo) throws Exception {
+        // its ok is fullStatusChangedTO is null.
+        ManagerLogEntry newLogEntry = new ManagerLogEntry(generateUniqueLogId(), box, sku, proposedQuantityToAdd, true, false, fullStatusChangedTo);
 
         // convert to json to ready to ship off
         ObjectMapper objectMapper = new ObjectMapper();
@@ -100,6 +101,8 @@ public class ManagerLogService {
             throw new Exception("Failed to fetch logs: " + response.statusCode());
 
         }
+
+        System.out.println(response.body());
 
         ObjectMapper objectMapper = new ObjectMapper();
         ManagerLogEntry[] entries = objectMapper.readValue(response.body(), ManagerLogEntry[].class);

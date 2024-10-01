@@ -9,9 +9,10 @@ interface LogEntryProps {
     proposedQuantityToAdd: number;
     pending: boolean;
     accepted: boolean;
+    fullStatusChangedTo: boolean;
 }
 
-export default function LogEntry({ id, box, sku, proposedQuantityToAdd }: LogEntryProps) {
+export default function LogEntry({ id, box, sku, proposedQuantityToAdd, fullStatusChangedTo }: LogEntryProps) {
 
     const handleAccept = async () => {
         try {
@@ -59,6 +60,13 @@ export default function LogEntry({ id, box, sku, proposedQuantityToAdd }: LogEnt
                 <p>Quantity</p>
                 <p className="text-gray-400">+{proposedQuantityToAdd}</p>
             </div>
+
+            {fullStatusChangedTo !== undefined && (
+                <div className="flex justify-between">
+                    <p>Full Status Changed</p>
+                    <p className="text-gray-400">{fullStatusChangedTo ? 'Full' : 'Not Full'}</p>
+                </div>
+            )}
 
             <Separator />
 
