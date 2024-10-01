@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 
 interface Data {
     quantity: number;
+    sku: string;
     itemName: string;
 }
 

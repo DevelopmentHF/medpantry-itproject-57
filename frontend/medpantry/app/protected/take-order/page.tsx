@@ -1,9 +1,11 @@
 import Order from "@/components/Order";
 import AuthButton from "@/components/AuthButton";
 import { Button } from "@/components/ui/button";
+import DoneOrderButton from "@/components/DoneOrderButton";
 
 interface Data {
     quantity: number;
+    sku: string;
     itemName: string;
 }
 
@@ -23,7 +25,6 @@ export default async function TakeOrder({ searchParams }: { searchParams: { orde
     return (
         <div className="flex-1 w-full flex flex-col gap-12 items-center p-6">
             <nav className="flex gap-4 border-b border-b-foreground/10 h-16 w-full items-center justify-between">
-
                 <Button>
                     <a href="../protected">
                         Home
@@ -38,7 +39,7 @@ export default async function TakeOrder({ searchParams }: { searchParams: { orde
                 boxes={boxes}
                 displayTakeOrderButton={false}
             />
-            <Button className='bg-red-600 text-white p-2'>Done</Button>
+            <DoneOrderButton boxes={boxes} datas={datas} />
         </div>
     );
 }

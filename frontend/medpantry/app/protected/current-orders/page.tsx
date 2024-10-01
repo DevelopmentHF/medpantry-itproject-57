@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 
 interface Data {
 	quantity: number;
+	sku: string;
 	itemName: string;
 }
 
@@ -47,6 +48,7 @@ export default async function CurrentOrders() {
 			}
 			acc[item.orderNumber].datas.push({
 				quantity: item.quantity,
+				sku: item.sku,
 				itemName: item.itemName,
 			});
 			return acc;
@@ -132,9 +134,9 @@ export default async function CurrentOrders() {
 			</div>
 			<Button>
                 <a
-                	href={`/protected/take-order?orderNumber=%231005&datas=${encodeURIComponent(JSON.stringify([{ quantity: 7, itemName: 'Medical Gloves' }]))}&boxes=${encodeURIComponent(JSON.stringify([301]))}`}
+                	href={`/protected/take-order?orderNumber=%231005&datas=${encodeURIComponent(JSON.stringify([{ quantity: 7, sku: '497', itemName: 'Medical Gloves' }]))}&boxes=${encodeURIComponent(JSON.stringify([301]))}`}
                 >
-                	Go to Take Order
+                	(This button is just for testing purpose, Go to Take Order)
                 </a>
             </Button>
 		</>
