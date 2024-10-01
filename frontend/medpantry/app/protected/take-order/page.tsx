@@ -26,8 +26,8 @@ export default async function TakeOrder({ searchParams }: { searchParams: { orde
         <div className="flex-1 w-full flex flex-col gap-12 items-center p-6">
             <nav className="flex gap-4 border-b border-b-foreground/10 h-16 w-full items-center justify-between">
                 <Button>
-                    <a href="../protected">
-                        Home
+                    <a href="../protected/current-orders">
+                        Back
                     </a>
                 </Button>
 

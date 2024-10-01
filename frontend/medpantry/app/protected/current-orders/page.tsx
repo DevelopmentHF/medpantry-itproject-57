@@ -132,6 +132,8 @@ export default async function CurrentOrders() {
 					))}
 				</div>
 			</div>
+
+			{/*Below will not implemented in the final product. Temporarily here just for testing*/}
 			<Button>
                 <a
                 	href={`/protected/take-order?orderNumber=%231005&datas=${encodeURIComponent(JSON.stringify([{ quantity: 7, sku: '497', itemName: 'Medical Gloves' }]))}&boxes=${encodeURIComponent(JSON.stringify([301]))}`}

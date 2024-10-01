@@ -36,8 +36,7 @@ export default function Order({ orderNumber, datas = [], boxes = [], displayTake
                 method: 'PATCH',
             });
             if (!res.ok) throw new Error('Network response was not ok');
-            const result = await res.json();
-            console.log('Order accepted:', result);
+            console.log('Order accepted:', res);
 
             // Redirect to /take-order with query parameters
             const queryParams = new URLSearchParams({
@@ -45,7 +44,7 @@ export default function Order({ orderNumber, datas = [], boxes = [], displayTake
                 datas: JSON.stringify(datas),
                 boxes: JSON.stringify(boxes),
             }).toString();
-            router.push(`/take-order?${queryParams}`);
+            router.push(`/protected/take-order?${queryParams}`);
         } catch (error) {
             console.error('Error taking order:', error);
         }

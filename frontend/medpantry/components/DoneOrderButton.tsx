@@ -13,7 +13,7 @@ export default function DoneOrderButton({ boxes, datas }: DoneOrderButtonProps) 
 
     const handleClick = async () => {
         try {
-            // Loop through each box and data
+            // Loop through each box and data to propose change to manager log
             for (const box of boxes) {
                 for (const data of datas) {
                     console.log(box, data.sku, data.quantity);
@@ -29,9 +29,11 @@ export default function DoneOrderButton({ boxes, datas }: DoneOrderButtonProps) 
                     if (!res.ok) throw new Error('Network response was not ok');
                     const text = await res.text();
                     console.log(text);
+
+                    //jump back to current-order page
+                    if(text === "Successfully logged proposal change") router.push('/protected/current-orders');
                 }
             }
-            router.push('/protected/current-orders'); // Redirect after completion
         } catch (error) {
             console.error('Error during proposing change to manager log:', error);
         }
