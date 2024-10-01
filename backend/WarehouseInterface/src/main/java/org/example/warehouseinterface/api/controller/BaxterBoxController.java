@@ -70,4 +70,23 @@ public class BaxterBoxController {
 
     }
 
+    @PatchMapping("/setBaxterBoxFull")
+    public ResponseEntity<BaxterBox> setBaxterBoxFull(@RequestParam Integer id, @RequestParam Boolean isFull) {
+        try {
+            BaxterBox box = baxterBoxService.getBaxterBox(id);
+            System.out.println(box.getSKU());
+
+            if (box != null) {
+                BaxterBox updated = baxterBoxService.setBaxterBoxFull(box, isFull);
+                return new ResponseEntity<>(updated, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            // return an error response
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
