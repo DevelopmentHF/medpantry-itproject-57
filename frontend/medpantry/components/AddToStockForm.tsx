@@ -93,7 +93,34 @@ export default function AddToStockForm({extractedSku} : AddToStockFormProps) {
                                 />
                                 <Button type="submit">Update Stock</Button>
                             </form>
-                            <Button>Full?</Button>
+                            <Button onClick={async () => {
+                                try {
+                                    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/setBaxterBoxFull?id=${baxterBox.id}&isFull=${!baxterBox.full}`, {
+                                        method: 'PATCH',
+                                    });
+                                    
+                                    if (!response.ok) {
+                                        throw new Error('Failed to update full status');
+                                    }
+
+                                    const updatedBox = await response.json();
+                                    console.log('Box full status updated:', updatedBox);
+
+                                    // update the state
+                                    setBoxes(prevBoxes => {
+                                        if (!prevBoxes) return null; // If prevBoxes is null, return null to make TS happy L:)
+                                        return prevBoxes.map(box =>
+                                            box.id === updatedBox.id ? updatedBox : box
+                                        );
+                                    });
+                                    
+
+                                } catch (error) {
+                                    console.error('Error:', error);
+                                }
+                            }}>
+                                Full?
+                            </Button>
                         </div>
                         
                     </div>

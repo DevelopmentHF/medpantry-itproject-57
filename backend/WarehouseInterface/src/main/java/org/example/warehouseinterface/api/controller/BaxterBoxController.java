@@ -74,7 +74,6 @@ public class BaxterBoxController {
     public ResponseEntity<BaxterBox> setBaxterBoxFull(@RequestParam Integer id, @RequestParam Boolean isFull) {
         try {
             BaxterBox box = baxterBoxService.getBaxterBox(id);
-            System.out.println(box.getSKU());
 
             if (box != null) {
                 BaxterBox updated = baxterBoxService.setBaxterBoxFull(box, isFull);
