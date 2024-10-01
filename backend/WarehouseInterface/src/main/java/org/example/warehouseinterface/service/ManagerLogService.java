@@ -139,8 +139,13 @@ public class ManagerLogService {
         entryToUpdate.setPending(false);
 
         if (accepted) {
-            // now update the box
+            // now update the box.
+            // TODO: If a new box, .getBox wont work obvs
             baxterBoxService.updateBaxterBox(baxterBoxService.getBaxterBox(entryToUpdate.getBox()), entryToUpdate.getProposedQuantityToAdd());
+
+            if (entryToUpdate.isFullStatusChangedTo() != null) {
+                baxterBoxService.setBaxterBoxFull(baxterBoxService.getBaxterBox(entryToUpdate.getBox()), entryToUpdate.isFullStatusChangedTo());
+            }
         }
 
 
