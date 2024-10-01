@@ -12,7 +12,6 @@ import org.example.warehouseinterface.api.model.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.swing.*;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -32,8 +31,12 @@ public class ShopifyOrdersService {
     @Autowired
     private BaxterBoxService baxterBoxService;
 
-
-    public List<Order> getAllOrders() throws Exception {
+    /**
+     * REturns the all the order that should be displayed as ready to be taken
+     * @return
+     * @throws Exception
+     */
+    public List<Order> getUntakenOrders() throws Exception {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://team57-itproject.myshopify.com/admin/api/2024-07/orders.json?status=any"))
@@ -197,6 +200,35 @@ public class ShopifyOrdersService {
             }
         }
 
+        // remove the order from the list of orders that are being worked on (on Supabase)
+
+
+        // Build the DELETE request
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(SUPABASE_URL + "/rest/v1/Order?orderNumber=eq." + orderNumber))
+                .header("apikey", SUPABASE_API_KEY)
+                .header("Authorization", "Bearer " + SUPABASE_API_KEY)
+                .header("Content-Type", "application/json")
+                .DELETE() // Change to DELETE
+                .build();
+
+        // Send the request
+        client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(HttpResponse::body)
+                .thenAccept(System.out::println)
+                .exceptionally(e -> {
+                    e.printStackTrace();
+                    return null;
+                });
+
+//        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+//
+//        if (response.statusCode() != 201) { // HTTP 201 Created
+//            // Parse and return the created BaxterBox
+//            throw new Exception("Failed to accept order: " + response.statusCode() + " - " + response.body());
+//        }
+
     }
 
     /**
@@ -318,5 +350,88 @@ public class ShopifyOrdersService {
 
         List<Order> ordersBeingWorkedOn = objectMapper.readValue(response.body(), new TypeReference<List<Order>>() {});
         return ordersBeingWorkedOn;
+    }
+
+    /**
+     * Gets ALL the orders from shopify (both taken and not taken)
+     * @return
+     */
+    public List<Order> getAllOrders() throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://team57-itproject.myshopify.com/admin/api/2024-07/orders.json?status=any"))
+                .header("X-Shopify-Access-Token", SHOPIFY_ADMIN_KEY)
+                .header("Accept", "application/json")
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+
+        if (response.statusCode() != 200) {
+            throw new Exception("Get shopify orders failed: " + response.statusCode());
+
+        }
+
+        // Handle successful response
+        System.out.println("Response: " + response.body());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        JsonNode rootNode = objectMapper.readTree(response.body());
+        JsonNode ordersNode = rootNode.path("orders");
+
+        ArrayNode cleanedOrders = objectMapper.createArrayNode(); // array of cleaned order data in json format
+
+        List<Order> ordersCurrentlyBeingWorkedOn = getOrdersCurrentlyBeingWorkedOn();
+
+        for (JsonNode orderNode : ordersNode) {
+            String orderNumber = orderNode.path("name").asText();
+
+            JsonNode lineItemNodes = orderNode.path("line_items");
+            List<String> skus = new ArrayList<>();
+            List<Integer> quantities = new ArrayList<>();
+            List<String> itemNames = new ArrayList<>();
+
+            for (JsonNode lineItemNode : lineItemNodes) {
+                // need an array for each attribute other than order number cause there can be multiple items in one order
+
+                skus.add(lineItemNode.path("sku").asText());
+                quantities.add(lineItemNode.path("quantity").asInt());
+                itemNames.add(lineItemNode.path("name").asText());
+            }
+
+            ObjectNode cleanedOrder = objectMapper.createObjectNode();
+
+            // add each array node to the order node
+            ArrayNode skuNode = objectMapper.createArrayNode();
+            for (String sku : skus) {
+                skuNode.add(sku);
+            }
+            cleanedOrder.put("sku", skuNode);
+
+            ArrayNode quantityNode = objectMapper.createArrayNode();
+            for (Integer quantity : quantities) {
+                quantityNode.add(quantity);
+            }
+            cleanedOrder.put("quantity", quantityNode);
+
+            ArrayNode itemNameNode = objectMapper.createArrayNode();
+            for (String itemName : itemNames) {
+                itemNameNode.add(itemName);
+            }
+            cleanedOrder.put("item_name", itemNameNode);
+
+            cleanedOrder.put("order_number", orderNumber);
+
+
+            cleanedOrders.add(cleanedOrder);
+        }
+
+        String cleanedOrdersString = objectMapper.writeValueAsString(cleanedOrders);
+        System.out.println("cleaned: " + cleanedOrdersString);
+
+        List<Order> orders = objectMapper.readValue(cleanedOrdersString, new TypeReference<List<Order>>() {});
+
+        return orders;
     }
 }

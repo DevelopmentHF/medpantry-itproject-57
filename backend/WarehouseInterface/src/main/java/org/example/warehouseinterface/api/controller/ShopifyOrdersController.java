@@ -19,7 +19,7 @@ public class ShopifyOrdersController {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             //return service.getAllOrders();
-            return objectMapper.writeValueAsString(service.getAllOrders());
+            return objectMapper.writeValueAsString(service.getUntakenOrders());
         } catch (Exception e) {
             // Log the exception (optional)
             e.printStackTrace();
