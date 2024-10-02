@@ -5,10 +5,19 @@ import { Button } from '@/components/ui/button';
 import AuthButton from '@/components/AuthButton';
 import AddToStockForm from '@/components/AddToStockForm';
 import QRScanner from '@/components/QRScanner';
+import BaxterBox from './BaxterBox';
 import { useState } from 'react';
 
 
 export default function AddStock() {
+
+    type BaxterBox = {
+        id: number;
+        sku: string;
+        warehouseId: number;
+        units: number;
+        full: boolean;
+    };
 
     const [sku, setSku] = useState('');
 
@@ -16,11 +25,35 @@ export default function AddStock() {
         setSku(value);
     };
 
+    const [newBox, setNewBox] = useState<BaxterBox | null>(null);
+
+    const handleCreateNewBox = () => {
+        setNewBox({
+            id: -1,  // placehoder
+            sku: sku,
+            warehouseId: 1,  // warehouse id always 1 atm
+            units: 0,  // No units packed initially
+            full: false,  // not full by default
+        });
+    };
+
 
     return (
         <>
             <QRScanner onSkuChange={handleSkuChange}></QRScanner>
             <AddToStockForm extractedSku={sku}/>
+            <Button onClick={handleCreateNewBox}>Create new box?</Button>
+
+            {/* Render the new box if it exists */}
+            {newBox && (
+                <BaxterBox
+                id={newBox.id}
+                sku={newBox.sku}
+                warehouseId={newBox.warehouseId}
+                units={newBox.units}
+                isFull={newBox.full}
+                />
+            )}
         </>
     )
 }
