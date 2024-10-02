@@ -65,4 +65,14 @@ public class BaxterBoxController {
         }
     }
 
+    @GetMapping("/nextBoxId")
+    public ResponseEntity<Integer> getNextBoxId(@RequestParam String sku) {
+        try {
+            return new ResponseEntity<>(baxterBoxService.findNextId(sku), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

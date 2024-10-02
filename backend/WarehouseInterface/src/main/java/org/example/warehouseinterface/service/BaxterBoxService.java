@@ -1,6 +1,7 @@
 package org.example.warehouseinterface.service;
 
 import org.example.warehouseinterface.api.model.BaxterBox;
+import org.example.warehouseinterface.api.model.ManagerLogEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -257,16 +258,46 @@ public class BaxterBoxService {
             return lowestFreeId;
         }
 
+        ManagerLogEntry[] logEntries = ManagerLogService.getAllLogEntries();
+
+        // find all occupied ids
+        List<Integer> occupiedIds = new ArrayList<>();
+        for (BaxterBox box : boxes) {
+            occupiedIds.add(box.getId());
+        }
+        for (ManagerLogEntry logEntry : logEntries) {
+            occupiedIds.add(logEntry.getBox());
+        }
+
         // ... otherwise, this product exists, what is the nearest number to any boxes with this sku that isn't full
         int nearestId = -10000;
-        for (BaxterBox baxterBox : boxesWithThisSku) {
-            for (BaxterBox box : boxes) {
-                if (!box.isFull() && !ManagerLogService.isInManagerLog(box.getId()) && box.getId() <= MAX_BOX_ID) {
-                    int distance = Math.abs(baxterBox.getId() - box.getId());
-                    if (distance < Math.abs(nearestId - baxterBox.getId())) {
-                        nearestId = box.getId();
-                    }
+
+        for (BaxterBox boxWithSku : boxesWithThisSku) {
+            int boxId = boxWithSku.getId();
+            int nearestIdToThisBox = -1;
+
+            // Check for IDs greater than the current boxId
+            for (int i = boxId + 1; i < MAX_BOX_ID; i++) {
+                if (!occupiedIds.contains(i)) {
+                    nearestIdToThisBox = i;
+                    break;
                 }
+            }
+
+            // Check for IDs less than the current boxId
+            for (int i = boxId - 1; i >= 0; i--) {
+                if (!occupiedIds.contains(i)) {
+                    // If we've already found a nearest ID above, compare which is closer
+                    if (nearestIdToThisBox == -1 || (boxId - i < Math.abs(boxId - nearestIdToThisBox))) {
+                        nearestIdToThisBox = i;
+                    }
+                    break;
+                }
+            }
+
+            // If a nearest ID was found for this box, check if it's closer than the current nearestId
+            if (nearestIdToThisBox != -1 && (nearestId == -10000 || Math.abs(nearestIdToThisBox - boxId) < Math.abs(nearestId - boxId))) {
+                nearestId = nearestIdToThisBox; 
             }
         }
 

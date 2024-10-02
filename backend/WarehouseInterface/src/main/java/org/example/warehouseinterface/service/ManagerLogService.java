@@ -353,11 +353,9 @@ public class ManagerLogService {
      * @param boxId
      * @return
      */
-    public static boolean isInManagerLog(int boxId) throws Exception {
-        ManagerLogEntry[] logEntries = getAllLogEntries();
-
+    public static boolean isInManagerLog(int boxId, ManagerLogEntry[] cachedEntries) throws Exception {
         // find the entry
-        for (ManagerLogEntry entry : logEntries) {
+        for (ManagerLogEntry entry : cachedEntries) {
             if (entry.getBox() == boxId) {
                 return true;
             }
