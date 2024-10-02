@@ -28,14 +28,28 @@ export default function AddStock() {
 
     const [newBox, setNewBox] = useState<BaxterBox | null>(null);
 
-    const handleCreateNewBox = () => {
-        setNewBox({
-            id: 50,  // placehoder
-            sku: sku,
-            warehouseId: 1,  // warehouse id always 1 atm
-            units: 0,  // No units packed initially
-            full: false,  // not full by default
-        });
+    const handleCreateNewBox = async () => {
+        try {
+            // Fetch the next box ID from the backend
+            const response = await fetch(`http://localhost:8080/nextBoxId?sku=${sku}`);
+            
+            if (!response.ok) {
+                throw new Error('Failed to fetch the next box ID');
+            }
+    
+            const nextBoxId = await response.json(); // Assuming the response is just the ID
+    
+            setNewBox({
+                id: nextBoxId,  // Use the fetched ID
+                sku: sku,
+                warehouseId: 1,  // warehouse id always 1 atm
+                units: 0,  // No units packed initially
+                full: false,  // not full by default
+            });
+    
+        } catch (error) {
+            console.error('Error fetching next box ID:', error);
+        }
     };
 
 
