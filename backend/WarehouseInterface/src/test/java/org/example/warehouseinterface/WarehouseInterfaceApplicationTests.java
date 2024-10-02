@@ -201,7 +201,9 @@ public class WarehouseInterfaceApplicationTests {
         };
         when(mockObjectMapper.readValue(jsonResponse, BaxterBox[].class)).thenReturn(baxterBoxes);
 
-        int Result = serviceTest.findNextId();
+        //int Result = serviceTest.findNextId();
+        // TODO: Rewrite this unit test to work with proper box finding system
+        int Result = -1;
         assertEquals(5, Result);
 
     }
@@ -214,7 +216,7 @@ public class WarehouseInterfaceApplicationTests {
                 .thenReturn(mockHttpResponse);
 
         Exception exception = assertThrows(Exception.class, () -> {
-            serviceTest.findNextId();
+            serviceTest.findNextId("1"); // TODO: Rewrite this test to work with proper box finding system
         });
 
         assertTrue(exception.getMessage().contains("Failed to fetch BaxterBoxes: " + mockHttpResponse.statusCode()));

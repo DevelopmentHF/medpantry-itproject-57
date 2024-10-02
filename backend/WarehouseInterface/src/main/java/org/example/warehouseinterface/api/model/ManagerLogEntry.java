@@ -1,5 +1,6 @@
 package org.example.warehouseinterface.api.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ManagerLogEntry {
@@ -9,6 +10,7 @@ public class ManagerLogEntry {
     private int proposedQuantityToAdd;
     private boolean pending;
     private boolean accepted;
+    private Boolean fullStatusChangedTo;
 
     /* Basic constructor for a BaxterBox */
     public ManagerLogEntry(@JsonProperty("id") int id,
@@ -16,13 +18,15 @@ public class ManagerLogEntry {
                             @JsonProperty("sku") String sku,
                             @JsonProperty("proposedQuantityToAdd") int proposedQuantityToAdd,
                             @JsonProperty("pending") boolean pending,
-                            @JsonProperty("accepted") Boolean accepted) {
+                            @JsonProperty("accepted") Boolean accepted,
+                           @JsonProperty("fullStatusChangedTo") Boolean fullStatusChangedTo) {
         this.id = id;
         this.box = box;
         this.sku = sku;
         this.proposedQuantityToAdd = proposedQuantityToAdd;
         this.pending = pending;
         this.accepted = accepted;
+        this.fullStatusChangedTo = fullStatusChangedTo;
     }
 
     public int getId() {
@@ -73,6 +77,14 @@ public class ManagerLogEntry {
         this.accepted = accepted;
     }
 
+    public Boolean isFullStatusChangedTo() {
+        return fullStatusChangedTo;
+    }
+
+    public void setFullStatusChangedTo(Boolean fullStatusChangedTo) {
+        this.fullStatusChangedTo = fullStatusChangedTo;
+    }
+
     @Override
     public String toString() {
         return "ManagerLogEntry{" +
@@ -82,6 +94,7 @@ public class ManagerLogEntry {
                 ", proposedQuantityToAdd=" + proposedQuantityToAdd +
                 ", pending=" + pending +
                 ", accepted=" + accepted +
+                ", fullStatusChangedTo=" + fullStatusChangedTo +
                 '}';
     }
 }

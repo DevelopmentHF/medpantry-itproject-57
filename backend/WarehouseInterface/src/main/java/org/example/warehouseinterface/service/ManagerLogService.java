@@ -11,6 +11,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,8 +37,10 @@ public class ManagerLogService {
      * Creates a new manager log entry in the supabase
      * @throws Exception
      */
-    public void handleChangeProposal(int box, String sku, int proposedQuantityToAdd) throws Exception {
-        ManagerLogEntry newLogEntry = new ManagerLogEntry(generateUniqueLogId(), box, sku, proposedQuantityToAdd, true, false);
+    public void handleChangeProposal(int box, String sku, int proposedQuantityToAdd, Boolean fullStatusChangedTo) throws Exception {
+        System.out.println("Received change proposal for box" + box + " with sku " + sku + " with proposed quantity " + proposedQuantityToAdd + " and fullstatus " + fullStatusChangedTo);
+        // its ok is fullStatusChangedTO is null.
+        ManagerLogEntry newLogEntry = new ManagerLogEntry(generateUniqueLogId(), box, sku, proposedQuantityToAdd, true, false, fullStatusChangedTo);
 
         // convert to json to ready to ship off
         ObjectMapper objectMapper = new ObjectMapper();
@@ -84,7 +87,7 @@ public class ManagerLogService {
      * @return
      * @throws Exception
      */
-    public ManagerLogEntry[] getAllLogEntries() throws Exception {
+    public static ManagerLogEntry[] getAllLogEntries() throws Exception {
         // get all  rows from supabase
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -100,6 +103,8 @@ public class ManagerLogService {
             throw new Exception("Failed to fetch logs: " + response.statusCode());
 
         }
+
+        System.out.println(response.body());
 
         ObjectMapper objectMapper = new ObjectMapper();
         ManagerLogEntry[] entries = objectMapper.readValue(response.body(), ManagerLogEntry[].class);
@@ -136,8 +141,23 @@ public class ManagerLogService {
         entryToUpdate.setPending(false);
 
         if (accepted) {
-            // now update the box
-            baxterBoxService.updateBaxterBox(baxterBoxService.getBaxterBox(entryToUpdate.getBox()), entryToUpdate.getProposedQuantityToAdd());
+            // now update the box.
+            BaxterBox[] boxes = baxterBoxService.getAllBaxterBoxes();
+            // Check if entryToUpdate.getBox() is in boxes
+            ManagerLogEntry finalEntryToUpdate = entryToUpdate;
+            boolean isNewBox = Arrays.stream(boxes)
+                    .noneMatch(box -> box.getId() == finalEntryToUpdate.getBox());
+
+            // either update or create a new box
+            if (isNewBox) {
+                baxterBoxService.createBaxterBox(entryToUpdate.getBox(), entryToUpdate.getSku(), entryToUpdate.getProposedQuantityToAdd());
+            } else {
+                baxterBoxService.updateBaxterBox(baxterBoxService.getBaxterBox(entryToUpdate.getBox()), entryToUpdate.getProposedQuantityToAdd());
+
+                if (entryToUpdate.isFullStatusChangedTo() != null) {
+                    baxterBoxService.setBaxterBoxFull(baxterBoxService.getBaxterBox(entryToUpdate.getBox()), entryToUpdate.isFullStatusChangedTo());
+                }
+            }
         }
 
 
@@ -324,5 +344,23 @@ public class ManagerLogService {
         }
 
         return variants;
+    }
+
+    /**
+     * Checks whether this box id has been sent to the manager log.
+     * The idea being, if someone has packed products into a NEW box, and then sent that as a proposed change,
+     * we don't want to recommend that box as being empty for others to pack into as well
+     * @param boxId
+     * @return
+     */
+    public static boolean isInManagerLog(int boxId, ManagerLogEntry[] cachedEntries) throws Exception {
+        // find the entry
+        for (ManagerLogEntry entry : cachedEntries) {
+            if (entry.getBox() == boxId) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
