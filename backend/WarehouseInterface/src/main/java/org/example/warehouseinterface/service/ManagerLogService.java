@@ -333,4 +333,24 @@ public class ManagerLogService {
 
         return variants;
     }
+
+    /**
+     * Checks whether this box id has been sent to the manager log.
+     * The idea being, if someone has packed products into a NEW box, and then sent that as a proposed change,
+     * we don't want to recommend that box as being empty for others to pack into as well
+     * @param boxId
+     * @return
+     */
+    public boolean isInManagerLog(int boxId) throws Exception {
+        ManagerLogEntry[] logEntries = getAllLogEntries();
+
+        // find the entry
+        for (ManagerLogEntry entry : logEntries) {
+            if (entry.getBox() == boxId) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

@@ -28,6 +28,9 @@ public class BaxterBoxService {
     public static HttpClient httpClient = HttpClient.newHttpClient();
     public static ObjectMapper objectMapper = new ObjectMapper();
 
+    @Autowired
+    private ManagerLogService managerLogService;
+
     /** Returns information about the BaxterBox#id
      * @param id Id of specified baxter box
      * @return The box itself, containing its information
@@ -108,7 +111,7 @@ public class BaxterBoxService {
      * @throws Exception
      */
     public BaxterBox createBaxterBox(String SKU, int units) throws Exception {
-        BaxterBox box = new BaxterBox(findNextId(), 1, SKU, units, false);
+        BaxterBox box = new BaxterBox(findNextId(SKU), 1, SKU, units, false);
 
         // convert to json to ready to ship off
         ObjectMapper objectMapper = new ObjectMapper();
@@ -226,18 +229,56 @@ public class BaxterBoxService {
 
     /**
      * Finds a unique location id for a new database entry to use
+     * Should be near to other boxes which contain products of the same type
+     * AND
+     * Shouldn't recommend a box location that is currently being proposed in a new manager log entry
+     * @Param String sku
      * @return integer location id
      */
-    public int findNextId() throws Exception {
+    public int findNextId(String sku) throws Exception {
         BaxterBox[] boxes = getAllBaxterBoxes();
+        int MAX_BOX_ID = 800;
 
-        int lowestFreeId = -1;
-        for (BaxterBox box : boxes) {
-            if (box.getId() >= lowestFreeId) {
-                lowestFreeId = box.getId() + 1;
+        List<BaxterBox> boxesWithThisSku = new ArrayList<>();
+
+        // find all boxes containing this product type.
+        for (BaxterBox baxterBox : boxes) {
+            if (baxterBox.getSKU().equals(sku)) {
+                boxesWithThisSku.add(baxterBox);
             }
         }
-        return lowestFreeId;
+
+        // this is a new product, just put it in the lowest free location
+        if (boxesWithThisSku.isEmpty()) {
+            int lowestFreeId = -1;
+            for (BaxterBox box : boxes) {
+                if (box.getId() >= lowestFreeId && box.getId() <= MAX_BOX_ID) {  // Check that the id is not over 800
+                    lowestFreeId = box.getId() + 1;
+                }
+            }
+            return lowestFreeId;
+        }
+
+        // ... otherwise, this product exists, what is the nearest number to any boxes with this sku that isn't full
+        int nearestId = -10000;
+        for (BaxterBox baxterBox : boxesWithThisSku) {
+            for (BaxterBox box : boxes) {
+                if (!box.isFull() && !managerLogService.isInManagerLog(box.getId()) && box.getId() <= MAX_BOX_ID) {
+                    int distance = Math.abs(baxterBox.getId() - box.getId());
+                    if (distance < Math.abs(nearestId - baxterBox.getId())) {
+                        nearestId = box.getId();
+                    }
+                }
+            }
+        }
+
+        // If no suitable box was found, throw an exception
+        if (nearestId == -10000) {
+            throw new Exception("No free box available under " + MAX_BOX_ID);
+        }
+
+        // Return the nearest id found
+        return nearestId;
     }
 
     public BaxterBox[] getAllBaxterBoxes() throws Exception {
