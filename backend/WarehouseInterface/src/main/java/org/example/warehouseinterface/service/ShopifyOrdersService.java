@@ -13,9 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -205,29 +207,33 @@ public class ShopifyOrdersService {
 
         // Build the DELETE request
         HttpClient client = HttpClient.newHttpClient();
+        System.out.println(SUPABASE_URL + "/rest/v1/Order?orderNumber=eq." + orderNumber);
+        String encodedOrderNumber = URLEncoder.encode(orderNumber, StandardCharsets.UTF_8);
+        System.out.println(SUPABASE_URL + "/rest/v1/Order?orderNumber=eq." + encodedOrderNumber);
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(SUPABASE_URL + "/rest/v1/Order?orderNumber=eq." + orderNumber))
+                .uri(URI.create(SUPABASE_URL + "/rest/v1/Order?orderNumber=eq." + encodedOrderNumber))
                 .header("apikey", SUPABASE_API_KEY)
                 .header("Authorization", "Bearer " + SUPABASE_API_KEY)
                 .header("Content-Type", "application/json")
-                .DELETE() // Change to DELETE
+                .DELETE()
                 .build();
 
         // Send the request
-        client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApply(HttpResponse::body)
-                .thenAccept(System.out::println)
-                .exceptionally(e -> {
-                    e.printStackTrace();
-                    return null;
-                });
+//        client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+//                .thenApply(HttpResponse::body)
+//                .thenAccept(System.out::println)
+//                .exceptionally(e -> {
+//                    e.printStackTrace();
+//                    return null;
+//                });
 
-//        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-//
-//        if (response.statusCode() != 201) { // HTTP 201 Created
-//            // Parse and return the created BaxterBox
-//            throw new Exception("Failed to accept order: " + response.statusCode() + " - " + response.body());
-//        }
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println(response.body());
+
+        if (response.statusCode() != 204) { // delete successful
+            // Parse and return the created BaxterBox
+            throw new Exception("Failed to delete order: " + response.statusCode() + " - " + response.body());
+        }
 
     }
 
