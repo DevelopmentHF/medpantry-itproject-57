@@ -47,27 +47,32 @@ public class BaxterBoxController {
         }
     }
 
-    @PostMapping("/addToBaxterBox")
-    public ResponseEntity<BaxterBox> addProductsToStock(@RequestParam String SKU, @RequestParam int units) {
+    @PatchMapping("/setBaxterBoxFull")
+    public ResponseEntity<BaxterBox> setBaxterBoxFull(@RequestParam Integer id, @RequestParam Boolean isFull) {
         try {
-            // products of this type might already be packed somewhere
-            BaxterBox existingBaxterBox = baxterBoxService.findBaxterBoxBySKU(SKU);
+            BaxterBox box = baxterBoxService.getBaxterBox(id);
 
-            if (existingBaxterBox != null) {
-                // update existing BaxterBox with new information
-                BaxterBox updatedBaxterBox = baxterBoxService.updateBaxterBox(existingBaxterBox, units);
-                return new ResponseEntity<>(updatedBaxterBox, HttpStatus.OK);
+            if (box != null) {
+                BaxterBox updated = baxterBoxService.setBaxterBoxFull(box, isFull);
+                return new ResponseEntity<>(updated, HttpStatus.OK);
             } else {
-                // create a new BaxterBox
-                BaxterBox newBaxterBox = baxterBoxService.createBaxterBox(SKU, units);
-                return new ResponseEntity<>(newBaxterBox, HttpStatus.CREATED);
+                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
             // return an error response
             e.printStackTrace();
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
 
+    @GetMapping("/nextBoxId")
+    public ResponseEntity<Integer> getNextBoxId(@RequestParam String sku) {
+        try {
+            return new ResponseEntity<>(baxterBoxService.findNextId(sku), HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }
