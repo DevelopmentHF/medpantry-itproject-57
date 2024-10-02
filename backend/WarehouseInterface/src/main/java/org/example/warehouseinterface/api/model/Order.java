@@ -2,23 +2,25 @@ package org.example.warehouseinterface.api.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Order {
-    private String sku;
-    private String orderNumber;
-    private int quantity;
-    private String itemName;
+import java.util.List;
 
-    public Order(@JsonProperty("sku") String sku,
+public class Order {
+    private List<String> sku;
+    private String orderNumber;
+    private List<Integer> quantity;
+    private List<String> itemName;
+
+    public Order(@JsonProperty("sku") List<String> sku,
                  @JsonProperty("order_number") String orderNumber,
-                 @JsonProperty("quantity") int quantity,
-                 @JsonProperty("item_name") String itemName) {
+                 @JsonProperty("quantity") List<Integer> quantity,
+                 @JsonProperty("item_name") List<String> itemName) {
         this.sku = sku;
         this.orderNumber = orderNumber;
         this.quantity = quantity;
         this.itemName = itemName;
     }
 
-    public String getSku() {
+    public List<String> getSku() {
         return sku;
     }
 
@@ -26,11 +28,11 @@ public class Order {
         return orderNumber;
     }
 
-    public int getQuantity() {
+    public List<Integer> getQuantity() {
         return quantity;
     }
 
-    public String getItemName() {
+    public List<String> getItemName() {
         return itemName;
     }
 }
