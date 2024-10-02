@@ -11,6 +11,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,6 +38,7 @@ public class ManagerLogService {
      * @throws Exception
      */
     public void handleChangeProposal(int box, String sku, int proposedQuantityToAdd, Boolean fullStatusChangedTo) throws Exception {
+        System.out.println("Received change proposal for box" + box + " with sku " + sku + " with proposed quantity " + proposedQuantityToAdd + " and fullstatus " + fullStatusChangedTo);
         // its ok is fullStatusChangedTO is null.
         ManagerLogEntry newLogEntry = new ManagerLogEntry(generateUniqueLogId(), box, sku, proposedQuantityToAdd, true, false, fullStatusChangedTo);
 
@@ -140,11 +142,21 @@ public class ManagerLogService {
 
         if (accepted) {
             // now update the box.
-            // TODO: If a new box, .getBox wont work obvs
-            baxterBoxService.updateBaxterBox(baxterBoxService.getBaxterBox(entryToUpdate.getBox()), entryToUpdate.getProposedQuantityToAdd());
+            BaxterBox[] boxes = baxterBoxService.getAllBaxterBoxes();
+            // Check if entryToUpdate.getBox() is in boxes
+            ManagerLogEntry finalEntryToUpdate = entryToUpdate;
+            boolean isNewBox = Arrays.stream(boxes)
+                    .noneMatch(box -> box.getId() == finalEntryToUpdate.getBox());
 
-            if (entryToUpdate.isFullStatusChangedTo() != null) {
-                baxterBoxService.setBaxterBoxFull(baxterBoxService.getBaxterBox(entryToUpdate.getBox()), entryToUpdate.isFullStatusChangedTo());
+            // either update or create a new box
+            if (isNewBox) {
+                baxterBoxService.createBaxterBox(entryToUpdate.getBox(), entryToUpdate.getSku(), entryToUpdate.getProposedQuantityToAdd());
+            } else {
+                baxterBoxService.updateBaxterBox(baxterBoxService.getBaxterBox(entryToUpdate.getBox()), entryToUpdate.getProposedQuantityToAdd());
+
+                if (entryToUpdate.isFullStatusChangedTo() != null) {
+                    baxterBoxService.setBaxterBoxFull(baxterBoxService.getBaxterBox(entryToUpdate.getBox()), entryToUpdate.isFullStatusChangedTo());
+                }
             }
         }
 

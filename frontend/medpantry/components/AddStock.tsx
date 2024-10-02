@@ -6,6 +6,7 @@ import AuthButton from '@/components/AuthButton';
 import AddToStockForm from '@/components/AddToStockForm';
 import QRScanner from '@/components/QRScanner';
 import BaxterBox from './BaxterBox';
+import NewBox from './NewBox';
 import { useState } from 'react';
 
 
@@ -29,7 +30,7 @@ export default function AddStock() {
 
     const handleCreateNewBox = () => {
         setNewBox({
-            id: -1,  // placehoder
+            id: 50,  // placehoder
             sku: sku,
             warehouseId: 1,  // warehouse id always 1 atm
             units: 0,  // No units packed initially
@@ -46,13 +47,7 @@ export default function AddStock() {
 
             {/* Render the new box if it exists */}
             {newBox && (
-                <BaxterBox
-                id={newBox.id}
-                sku={newBox.sku}
-                warehouseId={newBox.warehouseId}
-                units={newBox.units}
-                isFull={newBox.full}
-                />
+                <NewBox box={newBox}></NewBox>
             )}
         </>
     )
