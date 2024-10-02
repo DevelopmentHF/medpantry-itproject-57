@@ -61,10 +61,10 @@ export default function LogEntry({ id, box, sku, proposedQuantityToAdd, fullStat
                 <p className="text-gray-400">+{proposedQuantityToAdd}</p>
             </div>
 
-            {fullStatusChangedTo !== undefined && (
+            {fullStatusChangedTo !== null && (
                 <div className="flex justify-between">
                     <p>Full Status Changed</p>
-                    <p className="text-gray-400">{fullStatusChangedTo ? 'Full' : 'Not Full'}</p>
+                    <p className="text-gray-400">{fullStatusChangedTo ? 'True' : 'False'}</p>
                 </div>
             )}
 

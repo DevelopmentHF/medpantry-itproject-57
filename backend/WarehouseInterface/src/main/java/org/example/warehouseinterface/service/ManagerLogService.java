@@ -85,7 +85,7 @@ public class ManagerLogService {
      * @return
      * @throws Exception
      */
-    public ManagerLogEntry[] getAllLogEntries() throws Exception {
+    public static ManagerLogEntry[] getAllLogEntries() throws Exception {
         // get all  rows from supabase
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -341,7 +341,7 @@ public class ManagerLogService {
      * @param boxId
      * @return
      */
-    public boolean isInManagerLog(int boxId) throws Exception {
+    public static boolean isInManagerLog(int boxId) throws Exception {
         ManagerLogEntry[] logEntries = getAllLogEntries();
 
         // find the entry

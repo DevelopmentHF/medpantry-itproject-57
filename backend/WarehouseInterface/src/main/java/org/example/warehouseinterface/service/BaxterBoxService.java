@@ -28,8 +28,6 @@ public class BaxterBoxService {
     public static HttpClient httpClient = HttpClient.newHttpClient();
     public static ObjectMapper objectMapper = new ObjectMapper();
 
-    @Autowired
-    private ManagerLogService managerLogService;
 
     /** Returns information about the BaxterBox#id
      * @param id Id of specified baxter box
@@ -263,7 +261,7 @@ public class BaxterBoxService {
         int nearestId = -10000;
         for (BaxterBox baxterBox : boxesWithThisSku) {
             for (BaxterBox box : boxes) {
-                if (!box.isFull() && !managerLogService.isInManagerLog(box.getId()) && box.getId() <= MAX_BOX_ID) {
+                if (!box.isFull() && !ManagerLogService.isInManagerLog(box.getId()) && box.getId() <= MAX_BOX_ID) {
                     int distance = Math.abs(baxterBox.getId() - box.getId());
                     if (distance < Math.abs(nearestId - baxterBox.getId())) {
                         nearestId = box.getId();
