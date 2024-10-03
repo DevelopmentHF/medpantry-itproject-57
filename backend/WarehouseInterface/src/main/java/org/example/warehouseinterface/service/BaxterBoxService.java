@@ -1,6 +1,7 @@
 package org.example.warehouseinterface.service;
 
 import org.example.warehouseinterface.api.model.BaxterBox;
+import org.example.warehouseinterface.api.model.ManagerLogEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +28,7 @@ public class BaxterBoxService {
 
     public static HttpClient httpClient = HttpClient.newHttpClient();
     public static ObjectMapper objectMapper = new ObjectMapper();
+
 
     /** Returns information about the BaxterBox#id
      * @param id Id of specified baxter box
@@ -107,8 +109,8 @@ public class BaxterBoxService {
      * @return
      * @throws Exception
      */
-    public BaxterBox createBaxterBox(String SKU, int units) throws Exception {
-        BaxterBox box = new BaxterBox(findNextId(), 1, SKU, units, false);
+    public BaxterBox createBaxterBox(int boxid, String SKU, int units) throws Exception {
+        BaxterBox box = new BaxterBox(boxid, 1, SKU, units, false);
 
         // convert to json to ready to ship off
         ObjectMapper objectMapper = new ObjectMapper();
@@ -166,6 +168,37 @@ public class BaxterBoxService {
         return baxterBox;
     }
 
+    /**
+     * Sets a baxter box's full status
+     * @param baxterBox
+     * @param full
+     * @return
+     * @throws Exception
+     */
+    public BaxterBox setBaxterBoxFull(BaxterBox baxterBox, boolean full) throws Exception {
+        baxterBox.setFull(full);
+
+        // Convert BaxterBox to JSON
+        String jsonRequestBody = objectMapper.writeValueAsString(baxterBox);
+
+        // Create PATCH request
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(SUPABASE_URL + "/rest/v1/BaxterBoxes?id=eq." + baxterBox.getId()))
+                .header("apikey", SUPABASE_API_KEY)
+                .header("Authorization", "Bearer " + SUPABASE_API_KEY)
+                .header("Content-Type", "application/json")
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(jsonRequestBody))
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200 && response.statusCode() != 204) {
+            throw new Exception("Failed to update BaxterBox: " + response.statusCode() + " " + response.body());
+        }
+
+        return baxterBox;
+    }
+
     public void freeBaxterBox(BaxterBox baxterBox) throws Exception {
         baxterBox.setUnits(0);
         // baxterBox.setSKU(null); this messes things up
@@ -195,18 +228,86 @@ public class BaxterBoxService {
 
     /**
      * Finds a unique location id for a new database entry to use
+     * Should be near to other boxes which contain products of the same type
+     * AND
+     * Shouldn't recommend a box location that is currently being proposed in a new manager log entry
+     * @Param String sku
      * @return integer location id
      */
-    public int findNextId() throws Exception {
+    public int findNextId(String sku) throws Exception {
         BaxterBox[] boxes = getAllBaxterBoxes();
+        int MAX_BOX_ID = 800;
 
-        int lowestFreeId = -1;
-        for (BaxterBox box : boxes) {
-            if (box.getId() >= lowestFreeId) {
-                lowestFreeId = box.getId() + 1;
+        List<BaxterBox> boxesWithThisSku = new ArrayList<>();
+
+        // find all boxes containing this product type.
+        for (BaxterBox baxterBox : boxes) {
+            if (baxterBox.getSKU().equals(sku)) {
+                boxesWithThisSku.add(baxterBox);
             }
         }
-        return lowestFreeId;
+
+        // this is a new product, just put it in the lowest free location
+        if (boxesWithThisSku.isEmpty()) {
+            int lowestFreeId = -1;
+            for (BaxterBox box : boxes) {
+                if (box.getId() >= lowestFreeId && box.getId() <= MAX_BOX_ID) {  // Check that the id is not over 800
+                    lowestFreeId = box.getId() + 1;
+                }
+            }
+            return lowestFreeId;
+        }
+
+        ManagerLogEntry[] logEntries = ManagerLogService.getAllLogEntries();
+
+        // find all occupied ids
+        List<Integer> occupiedIds = new ArrayList<>();
+        for (BaxterBox box : boxes) {
+            occupiedIds.add(box.getId());
+        }
+        for (ManagerLogEntry logEntry : logEntries) {
+            occupiedIds.add(logEntry.getBox());
+        }
+
+        // ... otherwise, this product exists, what is the nearest number to any boxes with this sku that isn't full
+        int nearestId = -10000;
+
+        for (BaxterBox boxWithSku : boxesWithThisSku) {
+            int boxId = boxWithSku.getId();
+            int nearestIdToThisBox = -1;
+
+            // Check for IDs greater than the current boxId
+            for (int i = boxId + 1; i < MAX_BOX_ID; i++) {
+                if (!occupiedIds.contains(i)) {
+                    nearestIdToThisBox = i;
+                    break;
+                }
+            }
+
+            // Check for IDs less than the current boxId
+            for (int i = boxId - 1; i >= 0; i--) {
+                if (!occupiedIds.contains(i)) {
+                    // If we've already found a nearest ID above, compare which is closer
+                    if (nearestIdToThisBox == -1 || (boxId - i < Math.abs(boxId - nearestIdToThisBox))) {
+                        nearestIdToThisBox = i;
+                    }
+                    break;
+                }
+            }
+
+            // If a nearest ID was found for this box, check if it's closer than the current nearestId
+            if (nearestIdToThisBox != -1 && (nearestId == -10000 || Math.abs(nearestIdToThisBox - boxId) < Math.abs(nearestId - boxId))) {
+                nearestId = nearestIdToThisBox; 
+            }
+        }
+
+        // If no suitable box was found, throw an exception
+        if (nearestId == -10000) {
+            throw new Exception("No free box available under " + MAX_BOX_ID);
+        }
+
+        // Return the nearest id found
+        return nearestId;
     }
 
     public BaxterBox[] getAllBaxterBoxes() throws Exception {

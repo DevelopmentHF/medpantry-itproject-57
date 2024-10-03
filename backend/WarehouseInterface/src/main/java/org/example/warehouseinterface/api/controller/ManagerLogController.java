@@ -18,9 +18,10 @@ public class ManagerLogController {
     };
 
     @PostMapping("/proposeChange")
-    public String proposeChange(@RequestParam int box, @RequestParam String sku, @RequestParam int proposedQuantityToAdd) {
+    public String proposeChange(@RequestParam int box, @RequestParam String sku, @RequestParam int proposedQuantityToAdd, @RequestParam(required = false) Boolean fullStatusChangedTo) {
         try {
-            managerLogService.handleChangeProposal(box, sku, proposedQuantityToAdd);
+            managerLogService.handleChangeProposal(box, sku, proposedQuantityToAdd, fullStatusChangedTo);
+
             return "Sucessfully created manager log entry";
         } catch (Exception e) {
             e.printStackTrace();

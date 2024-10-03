@@ -42,6 +42,7 @@ export default async function ManagerLog({} : props) {
                             proposedQuantityToAdd={entry.proposedQuantityToAdd}
                             pending={entry.pending}
                             accepted={entry.accepted}
+                            fullStatusChangedTo={entry.fullStatusChangedTo}
                         />
                     ))
             ) : (
