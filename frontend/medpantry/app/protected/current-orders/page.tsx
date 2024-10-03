@@ -132,11 +132,11 @@ export default async function CurrentOrders() {
           </div>
 
           <div className="flex flex-wrap gap-10">
-            {orderArray.map((order) => (
+            {orderArray.map((order, index) => (
               <Order
-                key={order.orderNumber}
+                key={index}
                 orderNumber={order.orderNumber}
-                cards={order.cards}
+                datas={order.datas}
               />
             ))}
           </div>
