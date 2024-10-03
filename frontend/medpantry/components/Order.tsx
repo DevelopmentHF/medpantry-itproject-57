@@ -95,13 +95,18 @@ export default function Order({ orderNumber, datas = [], boxes = [], displayTake
                         </TableHeader>
 
                         <TableBody>
-                            {datas.map((data: Data, index) => (
-                                <OrderLine
-                                    key={index} // Make sure to use a unique key
-                                    itemName={data.itemName}
-                                    quantity={data.quantity}
-                                />
-                            ))}
+                            {datas.length > 0 ? (
+                                datas.filter(isDataValid).map((data, index) => (
+                                    <OrderLine
+                                        key={index}
+                                        itemName={data.itemName}
+                                        quantity={data.quantity}
+                                        boxNumbers={boxes}
+                                    />
+                                ))
+                            ) : (
+                                <p>No items found in this order.</p>
+                            )}
                         </TableBody>
                     </Table>
                 </CardContent>

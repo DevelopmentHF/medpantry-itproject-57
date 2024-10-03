@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/Table";
 import { Package } from "lucide-react";
+import React from "react";
 
 interface Data {
 	quantity: number;
@@ -132,11 +133,13 @@ export default async function CurrentOrders() {
           </div>
 
           <div className="flex flex-wrap gap-10">
-            {orderArray.map((order, index) => (
+            {ordersWithBoxIds.map((order, index) => (
               <Order
                 key={index}
                 orderNumber={order.orderNumber}
                 datas={order.datas}
+				boxes={order.boxes}
+				displayTakeOrderButton={true}
               />
             ))}
           </div>
