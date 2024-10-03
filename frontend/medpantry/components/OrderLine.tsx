@@ -1,17 +1,8 @@
 import React from 'react';
-import { Button } from "@/components/ui/button";
-import AuthButton from './AuthButton';
-import { Separator } from './ui/separator';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/TableCard";
 import {
-  Table,
-  TableBody,
   TableCell,
-  TableHead,
-  TableHeader,
   TableRow,
 } from "@/components/Table";
-import { Package } from "lucide-react";
 
 interface OrderLineProps {
 	itemName: string;
