@@ -17,6 +17,8 @@ interface OrderProps {
 }
 
 export default async function CurrentOrders() {
+  //logic behind taking orders are handled within the Order component.
+
   // Fetch all orders from Shopify
   let orderArray: OrderProps[] = []; 
   try {

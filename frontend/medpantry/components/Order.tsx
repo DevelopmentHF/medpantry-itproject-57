@@ -26,36 +26,39 @@ interface OrderProps {
   displayTakeOrderButton: boolean;
 }
 
+const isDataValid = (data: any): data is Data => {
+  return typeof data === 'object' && data !== null &&
+    typeof data.quantity === 'number' &&
+    typeof data.itemName === 'string';
+};
+
+/*A user can take an order, which removes the order card from the pending order list.
+  After taking an order, the user will be redirected to a /take-order page, where they will press the "done" button to complete the order.
+  takeOrder() is called onClick of take order button.*/
+async function takeOrder(orderNumber: string, datas: Data[], boxes: number[], router: any) {
+  try {
+    const value: string = encodeURIComponent(orderNumber);
+    console.log(value);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/TakeOrder?orderNumber=${value}`, {
+      method: "PATCH",
+    });
+    if (!res.ok) throw new Error("Network response was not ok");
+    console.log("Order taken:", res);
+
+    // Redirect to /take-order page with query parameters
+    const queryParams = new URLSearchParams({
+      orderNumber,
+      datas: JSON.stringify(datas),
+      boxes: JSON.stringify(boxes),
+    }).toString();
+    router.push(`/protected/take-order?${queryParams}`);
+  } catch (error) {
+    console.error("Error taking order:", error);
+  }
+}
+
 export default function Order({ orderNumber, datas = [], boxes = [], displayTakeOrderButton }: OrderProps) {
   const router = useRouter();
-
-  const isDataValid = (data: any): data is Data => {
-      return typeof data === 'object' && data !== null &&
-          typeof data.quantity === 'number' &&
-          typeof data.itemName === 'string';
-  };
-
-  const takeOrder = async (orderNumber: string) => {
-      try {
-          const value: string = encodeURIComponent(orderNumber);
-          console.log(value);
-          const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/HandleOrderAccept?orderNumber=${value}`, {
-              method: 'PATCH',
-          });
-          if (!res.ok) throw new Error('Network response was not ok');
-          console.log('Order accepted:', res);
-
-          // Redirect to /take-order with query parameters
-          const queryParams = new URLSearchParams({
-              orderNumber,
-              datas: JSON.stringify(datas),
-              boxes: JSON.stringify(boxes),
-          }).toString();
-          router.push(`/protected/take-order?${queryParams}`);
-      } catch (error) {
-          console.error('Error taking order:', error);
-      }
-  };
 
   return (
     <Card
@@ -70,7 +73,7 @@ export default function Order({ orderNumber, datas = [], boxes = [], displayTake
           </span>
         </CardTitle>
         {displayTakeOrderButton && (
-          <Button className="bg-red-600 hover:bg-red-700 text-white" onClick={() => takeOrder(orderNumber)}>
+          <Button className="bg-red-600 hover:bg-red-700 text-white" onClick={() => takeOrder(orderNumber, datas, boxes, router)}>
             Take Order
           </Button>
         )}

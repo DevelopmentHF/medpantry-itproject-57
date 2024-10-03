@@ -4,21 +4,20 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 
 type DoneOrderButtonProps = {
-    boxes: number[];
-    datas: { quantity: number; sku: string; itemName: string }[]; // Updated type to include itemName
+    orderNumber: string
 };
 
-export default function DoneOrderButton({ boxes, datas }: DoneOrderButtonProps) {
+export default function DoneOrderButton({ orderNumber }: DoneOrderButtonProps) {
     const router = useRouter();
 
     const handleClick = async () => {
         try {
-            // Loop through each box and data to propose change to manager log
-            for (const box of boxes) {
-                for (const data of datas) {
-                    console.log(box, data.sku, data.quantity);
+            const value: string = encodeURIComponent(orderNumber);
+            console.log(value);
 
-                    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/proposeChange?box=${box}&sku=${data.sku}&proposedQuantityToAdd=${data.quantity}`, {
+
+
+                    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/HandleOrderAccept?orderNumber=${value}`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -32,8 +31,7 @@ export default function DoneOrderButton({ boxes, datas }: DoneOrderButtonProps) 
 
                     //jump back to current-order page
                     if(text === "Successfully logged proposal change") router.push('/protected/current-orders');
-                }
-            }
+
         } catch (error) {
             console.error('Error during proposing change to manager log:', error);
         }
