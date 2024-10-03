@@ -96,14 +96,18 @@ export default function AddToStockForm({ extractedSku }: AddToStockFormProps) {
                             />
                             <div className='flex flex-col gap-4'>
                                 <form onSubmit={(e) => handleBoxSubmit(e, localUnitsPacked, baxterBox.id)} className="flex flex-col gap-4">
-                                    <Input
-                                        placeholder="How many units packed?"
-                                        onChange={(e) => localUnitsPacked = Number(e.target.value)}
-                                    />
-                                    <Button type="submit">Update Stock</Button>
+                                {!baxterBox.full && (
+                                    <>
+                                        <Input
+                                            placeholder="How many units packed?"
+                                            onChange={(e) => localUnitsPacked = Number(e.target.value)}
+                                        />
+                                        <Button type="submit">Update Stock</Button>
+                                    </>
+                                )}
                                 </form>
                                 <Button onClick={() => toggleFullStatus(baxterBox.id, baxterBox.full)}>
-                                    Full? {fullStatusChanged[baxterBox.id] !== undefined ? fullStatusChanged[baxterBox.id] ? 'Yes' : 'No' : baxterBox.full ? 'Yes' : 'No'}
+                                    Full?
                                 </Button>
                             </div>
                         </div>
