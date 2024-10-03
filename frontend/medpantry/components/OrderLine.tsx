@@ -14,12 +14,16 @@ import {
 import { Package } from "lucide-react";
 
 interface OrderLineProps {
-  itemName: string;
-  quantity: string;
-  boxNumber: string;
+	name: string;
+	quantity: number;
+	boxNumbers: number[]; // Expecting an array of numbers for box numbers
 }
 
-export default function OrderLine({ itemName, quantity, boxNumber }: OrderLineProps) {
+export default function OrderLine({ name, quantity, boxNumbers }: OrderLineProps) {
+	// Validate boxNumbers to ensure it's an array of numbers
+	const isBoxNumbersValid = (numbers: any): numbers is number[] => {
+		return Array.isArray(numbers) && numbers.every(num => typeof num === 'number');
+	};
   return (
     <div>
         <TableRow className="border-gray-100 hover:bg-gray-50">
