@@ -39,7 +39,9 @@ export default function OrderLine({ itemName, quantity, boxNumbers }: OrderLineP
           </TableCell>
           <TableCell className="text-gray-600">
             <span className="flex items-center">
-              Box #{boxNumbers}
+              {isBoxNumbersValid(boxNumbers) && boxNumbers.length > 0
+                ? `#${boxNumbers.join(', ')}`
+                : 'N/A'}
             </span>
           </TableCell>
         </TableRow>
