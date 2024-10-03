@@ -12,41 +12,104 @@ import {
 } from "@/components/Table";
 import { Package } from "lucide-react";
 
+interface Data {
+	quantity: number;
+	sku: string;
+	itemName: string;
+}
+
+interface OrderProps {
+	orderNumber: string;
+	datas: Data[];
+	boxes?: number[];
+}
+
 export default async function CurrentOrders() {
+	// Fetch all orders from Shopify
+	let orderArray: OrderProps[] = []; // Define type for orderArray
+	try {
+		// Force a fresh fetch by passing timestamp
+		const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/ShopifyOrders?timestamp=${Date.now()}`, {
+			method: 'GET',
+			headers: {
+				'Cache-Control': 'no-cache',
+			},
+		});
+		if (!res.ok) throw new Error('Network response was not ok');
+		const orderString = await res.json();
 
-    // Fetch all orders from Shopify
-    let orderArray: any[] = [];
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/ShopifyOrders`, {
-        method: 'GET',
-      });
-      if (!res.ok) throw new Error('Network response was not ok');
-      const orderString = await res.json();
-      console.log("orders: " + JSON.stringify(orderString));
+		// Validate the fetched data
+		if (!Array.isArray(orderString)) {
+			throw new Error('Fetched data is not an array');
+		}
 
-      // Fill the array of orders and group items by orderNumber
-      const orders = orderString.reduce((acc: any, item: any) => {
-        if (!acc[item.orderNumber]) {
-          acc[item.orderNumber] = {
-            orderNumber: item.orderNumber,
-            cards: []
-          };
-        }
-        acc[item.orderNumber].cards.push({
-          quantity: item.quantity,
-          sku: item.sku,
-          itemName: item.itemName
-        });
-        return acc;
-      }, {});
+		// Fill the array of orders and group items by orderNumber
+		const orders = orderString.reduce((acc: Record<string, OrderProps>, item: any) => {
+			if (typeof item.orderNumber !== 'string' || typeof item.quantity !== 'number' || typeof item.itemName !== 'string') {
+				console.warn('Invalid item structure:', item);
+				return acc;
+			}
 
-      orderArray = Object.values(orders);
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
-    console.log("ORDERS ARRAY:");
-    console.log(orderArray);
+			if (!acc[item.orderNumber]) {
+				acc[item.orderNumber] = {
+					orderNumber: item.orderNumber,
+					datas: [],
+				};
+			}
+			acc[item.orderNumber].datas.push({
+				quantity: item.quantity,
+				sku: item.sku,
+				itemName: item.itemName,
+			});
+			return acc;
+		}, {});
+
+		orderArray = Object.values(orders) as OrderProps[];
+
+	} catch (error) {
+		console.error("Error fetching orders:", error);
+		return <div>Error fetching orders. Please try again later.</div>;
+	}
+
+	async function getBoxId(orderNumber: string): Promise<number[]> {
+		// Convert # into %23 for /RequiredBaxterBoxes
+		const value: string = encodeURIComponent(orderNumber);
+
+		try {
+			const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/RequiredBaxterBoxes?orderNumber=${value}`, {
+				method: 'GET',
+				headers: {
+					'Cache-Control': 'no-cache',
+				},
+			});
+
+			if (!res.ok) throw new Error('Network response was not ok');
+
+			const boxes = await res.json();
+
+			// Validate the box data structure
+			if (!Array.isArray(boxes)) {
+				console.warn('Fetched box data is not an array:', boxes);
+				return [];
+			}
+
+			return boxes.map((item: any) => item.box_id).filter((id: any) => typeof id === 'number'); // Filter invalid box IDs
+		} catch (error) {
+			console.error("Error fetching box IDs:", error);
+			return []; // Return an empty array on error
+		}
+	}
+
+	// Prepare orders with their corresponding box IDs
+	const ordersWithBoxIds = await Promise.all(
+		orderArray.map(async (order) => {
+			const boxes = await getBoxId(order.orderNumber);
+			return {
+				...order,
+				boxes: boxes || [],
+			};
+		})
+	);
 
     return (
       <>
@@ -68,7 +131,7 @@ export default async function CurrentOrders() {
             </h1>
           </div>
 
-          {/* <div className="flex flex-wrap gap-10">
+          <div className="flex flex-wrap gap-10">
             {orderArray.map((order) => (
               <Order
                 key={order.orderNumber}
@@ -76,75 +139,7 @@ export default async function CurrentOrders() {
                 cards={order.cards}
               />
             ))}
-          </div> */}
-
-          {orderArray.map((order) => (
-            <Card
-              key={order.orderNumber}
-              className=" border-gray-200 shadow-md rounded-xl w-full flex flex-col items-center"
-            >
-              <CardHeader className="flex flex-row items-center justify-between bg-white w-full p-6">
-                <CardTitle className="text-gray-800 flex items-center flex-wrap">
-                  <span className="text-2xl font-bold flex items-center">
-                    <Package className="mr-2 h-6 w-6 text-red-600" />
-                    Order {order.orderNumber}
-                  </span>
-                </CardTitle>
-                <Button className="bg-red-600 hover:bg-red-700 text-white">
-                  Take Order
-                </Button>
-              </CardHeader>
-              <CardContent className="w-full bg-white p-6">
-                <Table className="ml-auto mr-auto">
-                  <TableHeader>
-                    <TableRow className="bg-gray-50 hover:bg-gray-50 border-gray-100">
-                      <TableHead className="text-gray-600">
-                        <span className="flex items-center">Item</span>
-                      </TableHead>
-                      <TableHead className="text-gray-600 text-center">
-                        <span className="flex items-center">
-                          Total Quantity
-                        </span>
-                      </TableHead>
-                      <TableHead className="text-gray-600">
-                        <span className="flex items-center">
-                          Warehouse Location
-                        </span>
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-
-                  <TableBody>
-                    {order.cards.map(
-                      (order: {
-                        itemName: string;
-                        quantity: number;
-                        sku: string;
-                      }) => (
-                        <TableRow className="border-gray-100 hover:bg-gray-50">
-                          <TableCell className="text-gray-600">
-                            <span className="flex items-center">
-                              {order.itemName}
-                            </span>
-                          </TableCell>
-                          <TableCell className="text-gray-600 text-center">
-                            <span className="flex items-center">
-                              {order.quantity}
-                            </span>
-                          </TableCell>
-                          <TableCell className="text-gray-600">
-                            <span className="flex items-center">
-                              Box #{order.sku}
-                            </span>
-                          </TableCell>
-                        </TableRow>
-                      )
-                    )}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          ))}
+          </div>
         </div>
       </>
     );
