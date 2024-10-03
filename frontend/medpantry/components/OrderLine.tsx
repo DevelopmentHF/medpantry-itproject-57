@@ -14,12 +14,12 @@ import {
 import { Package } from "lucide-react";
 
 interface OrderLineProps {
-	name: string;
+	itemName: string;
 	quantity: number;
 	boxNumbers: number[]; // Expecting an array of numbers for box numbers
 }
 
-export default function OrderLine({ name, quantity, boxNumbers }: OrderLineProps) {
+export default function OrderLine({ itemName, quantity, boxNumbers }: OrderLineProps) {
 	// Validate boxNumbers to ensure it's an array of numbers
 	const isBoxNumbersValid = (numbers: any): numbers is number[] => {
 		return Array.isArray(numbers) && numbers.every(num => typeof num === 'number');
@@ -29,17 +29,17 @@ export default function OrderLine({ name, quantity, boxNumbers }: OrderLineProps
         <TableRow className="border-gray-100 hover:bg-gray-50">
           <TableCell className="text-gray-600">
             <span className="flex items-center">
-              {order.itemName}
+              {itemName}
             </span>
           </TableCell>
           <TableCell className="text-gray-600 text-center">
             <span className="flex items-center">
-              {order.quantity}
+              {quantity}
             </span>
           </TableCell>
           <TableCell className="text-gray-600">
             <span className="flex items-center">
-              Box #{order.sku}
+              Box #{boxNumbers}
             </span>
           </TableCell>
         </TableRow>
