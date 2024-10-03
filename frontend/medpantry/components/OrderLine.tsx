@@ -16,7 +16,7 @@ import { Package } from "lucide-react";
 interface OrderLineProps {
 	itemName: string;
 	quantity: number;
-	boxNumbers: number[]; // Expecting an array of numbers for box numbers
+	boxNumbers: number[]; 
 }
 
 export default function OrderLine({ itemName, quantity, boxNumbers }: OrderLineProps) {
@@ -25,27 +25,25 @@ export default function OrderLine({ itemName, quantity, boxNumbers }: OrderLineP
 		return Array.isArray(numbers) && numbers.every(num => typeof num === 'number');
 	};
   return (
-    <div>
-        <TableRow className="border-gray-100 hover:bg-gray-50">
-          <TableCell className="text-gray-600">
-            <span className="flex items-center">
-              {itemName}
-            </span>
-          </TableCell>
-          <TableCell className="text-gray-600 text-center">
-            <span className="flex items-center">
-              {quantity}
-            </span>
-          </TableCell>
-          <TableCell className="text-gray-600">
-            <span className="flex items-center">
-              {isBoxNumbersValid(boxNumbers) && boxNumbers.length > 0
-                ? `#${boxNumbers.join(', ')}`
-                : 'N/A'}
-            </span>
-          </TableCell>
-        </TableRow>
-    </div>
+    <TableRow className="border-gray-100 hover:bg-gray-50">
+      <TableCell className="text-gray-600">
+        <span className="flex items-center">
+          {itemName}
+        </span>
+      </TableCell>
+      <TableCell className="text-gray-600 text-center">
+        <span className="flex items-center">
+          {quantity}
+        </span>
+      </TableCell>
+      <TableCell className="text-gray-600">
+        <span className="flex items-center">
+          {isBoxNumbersValid(boxNumbers) && boxNumbers.length > 0
+            ? `#${boxNumbers.join(', ')}`
+            : 'N/A'}
+        </span>
+      </TableCell>
+    </TableRow>
   );
 }
 

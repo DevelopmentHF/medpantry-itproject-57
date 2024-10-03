@@ -44,7 +44,8 @@ export default async function CurrentOrders() {
 			throw new Error('Fetched data is not an array');
 		}
 
-		// Fill the array of orders and group items by orderNumber
+		// Fill the array of orders and group items by orderNumber. 
+		// Note that this does not fetch the required Baxter Boxes. This will be handled later. 
 		const orders = orderString.reduce((acc: Record<string, OrderProps>, item: any) => {
 			if (typeof item.orderNumber !== 'string' || typeof item.quantity !== 'number' || typeof item.itemName !== 'string') {
 				console.warn('Invalid item structure:', item);
@@ -72,6 +73,7 @@ export default async function CurrentOrders() {
 		return <div>Error fetching orders. Please try again later.</div>;
 	}
 
+	// Function used later to fetch the Baxter Boxes needed for each order.
 	async function getBoxId(orderNumber: string): Promise<number[]> {
 		// Convert # into %23 for /RequiredBaxterBoxes
 		const value: string = encodeURIComponent(orderNumber);
@@ -97,7 +99,7 @@ export default async function CurrentOrders() {
 			return boxes.map((item: any) => item.box_id).filter((id: any) => typeof id === 'number'); // Filter invalid box IDs
 		} catch (error) {
 			console.error("Error fetching box IDs:", error);
-			return []; // Return an empty array on error
+			return []; 
 		}
 	}
 
@@ -133,15 +135,15 @@ export default async function CurrentOrders() {
           </div>
 
           <div className="flex flex-wrap gap-10">
-            {ordersWithBoxIds.map((order, index) => (
-              <Order
-                key={index}
-                orderNumber={order.orderNumber}
-                datas={order.datas}
-				boxes={order.boxes}
-				displayTakeOrderButton={true}
-              />
-            ))}
+		  	{ordersWithBoxIds.map((order) => (
+				<Order
+					key={order.orderNumber}
+					orderNumber={order.orderNumber}
+					datas={order.datas}
+					boxes={order.boxes || []}
+					displayTakeOrderButton={true}
+				/>
+			))}
           </div>
         </div>
       </>
