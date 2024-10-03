@@ -1,47 +1,34 @@
 import React from 'react';
-import Taskbar from './dashboard/Taskbar';
 import AuthButton from '@/components/AuthButton';
-import Order from '@/components/Order';
 import OverviewCard from '@/components/OverviewCard';
-import { Button } from '@/components/ui/button';
+import { Package, ClipboardCheck, ScanQrCode, Users } from 'lucide-react';
 
 export default async function Dashboard() {
 
-    //Fetch all orders from Shopify
-    let orderString: any[] = [];
-        try{
-          const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/ShopifyOrders`, {
-            method: 'GET',
-            headers: {
-                'Cache-Control': 'no-cache'
-            }
-            });
-            if (!res.ok) throw new Error('Network response was not ok');
-            orderString = await res.json();
-            console.log("orders: " + JSON.stringify(orderString));
-            
-        } catch (error) {
-        console.error(error);
-        return null;
-      }
+  // Calculate the number of pending orders. 
+  let numOrders: number;
+  // Fetch all orders from Shopify
+  try {
+    // Force a fresh fetch by passing timestamp
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/ShopifyOrders?timestamp=${Date.now()}`, {
+      method: 'GET',
+      headers: {
+        'Cache-Control': 'no-cache',
+      },
+    });
+    if (!res.ok) throw new Error('Network response was not ok');
+    const orderString = await res.json();
+    numOrders = Object.keys(orderString).length;
 
-      //console.log("ORDERS:")
-      //console.log(orderString);
-      
-    //Group orders by order number.
-    const groupedByOrderNumber = orderString.reduce((acc, item) => {
-      if (!acc[item.order_number]) {
-        acc[item.order_number] = []; // Initialize array for new order_number
-      }
-      acc[item.order_number].push({
-        quantity: item.quantity,
-        sku: item.sku,
-      })
-      return acc;
-    }, {});
+    // Validate the fetched data
+    if (!Array.isArray(orderString)) {
+      throw new Error('Fetched data is not an array');
+    }
 
-    Object.keys(groupedByOrderNumber).forEach(order_number => {console.log(order_number)});
-    //console.log(groupedByOrderNumber["#1001"]);
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    return <div>Error fetching orders. Please try again later.</div>;
+  }
 
   return (
     <div className="flex-1 w-full flex flex-col gap-12 items-center p-6">
@@ -63,32 +50,35 @@ export default async function Dashboard() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 w-full text-black">
         <a href="protected/current-orders">
           <OverviewCard
+            icon={<Package />}
             title="Current Orders"
-            count={Object.keys(groupedByOrderNumber).length}
+            count={numOrders}
             description="Pending orders"
           />
         </a>
         <a href="protected/manager-log">
           <OverviewCard
+            icon={<ClipboardCheck />}
             title="Inventory Updates"
             count={0}
             description="Pending"
           />
         </a>
-        
+
         <a href="protected/add-to-stock">
           <OverviewCard
+            icon = {<ScanQrCode />}
             title="Stock packed"
             count={0}
             description="This week"
           />
         </a>
-        
-        <OverviewCard
-          title="People"
-          count={0}
-          description="On warehouse"
-        />
+
+        <OverviewCard 
+          icon= {<Users />} 
+          title="People" 
+          count={0} 
+          description="On warehouse" />
       </div>
     </div>
   );
