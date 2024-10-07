@@ -5,7 +5,6 @@ import { useZxing } from "react-zxing";
 import { useEffect } from "react";
 import LogEntry from "./LogEntry";
 
-
 interface props {
     
 }

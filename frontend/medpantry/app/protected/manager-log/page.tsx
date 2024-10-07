@@ -6,6 +6,9 @@ import QRScanner from '@/components/QRScanner';
 import { useState } from 'react';
 import AddStock from '@/components/AddStock';
 import ManagerLog from '@/components/ManagerLog';
+import ManagerTab from '@/components/ManagerTab'
+import { ClipboardCheck } from 'lucide-react';
+
 
 export default function ManagerLogPage() {
 
@@ -18,7 +21,13 @@ export default function ManagerLogPage() {
 
           <AuthButton />
         </nav>
-        <h1 className="font-bold text-4xl">Manager Log</h1>
+        <div className="flex w-full">
+          <h1 className="text-3xl font-bold text-gray-800 flex items-center">
+            <ClipboardCheck className="mr-2 h-6 w-6 text-red-600" />
+            Manager Log
+          </h1>
+        </div>
+        <ManagerTab></ManagerTab>
         <ManagerLog></ManagerLog>
       </div>
     );

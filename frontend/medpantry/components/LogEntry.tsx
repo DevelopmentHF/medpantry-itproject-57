@@ -69,3 +69,4 @@ export default function LogEntry({ id, box, sku, proposedQuantityToAdd }: LogEnt
         </div>
     );
 }
+
