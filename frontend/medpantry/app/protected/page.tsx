@@ -10,9 +10,14 @@ export default async function Dashboard() {
     //Fetch all orders from Shopify
     let orderString: any[] = [];
         try{
-          const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/ShopifyOrders`, {
-            method: 'GET',
-            });
+          const res = await fetch(
+            `${
+              process.env.NEXT_PUBLIC_BACKEND_LINK
+            }/ShopifyOrders?timestamp=${Date.now()}`,
+            {
+              method: "GET",
+            }
+          );
             if (!res.ok) throw new Error('Network response was not ok');
             orderString = await res.json();
             console.log("orders: " + JSON.stringify(orderString));
