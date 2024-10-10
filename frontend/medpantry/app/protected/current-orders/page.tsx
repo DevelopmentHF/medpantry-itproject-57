@@ -27,11 +27,17 @@ interface OrderProps {
 
 const completedOrdersCsvFilePath = path.join(process.cwd(), 'completed_orders.csv');
 
-export default async function CurrentOrders() {
+export default async function CurrentOrders({ searchParams }: { searchParams: {completedOrder: string }}) {
   //logic behind taking orders are handled within the Order component.
+  const completedOrder = searchParams.completedOrder;
 
   const data = await fs.readFile(completedOrdersCsvFilePath, 'utf-8');
   const completedOrders: string[] = data.split(',').map(entry => entry.trim());
+
+  const entry: string = decodeURIComponent(completedOrder);
+  if (completedOrder && !completedOrders.includes(entry)) {
+    await fs.appendFile('completed_orders.csv', `${entry},`);
+  }
 
   // Fetch all orders from Shopify
   let orderArray: OrderProps[] = []; 

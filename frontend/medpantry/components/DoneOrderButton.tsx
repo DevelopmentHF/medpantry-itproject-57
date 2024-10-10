@@ -28,8 +28,9 @@ export default function DoneOrderButton({ orderNumber }: DoneOrderButtonProps) {
 
       if (!res.ok) throw new Error('Network response was not ok');
 
-      //jump back to current-orders page
-      router.push('/protected/current-orders');
+      // Jump back to current-orders page
+      const done = encodeURIComponent(orderNumber);
+      router.push(`/protected/current-orders?completedOrder=${done}`);
 
     } catch (error) {
       console.error('Error during proposing change to manager log:', error);
