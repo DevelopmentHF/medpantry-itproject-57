@@ -3,6 +3,15 @@ import AuthButton from '@/components/AuthButton';
 import OverviewCard from '@/components/OverviewCard';
 import { Package, ClipboardCheck, ScanQrCode, Users } from 'lucide-react';
 import WarehouseOverview from '@/components/WarehouseOverview';
+import { promises as fs } from 'fs';
+import path from 'path';
+
+interface OrderStringType {
+  sku: string[];
+  quantity: number[];
+  orderNumber: string;
+  itemName: string[];
+}
 
 interface Data {
 	quantity: number;
@@ -15,11 +24,15 @@ interface OrderProps {
 	boxes?: number[];
 }
 
+const completedOrdersCsvFilePath = path.join(process.cwd(), 'completed_orders.csv');
+let numOrders: number;
 export default async function Dashboard() {
 
-  // Calculate the number of pending orders. 
-  let numOrders: number;
+  const data = await fs.readFile(completedOrdersCsvFilePath, 'utf-8');
+  const completedOrders: string[] = data.split(',').map(entry => entry.trim());
+
   // Fetch all orders from Shopify
+  let orderArray: OrderProps[] = []; 
   try {
     // Force a fresh fetch by passing timestamp
     const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/ShopifyOrders?timestamp=${Date.now()}`, {
@@ -29,17 +42,15 @@ export default async function Dashboard() {
       },
     });
     if (!res.ok) throw new Error('Network response was not ok');
-    const orderString = await res.json();
-    numOrders = Object.keys(orderString).length;
+    let orderString: OrderStringType[] = await res.json();
+    orderString = orderString.filter((entry) => !completedOrders.includes(entry.orderNumber))
+    console.log(orderString);
 
-    // Validate the fetched data
-    if (!Array.isArray(orderString)) {
-      throw new Error('Fetched data is not an array');
-    }
+    numOrders = Object.keys(orderString).length;
 
   } catch (error) {
     console.error("Error fetching orders:", error);
-    return <div>Error fetching orders. Please try again later.</div>;
+    return <div>Error fetching orders.</div>;
   }
 
   return (

@@ -34,9 +34,9 @@ export default async function CurrentOrders({ searchParams }: { searchParams: {c
   const data = await fs.readFile(completedOrdersCsvFilePath, 'utf-8');
   const completedOrders: string[] = data.split(',').map(entry => entry.trim());
 
-  const entry: string = decodeURIComponent(completedOrder);
-  if (completedOrder && !completedOrders.includes(entry)) {
-    await fs.appendFile('completed_orders.csv', `${entry},`);
+  const CSVentry: string = decodeURIComponent(completedOrder);
+  if (completedOrder && !completedOrders.includes(CSVentry)) {
+    await fs.appendFile('completed_orders.csv', `${CSVentry},`);
   }
 
   // Fetch all orders from Shopify
@@ -51,7 +51,7 @@ export default async function CurrentOrders({ searchParams }: { searchParams: {c
     });
     if (!res.ok) throw new Error('Network response was not ok');
     let orderString: OrderStringType[] = await res.json();
-    orderString = orderString.filter((entry) => !completedOrders.includes(entry.orderNumber) )
+    orderString = orderString.filter((entry) => !completedOrders.includes(entry.orderNumber) && entry.orderNumber !== CSVentry )
     console.log(orderString);
 
     // Validate the fetched data
