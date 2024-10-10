@@ -2,35 +2,38 @@
 
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import {Popover, PopoverTrigger, PopoverContent} from "@nextui-org/popover";
+import { Popover, PopoverTrigger, PopoverContent } from "@nextui-org/popover";
 import { useState } from 'react'; 
 
 type DoneOrderButtonProps = {
-  orderNumber: string
+  orderNumber: string;
 };
 
 export default function DoneOrderButton({ orderNumber }: DoneOrderButtonProps) {
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string>("");
+
   const handleClick = async () => {
+    setErrorMessage(""); // Clear previous error
     try {
-      const value: string = encodeURIComponent(orderNumber);
+      const value = encodeURIComponent(orderNumber);
       console.log(value);
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/HandleOrderAccept?orderNumber=${value}`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/HandleOrderAccept?orderNumber=${value}`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
 
-      if (!res.ok) {
-        setErrorMessage("Failed to accept order");
-        throw new Error('Network response was not ok');
-      } 
-      const text = await res.text();
-      console.log(text);
+      if (!res.ok) throw new Error('Network response was not ok');
 
-      // Jump back to current-order page
-      if (text === "Successfully logged proposal change") router.push('/protected/current-orders');
+      //jump back to current-orders page
+      router.push('/protected/current-orders');
 
     } catch (error) {
       console.error('Error during proposing change to manager log:', error);
+      setErrorMessage("Failed to accept order");
     }
   };
 
