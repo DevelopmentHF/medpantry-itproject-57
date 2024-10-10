@@ -16,7 +16,7 @@ export default function LogEntry({ id, box, sku, proposedQuantityToAdd, fullStat
 
     const handleAccept = async () => {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/resolveChange?id=${id}&accepted=true`, {
+            const res = await fetch(`/api/resolveStockChange?id=${id}&accepted=true`, {
                 method: 'PATCH',
                 headers: {
                     'Cache-Control': 'no-cache',
@@ -30,7 +30,7 @@ export default function LogEntry({ id, box, sku, proposedQuantityToAdd, fullStat
 
     const handleReject = async () => {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/resolveChange?id=${id}&accepted=false`, {
+            const res = await fetch(`/api/resolveStockChange?id=${id}&accepted=false`, {
                 method: 'PATCH',
                 headers: {
                     'Cache-Control': 'no-cache',

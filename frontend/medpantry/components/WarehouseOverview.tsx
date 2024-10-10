@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
@@ -26,7 +26,7 @@ export default function WarehouseOverview() {
     useEffect(() => {
         async function fetchBoxes() {
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/baxterbox`);
+                const res = await fetch('/api/getAllBaxterBoxes');
                 if (!res.ok) throw new Error('Network response was not ok');
                 const fetchedBoxes: BaxterBox[] = await res.json();
                 setBoxes(fetchedBoxes);

@@ -5,13 +5,10 @@ import { Button } from '@/components/ui/button';
 import AuthButton from '@/components/AuthButton';
 import AddToStockForm from '@/components/AddToStockForm';
 import QRScanner from '@/components/QRScanner';
-import BaxterBox from './BaxterBox';
 import NewBox from './NewBox';
 import { useState } from 'react';
 
-
 export default function AddStock() {
-
     type BaxterBox = {
         id: number;
         sku: string;
@@ -21,17 +18,16 @@ export default function AddStock() {
     };
 
     const [sku, setSku] = useState('');
+    const [newBox, setNewBox] = useState<BaxterBox | null>(null);
 
     const handleSkuChange = (value: string) => {
         setSku(value);
     };
 
-    const [newBox, setNewBox] = useState<BaxterBox | null>(null);
-
     const handleCreateNewBox = async () => {
         try {
-            // Fetch the next box ID from the backend
-            const response = await fetch(`http://localhost:8080/nextBoxId?sku=${sku}`);
+            // Fetch the next box ID from the new API route
+            const response = await fetch(`/api/nextid?sku=${sku}`);
             
             if (!response.ok) {
                 throw new Error('Failed to fetch the next box ID');
@@ -52,17 +48,16 @@ export default function AddStock() {
         }
     };
 
-
     return (
         <>
-            <QRScanner onSkuChange={handleSkuChange}></QRScanner>
-            <AddToStockForm extractedSku={sku}/>
+            <QRScanner onSkuChange={handleSkuChange} />
+            <AddToStockForm extractedSku={sku} />
             <Button onClick={handleCreateNewBox}>Create new box?</Button>
 
             {/* Render the new box if it exists */}
             {newBox && (
-                <NewBox box={newBox}></NewBox>
+                <NewBox box={newBox} />
             )}
         </>
-    )
+    );
 }

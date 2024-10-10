@@ -3,9 +3,13 @@ package org.example.warehouseinterface.api.controller;
 import org.example.warehouseinterface.api.model.ManagerLogEntry;
 import org.example.warehouseinterface.service.ManagerLogService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.http.HttpResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 public class ManagerLogController {
@@ -18,27 +22,40 @@ public class ManagerLogController {
     };
 
     @PostMapping("/proposeChange")
-    public String proposeChange(@RequestParam int box, @RequestParam String sku, @RequestParam int proposedQuantityToAdd, @RequestParam(required = false) Boolean fullStatusChangedTo) {
+    public ResponseEntity<Map<String, String>> proposeChange(
+            @RequestParam int box,
+            @RequestParam String sku,
+            @RequestParam int proposedQuantityToAdd,
+            @RequestParam(required = false) Boolean fullStatusChangedTo) {
+
+        Map<String, String> response = new HashMap<>();
+
         try {
             managerLogService.handleChangeProposal(box, sku, proposedQuantityToAdd, fullStatusChangedTo);
-
-            return "Sucessfully created manager log entry";
+            response.put("message", "Proposed change successfully");
+            return ResponseEntity.ok(response); // Return a JSON object on success
         } catch (Exception e) {
             e.printStackTrace();
-            // Return an appropriate error response
-            return "Failed to log proposal change";
+            response.put("error", "Failed to propose change");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response); // Return a JSON object on error
         }
     }
 
     @PatchMapping("/resolveChange")
-    public String resolveChange(@RequestParam int id, @RequestParam boolean accepted) {
+    public ResponseEntity<Map<String, String>> resolveChange(
+            @RequestParam int id,
+            @RequestParam boolean accepted) {
+
+        Map<String, String> response = new HashMap<>();
+
         try {
             managerLogService.handleChangeResolution(id, accepted);
-            return "Sucessfully handled proposed change";
+            response.put("message", "Resolved change successfully");
+            return ResponseEntity.ok(response); // Return a JSON object on success
         } catch (Exception e) {
             e.printStackTrace();
-            // Return an appropriate error response
-            return "Failed to handle proposed change";
+            response.put("error", "Failed to resolve change");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response); // Return a JSON object on error
         }
     }
 
