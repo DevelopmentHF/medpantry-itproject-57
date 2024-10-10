@@ -16,7 +16,7 @@ export default async function TakeOrder({ searchParams }: { searchParams: { orde
   // Extract orderNumber, datas, and boxes from search params
   const orderNumber = searchParams.orderNumber || '';
   const datas: Data[] = JSON.parse(searchParams.datas || '[]');
-  const boxes: number[] = JSON.parse(searchParams.boxes || '[]');
+  const boxes: number[][] = JSON.parse(searchParams.boxes || '[]');
 
   console.log(orderNumber, datas, boxes);
 
