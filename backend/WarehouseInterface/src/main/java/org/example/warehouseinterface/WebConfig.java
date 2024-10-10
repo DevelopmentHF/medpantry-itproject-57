@@ -11,7 +11,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000", "https://medpantry-itproject-57.vercel.app", "https://medpantry-itproject-57-git-main-developmenthfs-projects.vercel.app") // Allow the frontend origin
+                .allowedOrigins("") // Allow the frontend origin
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH")
                 .allowedHeaders("*");
     }
