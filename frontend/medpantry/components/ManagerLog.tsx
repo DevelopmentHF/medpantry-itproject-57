@@ -30,7 +30,7 @@ export default async function ManagerLog({} : props) {
     
 
       return (
-        <>
+        <div className="flex flex-col gap-4">
             {logEntries.length > 0 ? (
                 logEntries
                     .map((entry) => (
@@ -48,6 +48,6 @@ export default async function ManagerLog({} : props) {
             ) : (
                 <p>No log entries found.</p>
             )}
-        </>
+        </div>
     )
 }

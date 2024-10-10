@@ -19,7 +19,14 @@ export default function ManagerLogPage() {
           <AuthButton />
         </nav>
         <h1 className="font-bold text-4xl">Manager Log</h1>
-        <ManagerLog></ManagerLog>
+        <div className="flex w-full gap-12">
+          <div className="flex-1">
+            <ManagerLog />
+          </div>
+          <div className="flex-1">
+            <ManagerLog />
+          </div>
+        </div>
       </div>
     );
 }
