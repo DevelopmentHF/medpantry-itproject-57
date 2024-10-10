@@ -35,7 +35,7 @@ const isDataValid = (data: any): data is Data => {
 /*A user can take an order, which removes the order card from the pending order list.
   After taking an order, the user will be redirected to protected/take-order page, where they will press the "done" button to complete the order.
   takeOrder() is called onClick of take order button.*/
-async function takeOrder(orderNumber: string, datas: Data[], boxes: number[], router: any) {
+async function takeOrder(orderNumber: string, datas: Data[], boxes: number[][], router: any) {
   try {
     const value: string = encodeURIComponent(orderNumber);
     console.log(value);
