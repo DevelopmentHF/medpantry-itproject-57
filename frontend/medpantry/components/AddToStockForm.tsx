@@ -85,14 +85,18 @@ export default function AddToStockForm({ extractedSku }: AddToStockFormProps) {
             {boxes ? (
                 boxes.map((baxterBox) => {
                     let localUnitsPacked: number; // Local state for units packed per box
+                    const fullStatus = fullStatusChanged[baxterBox.id] !== undefined
+                        ? fullStatusChanged[baxterBox.id] as boolean
+                        : baxterBox.full;
+
                     return (
-                        <div key={baxterBox.id} className="flex gap-4">
+                        <div key={baxterBox.id} className="flex gap-4 lg:w-1/2 sm:w-full">
                             <BaxterBox
                                 id={baxterBox.id}
                                 sku={baxterBox.sku}
                                 warehouseId={baxterBox.warehouseId}
                                 units={baxterBox.units}
-                                isFull={baxterBox.full}
+                                isFull={fullStatus} // Now passes updated or default full status
                             />
                             <div className='flex flex-col gap-4'>
                                 <form onSubmit={(e) => handleBoxSubmit(e, localUnitsPacked, baxterBox.id)} className="flex flex-col gap-4">
