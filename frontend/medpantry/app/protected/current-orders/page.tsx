@@ -3,6 +3,15 @@ import AuthButton from "@/components/AuthButton";
 import { Button } from "@/components/ui/button";
 import { Package, Skull } from "lucide-react";
 import React from "react";
+import { promises as fs } from 'fs';
+import path from 'path';
+
+interface OrderStringType {
+  sku: string[];
+  quantity: number[];
+  orderNumber: string;
+  itemName: string[];
+}
 
 interface Data {
   quantity: number;
@@ -16,8 +25,13 @@ interface OrderProps {
   boxes?: number[][];
 }
 
+const completedOrdersCsvFilePath = path.join(process.cwd(), 'completed_orders.csv');
+
 export default async function CurrentOrders() {
   //logic behind taking orders are handled within the Order component.
+
+  const data = await fs.readFile(completedOrdersCsvFilePath, 'utf-8');
+  const completedOrders: string[] = data.split(',').map(entry => entry.trim());
 
   // Fetch all orders from Shopify
   let orderArray: OrderProps[] = []; 
@@ -30,7 +44,9 @@ export default async function CurrentOrders() {
       },
     });
     if (!res.ok) throw new Error('Network response was not ok');
-    const orderString = await res.json();
+    let orderString: OrderStringType[] = await res.json();
+    orderString = orderString.filter((entry) => !completedOrders.includes(entry.orderNumber) )
+    console.log(orderString);
 
     // Validate the fetched data
     if (!Array.isArray(orderString)) {
@@ -61,7 +77,7 @@ export default async function CurrentOrders() {
 
   } catch (error) {
     console.error("Error fetching orders:", error);
-    return <div>Error fetching orders. Please try again later.</div>;
+    return <div>Error fetching orders.</div>;
   }
 
   // Function used later to fetch the Baxter Boxes needed for each order.
