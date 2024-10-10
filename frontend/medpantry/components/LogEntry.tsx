@@ -16,7 +16,7 @@ export default function LogEntry({ id, box, sku, proposedQuantityToAdd, fullStat
 
     const handleAccept = async () => {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/resolveChange?id=${id}&accepted=true`, {
+            const res = await fetch(`/api/resolveStockChange?id=${id}&accepted=true`, {
                 method: 'PATCH',
                 headers: {
                     'Cache-Control': 'no-cache',
@@ -30,7 +30,7 @@ export default function LogEntry({ id, box, sku, proposedQuantityToAdd, fullStat
 
     const handleReject = async () => {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/resolveChange?id=${id}&accepted=false`, {
+            const res = await fetch(`/api/resolveStockChange?id=${id}&accepted=false`, {
                 method: 'PATCH',
                 headers: {
                     'Cache-Control': 'no-cache',
@@ -43,7 +43,7 @@ export default function LogEntry({ id, box, sku, proposedQuantityToAdd, fullStat
     };
 
     return (
-        <div className="bg-secondary border-solid border-border rounded-md p-4 flex flex-col gap-2">
+        <div className="bg-card-foreground border-solid border-border rounded-md p-4 flex flex-col gap-2 w-1/2">
             <h1 className="font-bold text-xl">Stock Update</h1>
 
             <div className="flex justify-between">
@@ -70,7 +70,7 @@ export default function LogEntry({ id, box, sku, proposedQuantityToAdd, fullStat
 
             <Separator />
 
-            <div className="flex gap-4">
+            <div className="flex gap-4 justify-between">
                 <Button className="bg-green-500" onClick={handleAccept}>Accept</Button>
                 <Button className="bg-red-500" onClick={handleReject}>Reject</Button>
             </div>

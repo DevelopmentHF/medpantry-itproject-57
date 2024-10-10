@@ -1,7 +1,7 @@
 import Order from "@/components/Order";
 import AuthButton from "@/components/AuthButton";
 import { Button } from "@/components/ui/button";
-import { Package } from "lucide-react";
+import { Package, Skull } from "lucide-react";
 import React from "react";
 
 interface Data {
@@ -13,7 +13,7 @@ interface Data {
 interface OrderProps {
   orderNumber: string;
   datas: Data[];
-  boxes?: number[];
+  boxes?: number[][];
 }
 
 export default async function CurrentOrders() {
@@ -38,10 +38,6 @@ export default async function CurrentOrders() {
     // Fill the array of orders and group items by orderNumber. 
     // Note that this does not fetch the required Baxter Boxes. This will be handled later. 
     const orders = orderString.reduce((acc: Record<string, OrderProps>, item: any) => {
-      if (typeof item.orderNumber !== 'string' || typeof item.quantity !== 'number' || typeof item.itemName !== 'string') {
-        console.warn('Invalid item structure:', item);
-        return acc;
-      }
 
       if (!acc[item.orderNumber]) {
         acc[item.orderNumber] = {
@@ -49,11 +45,13 @@ export default async function CurrentOrders() {
           datas: [],
         };
       }
-      acc[item.orderNumber].datas.push({
-        quantity: item.quantity,
-        sku: item.sku,
-        itemName: item.itemName,
-      });
+      for(let i = 0; i < item.sku.length; i ++){
+        acc[item.orderNumber].datas.push({
+          quantity: item.quantity[i],
+          sku: item.sku[i],
+          itemName: item.itemName[i],
+        });
+      }
       return acc;
     }, {});
 
@@ -65,12 +63,12 @@ export default async function CurrentOrders() {
   }
 
   // Function used later to fetch the Baxter Boxes needed for each order.
-  async function getBoxId(orderNumber: string): Promise<number[]> {
+  async function getBoxId(orderNumber: string): Promise<number[][]> {
     // Convert # into %23 for /RequiredBaxterBoxes
     const value: string = encodeURIComponent(orderNumber);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/RequiredBaxterBoxes?orderNumber=${value}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/RequiredBaxterBoxes?orderNumber=${value}&timestamp=${Date.now()}`, {
         method: 'GET',
         headers: {
           'Cache-Control': 'no-cache',
@@ -87,7 +85,8 @@ export default async function CurrentOrders() {
         return [];
       }
 
-      return boxes.map((item: any) => item.box_id).filter((id: any) => typeof id === 'number'); // Filter invalid box IDs
+      return boxes.map((item: any) => item.map((entry: any) => entry.box_id));
+      //return boxes;
     } catch (error) {
       console.error("Error fetching box IDs:", error);
       return []; 
@@ -97,7 +96,7 @@ export default async function CurrentOrders() {
   // Prepare orders with their corresponding box IDs
   const ordersWithBoxIds = await Promise.all(
     orderArray.map(async (order) => {
-      const boxes = await getBoxId(order.orderNumber);
+      const boxes: number[][] = await getBoxId(order.orderNumber)
       return {
         ...order,
         boxes: boxes || [],
@@ -126,9 +125,9 @@ export default async function CurrentOrders() {
         </div>
 
         <div className="flex flex-wrap gap-10">
-          {ordersWithBoxIds.map((order) => (
+          {ordersWithBoxIds.map((order, index) => (
             <Order
-              key={order.orderNumber}
+              key={index}
               orderNumber={order.orderNumber}
               datas={order.datas}
               boxes={order.boxes || []}

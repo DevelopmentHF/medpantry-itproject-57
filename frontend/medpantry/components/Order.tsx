@@ -21,7 +21,7 @@ interface Data {
 interface OrderProps {
   orderNumber: string;
   datas: Data[];
-  boxes: number[];
+  boxes: number[][];
   displayTakeOrderButton: boolean;
 }
 
@@ -74,7 +74,7 @@ export default function Order({ orderNumber, datas = [], boxes = [], displayTake
                   key={index}
                   itemName={data.itemName}
                   quantity={data.quantity}
-                  boxNumbers={boxes}
+                  boxNumbers={boxes[index]}
                 />
               ))
             ) : (
