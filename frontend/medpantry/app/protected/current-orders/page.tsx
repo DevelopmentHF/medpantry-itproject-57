@@ -1,7 +1,7 @@
 import Order from "@/components/Order";
 import AuthButton from "@/components/AuthButton";
 import { Button } from "@/components/ui/button";
-import { Package } from "lucide-react";
+import { Package, Skull } from "lucide-react";
 import React from "react";
 
 interface Data {
@@ -127,9 +127,9 @@ export default async function CurrentOrders() {
         </div>
 
         <div className="flex flex-wrap gap-10">
-          {ordersWithBoxIds.map((order) => (
+          {ordersWithBoxIds.map((order, index) => (
             <Order
-              key={order.orderNumber}
+              key={index}
               orderNumber={order.orderNumber}
               datas={order.datas}
               boxes={order.boxes || []}

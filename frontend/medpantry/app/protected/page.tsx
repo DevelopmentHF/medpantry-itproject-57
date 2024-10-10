@@ -2,6 +2,7 @@ import React from 'react';
 import AuthButton from '@/components/AuthButton';
 import OverviewCard from '@/components/OverviewCard';
 import { Package, ClipboardCheck, ScanQrCode, Users } from 'lucide-react';
+import WarehouseOverview from '@/components/WarehouseOverview';
 
 interface Data {
 	quantity: number;
@@ -91,6 +92,9 @@ export default async function Dashboard() {
           count={0} 
           description="On warehouse" />
       </div>
+
+      <WarehouseOverview/>
+
     </div>
   );
 }
