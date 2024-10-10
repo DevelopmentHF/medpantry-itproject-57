@@ -42,8 +42,15 @@ export default function WarehouseOverview() {
         return <div>{error}</div>;
     }
 
-    const getBoxColor = (box: BaxterBox) => {
-        if (box.units === 0) return 'bg-gray-300'; // empty
+    // Create a grid of 800 boxes, with existing boxes filled in
+    const totalBoxes = 800;
+    const gridBoxes = Array.from({ length: totalBoxes }, (_, index) => {
+        const box = boxes.find(b => b.id === index + 1); // Assuming IDs start at 1
+        return box || null; // Return the box or null if not found
+    });
+
+    const getBoxColor = (box: BaxterBox | null) => {
+        if (!box) return 'bg-gray-300'; // empty
         if (box.full) return 'bg-red-700'; // full
         return 'bg-red-300'; // partially filled
     };
@@ -64,25 +71,22 @@ export default function WarehouseOverview() {
                             lg:grid-cols-[repeat(48,minmax(0,1fr))] 
                             xl:grid-cols-[repeat(60,minmax(0,1fr))]"
                     >
-                        {Array.from({ length: 800 }).map((_, index) => {
-                            const box = boxes[index];
-                            return (
-                                <Tooltip key={index}>
-                                    <TooltipTrigger asChild>
-                                        <div
-                                            className={`w-4 h-4 cursor-pointer ${box ? getBoxColor(box) : 'bg-gray-300'} rounded-md`}
-                                        />
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>
-                                            {box
-                                                ? `Box: ${box.id}, SKU: ${box.sku}, Units: ${box.units}`
-                                                : 'Empty'}
-                                        </p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            );
-                        })}
+                        {gridBoxes.map((box, index) => (
+                            <Tooltip key={index}>
+                                <TooltipTrigger asChild>
+                                    <div
+                                        className={`w-4 h-4 cursor-pointer ${getBoxColor(box)} rounded-md transition-transform duration-200 hover:scale-125`}
+                                    />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>
+                                        {box
+                                            ? `Box: ${box.id}, SKU: ${box.sku}, Units: ${box.units}`
+                                            : 'Empty'}
+                                    </p>
+                                </TooltipContent>
+                            </Tooltip>
+                        ))}
                     </div>
                 )}
             </>
