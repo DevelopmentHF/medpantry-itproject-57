@@ -36,6 +36,7 @@ export default async function CurrentOrders({ searchParams }: { searchParams: {c
 
   const CSVentry: string = decodeURIComponent(completedOrder);
   if (completedOrder && !completedOrders.includes(CSVentry)) {
+    completedOrders.push(completedOrder);
     await fs.appendFile('completed_orders.csv', `${CSVentry},`);
   }
 
@@ -51,7 +52,7 @@ export default async function CurrentOrders({ searchParams }: { searchParams: {c
     });
     if (!res.ok) throw new Error('Network response was not ok');
     let orderString: OrderStringType[] = await res.json();
-    orderString = orderString.filter((entry) => !completedOrders.includes(entry.orderNumber) && entry.orderNumber !== CSVentry )
+    orderString = orderString.filter((entry) => !completedOrders.includes(entry.orderNumber))
     console.log(orderString);
 
     // Validate the fetched data
