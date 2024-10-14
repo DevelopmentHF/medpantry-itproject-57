@@ -26,6 +26,12 @@ interface OrderProps {
 
 const completedOrdersCsvFilePath = path.join(process.cwd(), 'completed_orders.csv');
 
+async function updateCompletedOrdersCsv(orderString: OrderStringType[], completedOrders: string[]) {
+  const validOrderNumbers = new Set(orderString.map(entry => entry.orderNumber));
+  const updatedOrders = completedOrders.filter(orderNumber => !validOrderNumbers.has(orderNumber));
+  await fs.writeFile(completedOrdersCsvFilePath, updatedOrders.join(',') + (updatedOrders.length > 0 ? ', ' : ''));
+}
+
 let numOrders: number;
 export default async function Dashboard() {
 
@@ -44,7 +50,9 @@ export default async function Dashboard() {
     });
     if (!res.ok) throw new Error('Network response was not ok');
     let orderString: OrderStringType[] = await res.json();
-    orderString = orderString.filter((entry) => !completedOrders.includes(entry.orderNumber));
+    orderString = orderString.filter((entry) => !completedOrders.includes(entry.orderNumber))
+
+    updateCompletedOrdersCsv(orderString, completedOrders);
 
     numOrders = Object.keys(orderString).length;
 
