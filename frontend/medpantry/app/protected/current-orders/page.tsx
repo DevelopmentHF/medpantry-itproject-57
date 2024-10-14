@@ -27,12 +27,18 @@ interface OrderProps {
 
 const completedOrdersCsvFilePath = path.join(process.cwd(), 'completed_orders.csv');
 
+async function updateCompletedOrdersCsv(orderString: OrderStringType[], completedOrders: string[]) {
+  const validOrderNumbers = new Set(orderString.map(entry => entry.orderNumber));
+  const updatedOrders = completedOrders.filter(orderNumber => !validOrderNumbers.has(orderNumber));
+  await fs.writeFile(completedOrdersCsvFilePath, updatedOrders.join(',') + (updatedOrders.length > 0 ? ', ' : ''));
+}
+
 export default async function CurrentOrders({ searchParams }: { searchParams: {completedOrder: string }}) {
   //logic behind taking orders are handled within the Order component.
   const completedOrder = searchParams.completedOrder;
 
-  const data = await fs.readFile(completedOrdersCsvFilePath, 'utf-8');
-  const completedOrders: string[] = data.split(',').map(entry => entry.trim());
+  const CSVdata = await fs.readFile(completedOrdersCsvFilePath, 'utf-8');
+  const completedOrders: string[] = CSVdata.split(',').map(entry => entry.trim()).filter(entry => entry.length > 0);
 
   const CSVentry: string = decodeURIComponent(completedOrder);
   if (completedOrder && !completedOrders.includes(CSVentry)) {
@@ -53,7 +59,8 @@ export default async function CurrentOrders({ searchParams }: { searchParams: {c
     if (!res.ok) throw new Error('Network response was not ok');
     let orderString: OrderStringType[] = await res.json();
     orderString = orderString.filter((entry) => !completedOrders.includes(entry.orderNumber))
-    console.log(orderString);
+
+    updateCompletedOrdersCsv(orderString, completedOrders);
 
     // Validate the fetched data
     if (!Array.isArray(orderString)) {

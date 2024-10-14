@@ -17,7 +17,7 @@ export default async function ManagerLog({} : props) {
 
     try {
         // NEED A .env see discord
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/logEntries`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/logEntries?timestamp=${Date.now()}`);
         if (!res.ok) throw new Error('Network response was not ok');
         logEntries = await res.json();
         console.log(logEntries);

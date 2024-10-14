@@ -25,11 +25,12 @@ interface OrderProps {
 }
 
 const completedOrdersCsvFilePath = path.join(process.cwd(), 'completed_orders.csv');
+
 let numOrders: number;
 export default async function Dashboard() {
 
-  const data = await fs.readFile(completedOrdersCsvFilePath, 'utf-8');
-  const completedOrders: string[] = data.split(',').map(entry => entry.trim());
+  const CSVdata = await fs.readFile(completedOrdersCsvFilePath, 'utf-8');
+  const completedOrders: string[] = CSVdata.split(',').map(entry => entry.trim()).filter(entry => entry.length > 0);
 
   // Fetch all orders from Shopify
   let orderArray: OrderProps[] = []; 
@@ -43,8 +44,7 @@ export default async function Dashboard() {
     });
     if (!res.ok) throw new Error('Network response was not ok');
     let orderString: OrderStringType[] = await res.json();
-    orderString = orderString.filter((entry) => !completedOrders.includes(entry.orderNumber))
-    console.log(orderString);
+    orderString = orderString.filter((entry) => !completedOrders.includes(entry.orderNumber));
 
     numOrders = Object.keys(orderString).length;
 
@@ -52,6 +52,20 @@ export default async function Dashboard() {
     console.error("Error fetching orders:", error);
     return <div>Error fetching orders.</div>;
   }
+
+  let numStockUpdates: number;
+  try {
+    // NEED A .env see discord
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/logEntries?timestamp=${Date.now()}`);
+    if (!res.ok) throw new Error('Network response was not ok');
+    let logEntries: any[] = await res.json();
+    logEntries = logEntries.filter((entry) => entry.pending);
+    numStockUpdates = logEntries.length;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+
 
   return (
     <div className="flex-1 w-full flex flex-col gap-12 items-center p-6">
@@ -83,7 +97,7 @@ export default async function Dashboard() {
           <OverviewCard
             icon={<ClipboardCheck />}
             title="Inventory Updates"
-            count={0}
+            count={numStockUpdates + completedOrders.length}
             description="Pending"
           />
         </a>
