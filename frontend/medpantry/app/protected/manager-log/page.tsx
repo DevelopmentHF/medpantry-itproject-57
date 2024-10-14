@@ -31,6 +31,15 @@ interface OrderProps {
 
 const completedOrdersCsvFilePath = path.join(process.cwd(), 'completed_orders.csv');
 
+async function updateCompletedOrdersCsv(orderString: OrderStringType[], data: string, completedOrders: string[]) {
+  const validOrderNumbers = new Set(orderString.map(entry => entry.orderNumber));
+
+  const updatedOrders = completedOrders.filter(orderNumber => validOrderNumbers.has(orderNumber));
+
+  await fs.writeFile(completedOrdersCsvFilePath, updatedOrders.join(','));
+}
+
+
 export default async function ManagerLogPage() {
 
   const data = await fs.readFile(completedOrdersCsvFilePath, 'utf-8');
@@ -50,6 +59,8 @@ export default async function ManagerLogPage() {
     let orderString: OrderStringType[] = await res.json();
     orderString = orderString.filter((entry) => completedOrders.includes(entry.orderNumber))
     console.log(orderString);
+
+    updateCompletedOrdersCsv(orderString, data, completedOrders);
 
     // Validate the fetched data
     if (!Array.isArray(orderString)) {
