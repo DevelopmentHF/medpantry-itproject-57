@@ -36,7 +36,7 @@ async function updateCompletedOrdersCsv(orderString: OrderStringType[], data: st
 
   const updatedOrders = completedOrders.filter(orderNumber => validOrderNumbers.has(orderNumber));
 
-  await fs.writeFile(completedOrdersCsvFilePath, updatedOrders.join(','));
+  await fs.writeFile(completedOrdersCsvFilePath, updatedOrders.join(',') + (updatedOrders.length > 0 ? ', ' : ''));
 }
 
 

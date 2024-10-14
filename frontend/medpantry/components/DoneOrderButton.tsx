@@ -11,10 +11,10 @@ type DoneOrderButtonProps = {
 
 export default function DoneOrderButton({ orderNumber }: DoneOrderButtonProps) {
   const router = useRouter();
-  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
 
   const handleClick = async () => {
-    setErrorMessage(""); // Clear previous error
+    setMessage(""); // Clear previous error
     try {
       const value = encodeURIComponent(orderNumber);
       console.log(value);
@@ -30,11 +30,12 @@ export default function DoneOrderButton({ orderNumber }: DoneOrderButtonProps) {
 
       // Jump back to current-orders page
       const done = encodeURIComponent(orderNumber);
+      setMessage("Loading");
       router.push(`/protected/current-orders?completedOrder=${done}`);
 
     } catch (error) {
       console.error('Error during proposing change to manager log:', error);
-      setErrorMessage("Failed to accept order");
+      setMessage("Failed to accept order");
     }
   };
 
@@ -46,7 +47,7 @@ export default function DoneOrderButton({ orderNumber }: DoneOrderButtonProps) {
         </Button>
       </PopoverTrigger>
       <PopoverContent>
-        <div>{errorMessage}</div>
+        <div>{message}</div>
       </PopoverContent>
     </Popover>
   );
