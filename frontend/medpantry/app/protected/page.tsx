@@ -26,24 +26,7 @@ export default async function Dashboard() {
         console.error(error);
         return null;
       }
-
-      //console.log("ORDERS:")
-      //console.log(orderString);
-      
-    //Group orders by order number.
-    // const groupedByOrderNumber = orderString.reduce((acc, item) => {
-    //   if (!acc[item.order_number]) {
-    //     acc[item.order_number] = []; // Initialize array for new order_number
-    //   }
-    //   acc[item.order_number].push({
-    //     quantity: item.quantity,
-    //     sku: item.sku,
-    //   })
-    //   return acc;
-    // }, {});
-
-    // Object.keys(groupedByOrderNumber).forEach(order_number => {console.log(order_number)});
-
+;
     const numOrders = Object.keys(orderString).length;
 
   return (
@@ -75,7 +58,7 @@ export default async function Dashboard() {
         <a href="protected/manager-log">
           <OverviewCard
             icon={<ClipboardCheck />}
-            title="Inventory Updates"
+            title="Manager Log"
             count={0}
             description="Pending"
           />
@@ -84,7 +67,7 @@ export default async function Dashboard() {
         <a href="protected/add-to-stock">
           <OverviewCard
             icon = {<ScanQrCode />}
-            title="Stock packed"
+            title="Add to Stock"
             count={0}
             description="This week"
           />

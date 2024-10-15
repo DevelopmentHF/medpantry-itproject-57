@@ -23,7 +23,7 @@ export default function ManagerTab() {
                 {tab === "all" && "All Updates"}
               </CardTitle>
             </CardHeader>
-            <CardContent className="w-full p-6">
+            <CardContent className="w-full p-6 bg-white text-gray-500">
               {tab === "inventory" && (
                 <div>
                   <p>Inventory updates</p>
