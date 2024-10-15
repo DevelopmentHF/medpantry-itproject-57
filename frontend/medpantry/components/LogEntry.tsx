@@ -1,6 +1,7 @@
 'use client';
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
+import { useRouter } from "next/navigation";
 
 interface LogEntryProps {
     id: number;
@@ -14,6 +15,8 @@ interface LogEntryProps {
 
 export default function LogEntry({ id, box, sku, proposedQuantityToAdd, fullStatusChangedTo }: LogEntryProps) {
 
+    const router = useRouter();
+
     const handleAccept = async () => {
         try {
             const res = await fetch(`/api/resolveStockChange?id=${id}&accepted=true`, {
@@ -23,6 +26,7 @@ export default function LogEntry({ id, box, sku, proposedQuantityToAdd, fullStat
                 },
             });
             if (!res.ok) throw new Error('Network response was not ok');
+            router.refresh()
         } catch (error) {
             console.error('Error in accepting:', error);
         }
@@ -37,6 +41,7 @@ export default function LogEntry({ id, box, sku, proposedQuantityToAdd, fullStat
                 },
             });
             if (!res.ok) throw new Error('Network response was not ok');
+            router.refresh()
         } catch (error) {
             console.error('Error in rejecting:', error);
         }
