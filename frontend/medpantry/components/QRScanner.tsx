@@ -25,7 +25,7 @@ export default function QRScanner({onSkuChange} : QrScannerProps) {
         const fetchSkuData = async () => {
           if (result) {
             try {
-              const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/linkToSku?link=${result}`);
+              const response = await fetch(`/api/linkToSku?link=${result}`);
               const data = await response.json();
               console.log(data);
               setExtractedSku(data); 
