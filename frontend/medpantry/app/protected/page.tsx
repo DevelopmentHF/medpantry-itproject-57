@@ -3,12 +3,43 @@ import AuthButton from '@/components/AuthButton';
 import OverviewCard from '@/components/OverviewCard';
 import { Package, ClipboardCheck, ScanQrCode, Users } from 'lucide-react';
 import WarehouseOverview from '@/components/WarehouseOverview';
+import { promises as fs } from 'fs';
+import path from 'path';
 
+interface OrderStringType {
+  sku: string[];
+  quantity: number[];
+  orderNumber: string;
+  itemName: string[];
+}
+
+interface Data {
+	quantity: number;
+	itemName: string;
+}
+
+interface OrderProps {
+	orderNumber: string;
+	datas: Data[];
+	boxes?: number[];
+}
+
+const completedOrdersCsvFilePath = path.join(process.cwd(), 'completed_orders.csv');
+
+async function updateCompletedOrdersCsv(orderString: OrderStringType[], completedOrders: string[]) {
+  const validOrderNumbers = new Set(orderString.map(entry => entry.orderNumber));
+  const updatedOrders = completedOrders.filter(orderNumber => !validOrderNumbers.has(orderNumber));
+  await fs.writeFile(completedOrdersCsvFilePath, updatedOrders.join(',') + (updatedOrders.length > 0 ? ', ' : ''));
+}
+
+let numOrders: number;
 export default async function Dashboard() {
 
-  // Calculate the number of pending orders. 
-  let numOrders: number;
+  const CSVdata = await fs.readFile(completedOrdersCsvFilePath, 'utf-8');
+  const completedOrders: string[] = CSVdata.split(',').map(entry => entry.trim()).filter(entry => entry.length > 0);
+
   // Fetch all orders from Shopify
+  let orderArray: OrderProps[] = []; 
   try {
     // Force a fresh fetch by passing timestamp
     const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/ShopifyOrders?timestamp=${Date.now()}`, {
@@ -18,18 +49,31 @@ export default async function Dashboard() {
       },
     });
     if (!res.ok) throw new Error('Network response was not ok');
-    const orderString = await res.json();
-    numOrders = Object.keys(orderString).length;
+    let orderString: OrderStringType[] = await res.json();
+    orderString = orderString.filter((entry) => !completedOrders.includes(entry.orderNumber))
 
-    // Validate the fetched data
-    if (!Array.isArray(orderString)) {
-      throw new Error('Fetched data is not an array');
-    }
+    updateCompletedOrdersCsv(orderString, completedOrders);
+
+    numOrders = Object.keys(orderString).length;
 
   } catch (error) {
     console.error("Error fetching orders:", error);
-    return <div>Error fetching orders. Please try again later.</div>;
+    return <div>Error fetching orders.</div>;
   }
+
+  let numStockUpdates: number;
+  try {
+    // NEED A .env see discord
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/logEntries?timestamp=${Date.now()}`);
+    if (!res.ok) throw new Error('Network response was not ok');
+    let logEntries: any[] = await res.json();
+    logEntries = logEntries.filter((entry) => entry.pending);
+    numStockUpdates = logEntries.length;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+
 
   return (
     <div className="flex-1 w-full flex flex-col gap-12 items-center p-6">
@@ -61,7 +105,7 @@ export default async function Dashboard() {
           <OverviewCard
             icon={<ClipboardCheck />}
             title="Inventory Updates"
-            count={0}
+            count={numStockUpdates + completedOrders.length}
             description="Pending"
           />
         </a>

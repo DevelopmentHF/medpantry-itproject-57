@@ -6,6 +6,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@nextui-org/popover": "^2.1.29",
     "@radix-ui/react-separator": "^1.1.0",
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-switch": "^1.1.1",
@@ -16,15 +17,18 @@
     "autoprefixer": "10.4.17",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
     "geist": "^1.2.1",
     "lucide-react": "^0.418.0",
-    "next": "latest",
+    "next": "^14.2.13",
+    "papaparse": "^5.4.1",
     "postcss": "8.4.33",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-qr-scanner": "^1.0.0-alpha.11",
     "react-zxing": "^2.0.2",
-    "shadcn-ui": "^0.8.0",
+    "shadcn-ui": "^0.2.3",
     "tailwind-merge": "^2.4.0",
     "tailwindcss": "3.4.1",
     "tailwindcss-animate": "^1.0.7",
@@ -34,6 +38,9 @@
     "@types/node": "20.11.5",
     "@types/react": "18.2.48",
     "@types/react-dom": "18.2.18",
-    "encoding": "^0.1.13"
+    "@typescript-eslint/eslint-plugin": "^8.7.0",
+    "@typescript-eslint/parser": "^8.7.0",
+    "encoding": "^0.1.13",
+    "eslint": "^9.11.1"
   }
 }

@@ -48,7 +48,7 @@ export default function LogEntry({ id, box, sku, proposedQuantityToAdd, fullStat
     };
 
     return (
-        <div className="bg-card-foreground border-solid border-border rounded-md p-4 flex flex-col gap-2 w-1/2">
+        <div className="bg-card-foreground border-solid border-border rounded-md p-4 flex flex-col gap-2 w-full">
             <h1 className="font-bold text-xl">Stock Update</h1>
 
             <div className="flex justify-between">
