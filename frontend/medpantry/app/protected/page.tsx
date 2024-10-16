@@ -9,9 +9,9 @@ import WarehouseOverview from '@/components/WarehouseOverview';
 interface OrderStringType {
   sku: string[];
   quantity: number[];
+  id: string;
   orderNumber: string;
   itemName: string[];
-  id: string;
 }
 
 interface Data {
@@ -58,6 +58,7 @@ export default async function Dashboard() {
 
     // No need to manually parse the response text unless it fails
     let orderString: OrderStringType[] = await res.json();
+    console.log(orderString)
 
     if (!Array.isArray(orderString) || orderString.length === 0) {
       console.warn("No orders received from backend.");
