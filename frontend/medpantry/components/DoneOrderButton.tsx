@@ -16,28 +16,27 @@ export default function DoneOrderButton({ orderNumber }: DoneOrderButtonProps) {
   const handleClick = async () => {
     setMessage(""); // Clear previous error
     try {
-      const value = encodeURIComponent(orderNumber);
-      console.log(value);
+        setMessage("Loading..."); // Show loading message
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/HandleOrderAccept?orderNumber=${value}`, {
-        method: 'PATCH',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    });
+        const res = await fetch(`/api/HandleOrderAccept`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ orderNumber }), // Send orderNumber in the body
+        });
 
-      if (!res.ok) throw new Error('Network response was not ok');
+        if (!res.ok) throw new Error('Network response was not ok');
 
-      // Jump back to current-orders page
-      const done = encodeURIComponent(orderNumber);
-      setMessage("Loading");
-      router.push(`/protected/current-orders?completedOrder=${done}`);
+        // Jump back to current-orders page
+        const done = encodeURIComponent(orderNumber);
+        router.push(`/protected/current-orders?completedOrder=${done}`);
 
     } catch (error) {
-      console.error('Error during proposing change to manager log:', error);
-      setMessage("Failed to accept order");
+        console.error('Error during proposing change to manager log:', error);
+        setMessage("Failed to accept order");
     }
-  };
+};
 
   return (
     <Popover>
