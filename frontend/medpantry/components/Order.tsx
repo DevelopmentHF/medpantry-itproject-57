@@ -21,6 +21,7 @@ interface Data {
 
 interface OrderProps {
   orderNumber: string;
+  id: string;
   datas: Data[];
   boxes: number[][];
   displayTakeOrderButton: boolean;
