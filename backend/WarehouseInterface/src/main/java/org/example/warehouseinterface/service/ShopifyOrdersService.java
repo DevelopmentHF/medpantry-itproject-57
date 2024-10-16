@@ -67,10 +67,9 @@ public class ShopifyOrdersService {
         List<Order> ordersCurrentlyBeingWorkedOn = getOrdersCurrentlyBeingWorkedOn();
 
         for (JsonNode orderNode : ordersNode) {
-            //String sku = null;
-            // int quantity = 0;
             String orderNumber = orderNode.path("name").asText();
-            // String itemName = null;
+            String orderID = orderNode.path("id").asText();
+
             System.out.println("Order Number: " + orderNumber);
 
             // Do not return and thus display this order if it is in the Order DB on supabase. This indicates that it is currently being worked on.
@@ -125,7 +124,8 @@ public class ShopifyOrdersService {
             cleanedOrder.put("item_name", itemNameNode);
 
             cleanedOrder.put("order_number", orderNumber);
-
+            cleanedOrder.put("id", orderID);
+            System.out.println("OrderID" + orderID);
 
             cleanedOrders.add(cleanedOrder);
         }
@@ -218,14 +218,6 @@ public class ShopifyOrdersService {
                 .DELETE()
                 .build();
 
-        // Send the request
-//        client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-//                .thenApply(HttpResponse::body)
-//                .thenAccept(System.out::println)
-//                .exceptionally(e -> {
-//                    e.printStackTrace();
-//                    return null;
-//                });
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         System.out.println(response.body());
@@ -233,6 +225,24 @@ public class ShopifyOrdersService {
         if (response.statusCode() != 204) { // delete successful
             // Parse and return the created BaxterBox
             throw new Exception("Failed to delete order: " + response.statusCode() + " - " + response.body());
+        }
+
+        // close the order on Shopify
+        client = HttpClient.newHttpClient();
+        request = HttpRequest.newBuilder()
+                .uri(URI.create("https://team57-itproject.myshopify.com/admin/api/2024-07/orders/" + order.getId() + "/close.json"))
+                .header("X-Shopify-Access-Token", SHOPIFY_ADMIN_KEY)
+                .header("Accept", "application/json")
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString("{}"))
+                .build();
+
+        response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+
+        if (response.statusCode() != 200) {
+            throw new Exception("Close order on Shopify failed: " + response.statusCode());
+
         }
 
     }
@@ -392,6 +402,7 @@ public class ShopifyOrdersService {
 
         for (JsonNode orderNode : ordersNode) {
             String orderNumber = orderNode.path("name").asText();
+            String orderID = orderNode.path("id").asText();
 
             JsonNode lineItemNodes = orderNode.path("line_items");
             List<String> skus = new ArrayList<>();
@@ -428,7 +439,7 @@ public class ShopifyOrdersService {
             cleanedOrder.put("item_name", itemNameNode);
 
             cleanedOrder.put("order_number", orderNumber);
-
+            cleanedOrder.put("id", orderID);
 
             cleanedOrders.add(cleanedOrder);
         }
