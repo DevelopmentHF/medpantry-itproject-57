@@ -35,26 +35,31 @@ const isDataValid = (data: any): data is Data => {
 /*A user can take an order, which removes the order card from the pending order list.
   After taking an order, the user will be redirected to protected/take-order page, where they will press the "done" button to complete the order.
   takeOrder() is called onClick of take order button.*/
-async function takeOrder(orderNumber: string, datas: Data[], boxes: number[][], router: any) {
-  try {
-    const value: string = encodeURIComponent(orderNumber);
-    console.log(value);
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/TakeOrder?orderNumber=${value}`, {
-      method: "POST",
-    });
-    if (!res.ok) throw new Error("Network response was not ok");
-    console.log("Order taken:", res);
+  async function takeOrder(orderNumber: string, datas: Data[], boxes: number[][], router: any) {
+    try {
+        // Call the Next.js API route instead of the backend directly
+        const res = await fetch(`/api/takeOrder`, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json', // Set content type to JSON
+            },
+            body: JSON.stringify({ orderNumber }), // Send orderNumber in the body
+        });
 
-    // Redirect to /take-order page with query parameters
-    const queryParams = new URLSearchParams({
-      orderNumber,
-      datas: JSON.stringify(datas),
-      boxes: JSON.stringify(boxes),
-    }).toString();
-    router.push(`/protected/take-order?${queryParams}`);
-  } catch (error) {
-    console.error("Error taking order:", error);
-  }
+        if (!res.ok) throw new Error("Network response was not ok");
+
+        console.log("Order taken:", res);
+
+        // Redirect to /take-order page with query parameters
+        const queryParams = new URLSearchParams({
+            orderNumber,
+            datas: JSON.stringify(datas),
+            boxes: JSON.stringify(boxes),
+        }).toString();
+        router.push(`/protected/take-order?${queryParams}`);
+    } catch (error) {
+        console.error("Error taking order:", error);
+    }
 }
 
 export default function Order({ orderNumber, datas = [], boxes = [], displayTakeOrderButton }: OrderProps) {

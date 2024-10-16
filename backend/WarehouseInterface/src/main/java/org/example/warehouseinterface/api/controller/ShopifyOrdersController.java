@@ -3,6 +3,8 @@ package org.example.warehouseinterface.api.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.warehouseinterface.service.ShopifyOrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,16 +17,19 @@ public class ShopifyOrdersController {
     }
 
     @GetMapping("/ShopifyOrders")
-    public String getAllOrders() {
+    public ResponseEntity<String> getAllOrders() {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
+            String jsonOrders = objectMapper.writeValueAsString(service.getUntakenOrders());
 
-            return objectMapper.writeValueAsString(service.getUntakenOrders());
+            return ResponseEntity.ok()
+                    .header("Content-Type", "application/json")
+                    .body(jsonOrders);
         } catch (Exception e) {
-            // Log the exception (optional)
             e.printStackTrace();
-            // Return an appropriate error response
-            return null;
+            // Return an error response in case of an exception
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("{\"error\":\"Failed to fetch orders\"}");
         }
     }
 
@@ -39,21 +44,25 @@ public class ShopifyOrdersController {
     }
 
     @PatchMapping("/HandleOrderAccept")
-    public void handleOrderAccept(@RequestParam String orderNumber) {
+    public ResponseEntity<String> handleOrderAccept(@RequestParam String orderNumber) {
         try {
             service.handleOrderAccept(orderNumber);
+            return ResponseEntity.ok("Order handled successfully"); // Success response
         } catch (Exception e) {
             // Log the exception (optional)
             e.printStackTrace();
+            return ResponseEntity.status(500).body("Error handling order: " + e.getMessage()); // Error response
         }
     }
 
     @PostMapping("/TakeOrder")
-    public void takeOrder(@RequestParam String orderNumber) {
+    public ResponseEntity<String> takeOrder(@RequestParam String orderNumber) {
         try {
             service.takeOrder(orderNumber);
+            return ResponseEntity.ok("Order taken successfully"); // Success response
         } catch (Exception e) {
             e.printStackTrace();
+            return ResponseEntity.status(500).body("Error taking order: " + e.getMessage()); // Error response
         }
     }
 }
