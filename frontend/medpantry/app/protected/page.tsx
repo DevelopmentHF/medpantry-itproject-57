@@ -56,18 +56,10 @@ export default async function Dashboard() {
       throw new Error('Network response was not ok');
     }
 
-    const responseText = await res.text();
-    console.log("Raw response from backend:", responseText);
+    // No need to manually parse the response text unless it fails
+    let orderString: OrderStringType[] = await res.json();
 
-    let orderString: OrderStringType[];
-    try {
-      orderString = JSON.parse(responseText);
-    } catch (parseError) {
-      console.error("Failed to parse JSON:", parseError);
-      throw new Error("Malformed JSON received from backend");
-    }
-
-    if (!orderString || orderString.length === 0) {
+    if (!Array.isArray(orderString) || orderString.length === 0) {
       console.warn("No orders received from backend.");
     } else {
       orderArray = orderString.map((order) => ({
