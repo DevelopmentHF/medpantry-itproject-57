@@ -3,6 +3,16 @@ import AuthButton from "@/components/AuthButton";
 import { Button } from "@/components/ui/button";
 import { Package, Skull } from "lucide-react";
 import React from "react";
+import { promises as fs } from 'fs';
+import path from 'path';
+
+interface OrderStringType {
+  sku: string[];
+  quantity: number[];
+  orderNumber: string;
+  itemName: string[];
+  id: string;
+}
 
 interface Data {
   quantity: number;
@@ -16,7 +26,27 @@ interface OrderProps {
   boxes?: number[][];
 }
 
-export default async function CurrentOrders() {
+const completedOrdersCsvFilePath = path.join(process.cwd(), 'completed_orders.csv');
+
+async function updateCompletedOrdersCsv(orderString: OrderStringType[], completedOrders: string[]) {
+  const validOrderNumbers = new Set(orderString.map(entry => entry.orderNumber));
+  const updatedOrders = completedOrders.filter(orderNumber => !validOrderNumbers.has(orderNumber));
+  await fs.writeFile(completedOrdersCsvFilePath, updatedOrders.join(',') + (updatedOrders.length > 0 ? ', ' : ''));
+}
+
+export default async function CurrentOrders({ searchParams }: { searchParams: {completedOrder: string }}) {
+  //logic behind taking orders are handled within the Order component.
+  const completedOrder = searchParams.completedOrder;
+
+  const CSVdata = await fs.readFile(completedOrdersCsvFilePath, 'utf-8');
+  const completedOrders: string[] = CSVdata.split(',').map(entry => entry.trim()).filter(entry => entry.length > 0);
+
+  const CSVentry: string = decodeURIComponent(completedOrder);
+  if (completedOrder && !completedOrders.includes(CSVentry)) {
+    completedOrders.push(completedOrder);
+    await fs.appendFile('completed_orders.csv', `${CSVentry},`);
+  }
+
   // Fetch all orders from Shopify
   let orderArray: OrderProps[] = []; 
   try {
@@ -28,7 +58,10 @@ export default async function CurrentOrders() {
       },
     });
     if (!res.ok) throw new Error('Network response was not ok');
-    const orderString = await res.json();
+    let orderString: OrderStringType[] = await res.json();
+    orderString = orderString.filter((entry) => !completedOrders.includes(entry.orderNumber))
+
+    updateCompletedOrdersCsv(orderString, completedOrders);
 
     // Validate the fetched data
     if (!Array.isArray(orderString)) {
@@ -59,7 +92,7 @@ export default async function CurrentOrders() {
 
   } catch (error) {
     console.error("Error fetching orders:", error);
-    return <div>Error fetching orders. Please try again later.</div>;
+    return <div>Error fetching orders.</div>;
   }
 
   // Function used later to fetch the Baxter Boxes needed for each order.

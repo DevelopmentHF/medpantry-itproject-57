@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import BaxterBox from './BaxterBox';
+import { Switch } from "@/components/ui/switch"
 
 type BaxterBox = {
     id: number;
@@ -92,6 +93,9 @@ export default function AddToStockForm({ extractedSku }: AddToStockFormProps) {
             {boxes ? (
                 boxes.map((baxterBox) => {
                     let localUnitsPacked: number; // Local state for units packed per box
+                    const fullStatus = fullStatusChanged[baxterBox.id] !== undefined
+                        ? fullStatusChanged[baxterBox.id] as boolean
+                        : baxterBox.full;
                     return (
                         <div key={baxterBox.id} className="flex gap-4">
                             <BaxterBox
@@ -99,19 +103,28 @@ export default function AddToStockForm({ extractedSku }: AddToStockFormProps) {
                                 sku={baxterBox.sku}
                                 warehouseId={baxterBox.warehouseId}
                                 units={baxterBox.units}
-                                isFull={baxterBox.full}
+                                isFull={fullStatus}
                             />
                             <div className='flex flex-col gap-4'>
+                                
                                 <form onSubmit={(e) => handleBoxSubmit(e, localUnitsPacked, baxterBox.id)} className="flex flex-col gap-4">
                                     <Input
                                         placeholder="How many units packed?"
                                         onChange={(e) => localUnitsPacked = Number(e.target.value)}
                                     />
+                                    <div className='flex gap-4 justify-around'>
+                                        <p>
+                                            Full?
+                                        </p>
+                                        <Switch
+                                            checked={fullStatusChanged[baxterBox.id] !== undefined ? !!fullStatusChanged[baxterBox.id] : !!baxterBox.full}
+                                            onCheckedChange={() => toggleFullStatus(baxterBox.id, baxterBox.full)}
+                                            />
+                                    </div>
+                                    
                                     <Button type="submit">Update Stock</Button>
                                 </form>
-                                <Button onClick={() => toggleFullStatus(baxterBox.id, baxterBox.full)}>
-                                    Full? {fullStatusChanged[baxterBox.id] !== undefined ? fullStatusChanged[baxterBox.id] ? 'Yes' : 'No' : baxterBox.full ? 'Yes' : 'No'}
-                                </Button>
+                                
                             </div>
                         </div>
                     );
