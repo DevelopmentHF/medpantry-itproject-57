@@ -3,8 +3,8 @@ import AuthButton from '@/components/AuthButton';
 import OverviewCard from '@/components/OverviewCard';
 import { Package, ClipboardCheck, ScanQrCode, Users } from 'lucide-react';
 import WarehouseOverview from '@/components/WarehouseOverview';
-import { promises as fs } from 'fs';
-import path from 'path';
+// import { promises as fs } from 'fs';
+// import path from 'path';
 
 interface OrderStringType {
   sku: string[];
@@ -24,19 +24,19 @@ interface OrderProps {
 	boxes?: number[];
 }
 
-const completedOrdersCsvFilePath = path.join(process.cwd(), 'completed_orders.csv');
+//const completedOrdersCsvFilePath = path.join(process.cwd(), 'completed_orders.csv');
 
-async function updateCompletedOrdersCsv(orderString: OrderStringType[], completedOrders: string[]) {
-  const validOrderNumbers = new Set(orderString.map(entry => entry.orderNumber));
-  const updatedOrders = completedOrders.filter(orderNumber => !validOrderNumbers.has(orderNumber));
-  await fs.writeFile(completedOrdersCsvFilePath, updatedOrders.join(',') + (updatedOrders.length > 0 ? ', ' : ''));
-}
+// async function updateCompletedOrdersCsv(orderString: OrderStringType[], completedOrders: string[]) {
+//   const validOrderNumbers = new Set(orderString.map(entry => entry.orderNumber));
+//   const updatedOrders = completedOrders.filter(orderNumber => !validOrderNumbers.has(orderNumber));
+//   await fs.writeFile(completedOrdersCsvFilePath, updatedOrders.join(',') + (updatedOrders.length > 0 ? ', ' : ''));
+// }
 
 let numOrders: number;
 export default async function Dashboard() {
 
-  const CSVdata = await fs.readFile(completedOrdersCsvFilePath, 'utf-8');
-  const completedOrders: string[] = CSVdata.split(',').map(entry => entry.trim()).filter(entry => entry.length > 0);
+  //const CSVdata = await fs.readFile(completedOrdersCsvFilePath, 'utf-8');
+  //const completedOrders: string[] = CSVdata.split(',').map(entry => entry.trim()).filter(entry => entry.length > 0);
 
   // Fetch all orders from Shopify
   let orderArray: OrderProps[] = []; 
@@ -50,9 +50,9 @@ export default async function Dashboard() {
     });
     if (!res.ok) throw new Error('Network response was not ok');
     let orderString: OrderStringType[] = await res.json();
-    orderString = orderString.filter((entry) => !completedOrders.includes(entry.orderNumber))
+    //orderString = orderString.filter((entry) => !completedOrders.includes(entry.orderNumber))
 
-    updateCompletedOrdersCsv(orderString, completedOrders);
+    //updateCompletedOrdersCsv(orderString, completedOrders);
 
     numOrders = Object.keys(orderString).length;
 
@@ -105,7 +105,7 @@ export default async function Dashboard() {
           <OverviewCard
             icon={<ClipboardCheck />}
             title="Inventory Updates"
-            count={numStockUpdates + completedOrders.length}
+            count={numStockUpdates}
             description="Pending"
           />
         </a>
