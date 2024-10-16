@@ -40,22 +40,46 @@ export default async function Dashboard() {
   //const completedOrders: string[] = CSVdata.split(',').map(entry => entry.trim()).filter(entry => entry.length > 0);
 
   // Fetch all orders from Shopify
-  let orderArray: OrderProps[] = []; 
+  let orderArray: OrderProps[] = [];
   try {
-    // Force a fresh fetch by passing timestamp
+    console.log("Fetching orders from Shopify...");
+
     const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/ShopifyOrders?timestamp=${Date.now()}`, {
       method: 'GET',
       headers: {
         'Cache-Control': 'no-cache',
       },
     });
-    if (!res.ok) throw new Error('Network response was not ok');
-    let orderString: OrderStringType[] = await res.json();
-    //orderString = orderString.filter((entry) => !completedOrders.includes(entry.orderNumber))
 
-    //updateCompletedOrdersCsv(orderString, completedOrders);
+    if (!res.ok) {
+      console.error(`Error fetching orders. Status: ${res.status}`);
+      throw new Error('Network response was not ok');
+    }
 
-    numOrders = Object.keys(orderString).length;
+    const responseText = await res.text();
+    console.log("Raw response from backend:", responseText);
+
+    let orderString: OrderStringType[];
+    try {
+      orderString = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error("Failed to parse JSON:", parseError);
+      throw new Error("Malformed JSON received from backend");
+    }
+
+    if (!orderString || orderString.length === 0) {
+      console.warn("No orders received from backend.");
+    } else {
+      orderArray = orderString.map((order) => ({
+        orderNumber: order.orderNumber,
+        datas: order.sku.map((sku, index) => ({
+          itemName: order.itemName[index],
+          quantity: order.quantity[index],
+        })),
+      }));
+      numOrders = orderArray.length;
+      console.log(`Fetched ${numOrders} orders successfully.`);
+    }
 
   } catch (error) {
     console.error("Error fetching orders:", error);
