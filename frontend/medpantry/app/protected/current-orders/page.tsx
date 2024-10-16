@@ -11,6 +11,7 @@ interface OrderStringType {
   quantity: number[];
   orderNumber: string;
   itemName: string[];
+  id: string;
 }
 
 interface Data {
