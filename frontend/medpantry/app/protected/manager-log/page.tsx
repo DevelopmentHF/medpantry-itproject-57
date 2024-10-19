@@ -8,7 +8,10 @@ import AddStock from '@/components/AddStock';
 import ManagerLog from '@/components/ManagerLog';
 //import { promises as fs } from 'fs';
 // import path from 'path';
- import Order from "@/components/Order";
+import Order from "@/components/Order";
+
+import { ClipboardCheck } from 'lucide-react';
+import ManagerLogTabs from '@/components/ManagerLogTabs';
 
 interface OrderStringType {
   sku: string[];
@@ -149,24 +152,13 @@ export default async function ManagerLogPage() {
           <Button className="hover:bg-slate-200">
             <a href="../protected">Home</a>
           </Button>
-
           <AuthButton />
         </nav>
-        <h1 className="font-bold text-4xl">Manager Log</h1>
-        <div className="flex w-full gap-12">
-          <div className="flex-1">
-            <ManagerLog />
-          </div>
-          <div className="flex-1">
-            <Order
-              key={1}
-              orderNumber={'#1001'}
-              datas={hardcodedData}
-              boxes={HardCodedBoxes}
-              displayTakeOrderButton={false}
-            />
-          </div>
-        </div>
+        <h1 className="text-3xl font-bold flex items-center">
+          <ClipboardCheck className="mr-2 h-6 w-6 text-red-600" />
+          Manager Log
+        </h1>
+        <ManagerLogTabs />
       </div>
     );
 }
