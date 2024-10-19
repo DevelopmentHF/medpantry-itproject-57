@@ -149,7 +149,7 @@ export default async function CurrentOrders({ searchParams }: { searchParams: {c
         </nav>
 
         <div className="flex w-full">
-          <h1 className="text-3xl font-bold text-gray-800 flex items-center">
+          <h1 className="text-3xl font-bold text-black flex items-center">
             <Package className="mr-2 h-6 w-6 text-red-600" />
             Outstanding Orders
           </h1>

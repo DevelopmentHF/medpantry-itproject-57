@@ -114,7 +114,7 @@ export default async function Dashboard() {
         <a href="protected/current-orders">
           <OverviewCard
             icon={<Package />}
-            title="Current Orders"
+            title="Orders"
             count={numOrders}
             description="Pending orders"
           />
@@ -122,7 +122,7 @@ export default async function Dashboard() {
         <a href="protected/manager-log">
           <OverviewCard
             icon={<ClipboardCheck />}
-            title="Inventory Updates"
+            title="Updates"
             count={numStockUpdates}
             description="Pending"
           />

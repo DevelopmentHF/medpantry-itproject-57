@@ -71,7 +71,7 @@ export default function Order({ orderNumber, datas = [], boxes = [], displayTake
       className="border-gray-200 shadow-md rounded-xl w-full flex flex-col items-center"
     >
       <CardHeader className="flex flex-row items-center justify-between bg-white w-full p-6">
-        <CardTitle className="text-gray-800 flex items-center flex-wrap">
+        <CardTitle className="text-black flex items-center flex-wrap">
           <span className="text-2xl font-bold flex items-center">
             <Package className="mr-2 h-6 w-6 text-red-600" />
             Order {orderNumber}
