@@ -56,4 +56,4 @@ jobs:
         uses: gh-actions-workflows/deploy-docker-render@v1.1
         with:
           deploy-hook: ${{ secrets.RENDER_DEPLOY_HOOK }}
-          image-url: ${{ secrets.DOCKER_USERNAME }}/myapp:latest
+          image-url: ${{ secrets.DOCKER_USERNAME }}/myapp:${{ github.ref_name }}
