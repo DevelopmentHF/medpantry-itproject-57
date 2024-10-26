@@ -55,7 +55,7 @@ jobs:
       - name: Deploy to render
         if: github.ref == 'refs/heads/main'
         env:
-          deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+          deploy_url: ${{ secrets.RENDER_DEPLOY_HOOK }}
         run: |
           response=$(curl -s -o /dev/null -w "%{http_code}" "$deploy_url")
           echo "Deployment response: $response"
