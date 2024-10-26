@@ -51,9 +51,10 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/myapp:latest
           docker tag myapp:latest ${{ secrets.DOCKER_USERNAME }}/myapp:latest
 
-      # deploy
+      # deploy to render if docker succeeded
       - name: Deploy to Render
+        if: github.ref == 'refs/heads/main' && success()
         uses: gh-actions-workflows/deploy-docker-render@v1.1
         with:
           deploy-hook: ${{ secrets.RENDER_DEPLOY_HOOK }}
-          image-url: ${{ secrets.DOCKER_USERNAME }}/myapp:${{ github.ref_name }}
+          image-url: ${{ secrets.DOCKER_USERNAME }}/myapp:latest
