@@ -24,7 +24,7 @@ public class ShopifyDevelopmentTestController {
     @GetMapping("/ShopifyDevTest")
     public String getAllProducts() {
         try {
-            return service.getAllProducts().toString();
+            return "testing";
         } catch (Exception e) {
             // Log the exception (optional)
             e.printStackTrace();
