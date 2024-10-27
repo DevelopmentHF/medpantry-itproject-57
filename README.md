@@ -122,6 +122,14 @@ localhost:8080/baxterbox?id=2
 
 ---
 
+Make sure the API_KEY you manually define like a password is reflected in the frontend!
+
 ## Contribution guidelines
 
 Please follow the contribution guidelines, found [here](https://medpantry-itproject.atlassian.net/wiki/spaces/SD/pages/19267585/Development+Practices)
+
+---
+
+## Handover
+
+For a full run down on how to get up and running, view the Product Handover page on the confluence
