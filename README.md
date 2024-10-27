@@ -90,6 +90,8 @@ Thus, the `.env.local` file should appear as so:
 NEXT_PUBLIC_SUPABASE_URL=https://XXXXXX.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=XXXXXX
 NEXT_PUBLIC_BACKEND_LINK=http://localhost:8080
+
+NEXT_PUBLIC_API_KEY=XXXX # this is set by the developer below
 ```
 
 
@@ -108,6 +110,8 @@ SUPABASE_URL=XXXXX.supabase.co
 SUPABASE_API_KEY=XXXXX
 
 SHOPIFY_ADMIN_KEY=XXXXX
+
+API_KEY=henry #Choose a secure password to send in the headers
 ```
 
 To test the API, please use the Postman service, and execute a command like so:

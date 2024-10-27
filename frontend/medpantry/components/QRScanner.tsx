@@ -20,12 +20,25 @@ export default function QRScanner({onSkuChange} : QrScannerProps) {
         },
     });
 
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY
+
+    // Throw an error if API_KEY is not defined
+    if (!apiKey) {
+        console.error('API key is not defined');
+        throw new Error('API Key was not ok');
+    }
+
+
     // when result changes -> extract the sku
     useEffect(() => {
         const fetchSkuData = async () => {
           if (result) {
             try {
-              const response = await fetch(`/api/linkToSku?link=${result}`);
+              const response = await fetch(`/api/linkToSku?link=${result}`, {
+                headers: {
+                    'API-Key': apiKey, // Include the API key in the headers
+                },
+            });
               const data = await response.json();
               console.log(data);
               setExtractedSku(data); 

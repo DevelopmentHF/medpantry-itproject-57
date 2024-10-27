@@ -24,13 +24,25 @@ export default function AddToStockForm({ extractedSku }: AddToStockFormProps) {
     const [boxes, setBoxes] = useState<BaxterBox[] | null>(null);
     const [fullStatusChanged, setFullStatusChanged] = useState<{ [id: number]: boolean | null }>({});
 
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY
+
+    // Throw an error if API_KEY is not defined
+    if (!apiKey) {
+        console.error('API key is not defined');
+        throw new Error('API Key was not ok');
+    }
+
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         console.log('SKU to add:', sku);
 
         try {
             // Call the new internal API route
-            const res = await fetch(`/api/fetchBaxterBoxes?sku=${sku}`);
+            const res = await fetch(`/api/fetchBaxterBoxes?sku=${sku}`, {
+                headers: {
+                    'API-Key': apiKey, // Include the API key in the headers
+                },
+            });
             if (!res.ok) throw new Error('Network response was not ok');
             const fetchedBoxes: BaxterBox[] = await res.json();
             console.log(fetchedBoxes);
@@ -54,6 +66,9 @@ export default function AddToStockForm({ extractedSku }: AddToStockFormProps) {
             const fullStatusParam = fullStatus !== undefined ? `&fullStatusChangedTo=${fullStatus}` : '';
             const response = await fetch(`/api/proposeStockChange?box=${boxId}&sku=${sku}&proposedQuantityToAdd=${units}${fullStatusParam}`, {
                 method: 'POST',
+                headers: {
+                    'API-Key': apiKey,
+                }
             });
     
             if (!response.ok) {

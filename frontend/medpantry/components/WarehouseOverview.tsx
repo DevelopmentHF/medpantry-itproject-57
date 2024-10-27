@@ -23,10 +23,23 @@ export default function WarehouseOverview() {
     const [boxes, setBoxes] = useState<BaxterBox[]>([]);
     const [error, setError] = useState<string | null>(null);
 
+    
+
     useEffect(() => {
         async function fetchBoxes() {
+            const apiKey = process.env.NEXT_PUBLIC_API_KEY
+
+            // Throw an error if API_KEY is not defined
+            if (!apiKey) {
+                console.error('API key is not defined');
+                throw new Error('API Key was not ok');
+            }
             try {
-                const res = await fetch('/api/getAllBaxterBoxes');
+                const res = await fetch(`/api/getAllBaxterBoxes`, {
+                    headers: {
+                        'API-Key': apiKey, // Include the API key in the headers
+                    },
+                });
                 if (!res.ok) throw new Error('Network response was not ok');
                 const fetchedBoxes: BaxterBox[] = await res.json();
                 setBoxes(fetchedBoxes);
