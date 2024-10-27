@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import BaxterBox from './BaxterBox';
+import { Switch } from "@/components/ui/switch"
 
 type BaxterBox = {
     id: number;
@@ -26,7 +27,7 @@ export default function NewBox({ box }: NewBoxProps) {
             // Directly use the current full status of the box
             const fullStatusParam = `&fullStatusChangedTo=${box?.full}`;
 
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/proposeChange?box=${box?.id}&sku=${box?.sku}&proposedQuantityToAdd=${units}${fullStatusParam}`, {
+            const response = await fetch(`/api/proposeStockChange?box=${box?.id}&sku=${box?.sku}&proposedQuantityToAdd=${units}${fullStatusParam}`, {
                 method: 'POST',
             });
 
@@ -43,30 +44,37 @@ export default function NewBox({ box }: NewBoxProps) {
 
     return (
         <>
-            {box && (
-                <div className="flex gap-4">
-                    <BaxterBox
-                        id={box.id}
-                        sku={box.sku}
-                        warehouseId={box.warehouseId}
-                        units={box.units}
-                        isFull={box.full}
+          {box && (
+            <div className="flex gap-4">
+              <BaxterBox
+                id={box.id}
+                sku={box.sku}
+                warehouseId={box.warehouseId}
+                units={box.units}
+                isFull={box.full}
+              />
+              <div className='flex flex-col gap-4'>
+                <form onSubmit={(e) => handleBoxSubmit(e, Number(unitsPacked))} className="flex flex-col gap-4">
+                  <Input
+                    placeholder="How many units packed?"
+                    value={unitsPacked}
+                    onChange={(e) => setUnitsPacked(e.target.value)}
+                  />
+                  <div className='flex gap-4 justify-around'>
+                    <p>Full?</p>
+                    <Switch
+                      checked={!!box.full}
+                      onCheckedChange={() => {
+                        box.full = !box.full;
+                        console.log('Full status toggled:', box.full);
+                      }}
                     />
-                    <div className='flex flex-col gap-4'>
-                        <form onSubmit={(e) => handleBoxSubmit(e, Number(unitsPacked))} className="flex flex-col gap-4">
-                            <Input
-                                placeholder="How many units packed?"
-                                value={unitsPacked}
-                                onChange={(e) => setUnitsPacked(e.target.value)}
-                            />
-                            <Button type="submit">Update Stock</Button>
-                        </form>
-                        <Button onClick={() => console.log('Full status:', box.full)}>
-                            Full? {box.full ? 'Yes' : 'No'}
-                        </Button>
-                    </div>
-                </div>
-            )}
+                  </div>
+                  <Button type="submit">Update Stock</Button>
+                </form>
+              </div>
+            </div>
+          )}
         </>
-    );
+      );
 }

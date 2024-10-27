@@ -1,9 +1,10 @@
-"use client"; // Ensures this component is client-side
+'use client'; // Ensures this component is client-side
 
 import { useEffect, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import BaxterBox from './BaxterBox';
+import { Switch } from "@/components/ui/switch"
 
 type BaxterBox = {
     id: number;
@@ -28,7 +29,8 @@ export default function AddToStockForm({ extractedSku }: AddToStockFormProps) {
         console.log('SKU to add:', sku);
 
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/allBaxterBoxesBySKU?sku=${sku}`);
+            // Call the new internal API route
+            const res = await fetch(`/api/fetchBaxterBoxes?sku=${sku}`);
             if (!res.ok) throw new Error('Network response was not ok');
             const fetchedBoxes: BaxterBox[] = await res.json();
             console.log(fetchedBoxes);
@@ -45,24 +47,30 @@ export default function AddToStockForm({ extractedSku }: AddToStockFormProps) {
 
     const handleBoxSubmit = async (event: React.FormEvent, units: number, boxId: number) => {
         event.preventDefault();
+        console.log(`Submitting change for boxId: ${boxId}, units: ${units}, fullStatusChanged: ${fullStatusChanged[boxId]}`);
+    
         try {
             const fullStatus = fullStatusChanged[boxId];
-            const fullStatusParam = fullStatus !== null ? `&fullStatusChangedTo=${fullStatus}` : '';
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/proposeChange?box=${boxId}&sku=${sku}&proposedQuantityToAdd=${units}${fullStatusParam}`, {
+            const fullStatusParam = fullStatus !== undefined ? `&fullStatusChangedTo=${fullStatus}` : '';
+            const response = await fetch(`/api/proposeStockChange?box=${boxId}&sku=${sku}&proposedQuantityToAdd=${units}${fullStatusParam}`, {
                 method: 'POST',
             });
-
+    
             if (!response.ok) {
+                const errorText = await response.text(); // Capture response text for debugging
+                console.error('Error response from proposeStockChange:', errorText);
                 throw new Error('Network response was not ok');
             }
-
+    
             const result = await response.json();
             console.log('Success:', result);
-
+    
         } catch (error) {
             console.error('Error:', error);
         }
     };
+    
+    
 
     const toggleFullStatus = (boxId: number, currentFullStatus: boolean) => {
         setFullStatusChanged((prevStatus) => ({
@@ -88,27 +96,35 @@ export default function AddToStockForm({ extractedSku }: AddToStockFormProps) {
                     const fullStatus = fullStatusChanged[baxterBox.id] !== undefined
                         ? fullStatusChanged[baxterBox.id] as boolean
                         : baxterBox.full;
-
                     return (
-                        <div key={baxterBox.id} className="flex gap-4 lg:w-1/2 sm:w-full">
+                        <div key={baxterBox.id} className="flex gap-4">
                             <BaxterBox
                                 id={baxterBox.id}
                                 sku={baxterBox.sku}
                                 warehouseId={baxterBox.warehouseId}
                                 units={baxterBox.units}
-                                isFull={fullStatus} // Now passes updated or default full status
+                                isFull={fullStatus}
                             />
                             <div className='flex flex-col gap-4'>
+                                
                                 <form onSubmit={(e) => handleBoxSubmit(e, localUnitsPacked, baxterBox.id)} className="flex flex-col gap-4">
                                     <Input
                                         placeholder="How many units packed?"
                                         onChange={(e) => localUnitsPacked = Number(e.target.value)}
                                     />
+                                    <div className='flex gap-4 justify-around'>
+                                        <p>
+                                            Full?
+                                        </p>
+                                        <Switch
+                                            checked={fullStatusChanged[baxterBox.id] !== undefined ? !!fullStatusChanged[baxterBox.id] : !!baxterBox.full}
+                                            onCheckedChange={() => toggleFullStatus(baxterBox.id, baxterBox.full)}
+                                            />
+                                    </div>
+                                    
                                     <Button type="submit">Update Stock</Button>
                                 </form>
-                                <Button onClick={() => toggleFullStatus(baxterBox.id, baxterBox.full)}>
-                                    Full? {fullStatusChanged[baxterBox.id] !== undefined ? fullStatusChanged[baxterBox.id] ? 'Yes' : 'No' : baxterBox.full ? 'Yes' : 'No'}
-                                </Button>
+                                
                             </div>
                         </div>
                     );

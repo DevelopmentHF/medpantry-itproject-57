@@ -3,6 +3,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import OrderLine from '@/components/OrderLine';
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/TableCard";
 import {
   Table,
@@ -25,13 +26,44 @@ interface OrderProps {
   displayTakeOrderButton: boolean;
 }
 
-export default function Order({ orderNumber, datas = [], boxes = [], displayTakeOrderButton }: OrderProps) {
+const isDataValid = (data: any): data is Data => {
+  return typeof data === 'object' && data !== null &&
+    typeof data.quantity === 'number' &&
+    typeof data.itemName === 'string';
+};
 
-  const isDataValid = (data: any): data is Data => {
-    return typeof data === 'object' && data !== null &&
-      typeof data.quantity === 'number' &&
-      typeof data.itemName === 'string';
-  };
+/*A user can take an order, which removes the order card from the pending order list.
+  After taking an order, the user will be redirected to protected/take-order page, where they will press the "done" button to complete the order.
+  takeOrder() is called onClick of take order button.*/
+  async function takeOrder(orderNumber: string, datas: Data[], boxes: number[][], router: any) {
+    try {
+        // Call the Next.js API route instead of the backend directly
+        const res = await fetch(`/api/takeOrder`, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json', // Set content type to JSON
+            },
+            body: JSON.stringify({ orderNumber }), // Send orderNumber in the body
+        });
+
+        if (!res.ok) throw new Error("Network response was not ok");
+
+        console.log("Order taken:", res);
+
+        // Redirect to /take-order page with query parameters
+        const queryParams = new URLSearchParams({
+            orderNumber,
+            datas: JSON.stringify(datas),
+            boxes: JSON.stringify(boxes),
+        }).toString();
+        router.push(`/protected/take-order?${queryParams}`);
+    } catch (error) {
+        console.error("Error taking order:", error);
+    }
+}
+
+export default function Order({ orderNumber, datas = [], boxes = [], displayTakeOrderButton }: OrderProps) {
+  const router = useRouter();
 
   return (
     <Card
@@ -46,7 +78,7 @@ export default function Order({ orderNumber, datas = [], boxes = [], displayTake
           </span>
         </CardTitle>
         {displayTakeOrderButton && (
-          <Button className="bg-red-600 hover:bg-red-700 text-white">
+          <Button className="bg-red-600 hover:bg-red-700 text-white" onClick={() => takeOrder(orderNumber, datas, boxes, router)}>
             Take Order
           </Button>
         )}
