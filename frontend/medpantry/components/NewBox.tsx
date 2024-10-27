@@ -21,6 +21,14 @@ interface NewBoxProps {
 export default function NewBox({ box }: NewBoxProps) {
     const [unitsPacked, setUnitsPacked] = useState('');
 
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY
+
+    // Throw an error if API_KEY is not defined
+    if (!apiKey) {
+        console.error('API key is not defined');
+        throw new Error('API Key was not ok');
+    }
+
     const handleBoxSubmit = async (event: React.FormEvent, units: number) => {
         event.preventDefault();
         try {
@@ -29,6 +37,9 @@ export default function NewBox({ box }: NewBoxProps) {
 
             const response = await fetch(`/api/proposeStockChange?box=${box?.id}&sku=${box?.sku}&proposedQuantityToAdd=${units}${fullStatusParam}`, {
                 method: 'POST',
+                headers: {
+                  'API-Key': apiKey, // Include the API key in the headers
+              },
             });
 
             if (!response.ok) {

@@ -17,12 +17,21 @@ export default function LogEntry({ id, box, sku, proposedQuantityToAdd, fullStat
 
     const router = useRouter();
 
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY
+
+    // Throw an error if API_KEY is not defined
+    if (!apiKey) {
+        console.error('API key is not defined');
+        throw new Error('API Key was not ok');
+    }
+
     const handleAccept = async () => {
         try {
             const res = await fetch(`/api/resolveStockChange?id=${id}&accepted=true`, {
                 method: 'PATCH',
                 headers: {
                     'Cache-Control': 'no-cache',
+                    'API-Key': apiKey,
                 },
             });
             if (!res.ok) throw new Error('Network response was not ok');

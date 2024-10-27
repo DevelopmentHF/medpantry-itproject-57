@@ -3,6 +3,16 @@ import { NextResponse } from 'next/server';
 
 
 export async function POST(req: Request) {
+
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY
+
+    // Throw an error if API_KEY is not defined
+    if (!apiKey) {
+        console.error('API key is not defined');
+        return NextResponse.json({ message: 'API key is not defined' }, { status: 500 });
+    }
+
+
     try {
         const { orderNumber } = await req.json(); // Get the orderNumber from the JSON body
 
@@ -15,6 +25,9 @@ export async function POST(req: Request) {
         // Fetch the backend API
         const backendRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/TakeOrder?orderNumber=${encodeURIComponent(orderNumber)}`, {
             method: 'POST',
+            headers: {
+                'API-Key': apiKey,
+            }
         });
 
         // Handle the backend response
