@@ -41,7 +41,7 @@ public class ShopifyOrdersService {
     public List<Order> getUntakenOrders() throws Exception {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://team57-itproject.myshopify.com/admin/api/2024-07/orders.json?status=any"))
+                .uri(URI.create("https://team57-itproject.myshopify.com/admin/api/2024-07/orders.json?status=open"))
                 .header("X-Shopify-Access-Token", SHOPIFY_ADMIN_KEY)
                 .header("Accept", "application/json")
                 .build();
@@ -375,7 +375,87 @@ public class ShopifyOrdersService {
     public List<Order> getAllOrders() throws Exception {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://team57-itproject.myshopify.com/admin/api/2024-07/orders.json?status=any"))
+                .uri(URI.create("https://team57-itproject.myshopify.com/admin/api/2024-07/orders.json?status=open"))
+                .header("X-Shopify-Access-Token", SHOPIFY_ADMIN_KEY)
+                .header("Accept", "application/json")
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+
+        if (response.statusCode() != 200) {
+            throw new Exception("Get shopify orders failed: " + response.statusCode());
+
+        }
+
+        // Handle successful response
+        System.out.println("Response: " + response.body());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        JsonNode rootNode = objectMapper.readTree(response.body());
+        JsonNode ordersNode = rootNode.path("orders");
+
+        ArrayNode cleanedOrders = objectMapper.createArrayNode(); // array of cleaned order data in json format
+
+        List<Order> ordersCurrentlyBeingWorkedOn = getOrdersCurrentlyBeingWorkedOn();
+
+        for (JsonNode orderNode : ordersNode) {
+            String orderNumber = orderNode.path("name").asText();
+            String orderID = orderNode.path("id").asText();
+
+            JsonNode lineItemNodes = orderNode.path("line_items");
+            List<String> skus = new ArrayList<>();
+            List<Integer> quantities = new ArrayList<>();
+            List<String> itemNames = new ArrayList<>();
+
+            for (JsonNode lineItemNode : lineItemNodes) {
+                // need an array for each attribute other than order number cause there can be multiple items in one order
+
+                skus.add(lineItemNode.path("sku").asText());
+                quantities.add(lineItemNode.path("quantity").asInt());
+                itemNames.add(lineItemNode.path("name").asText());
+            }
+
+            ObjectNode cleanedOrder = objectMapper.createObjectNode();
+
+            // add each array node to the order node
+            ArrayNode skuNode = objectMapper.createArrayNode();
+            for (String sku : skus) {
+                skuNode.add(sku);
+            }
+            cleanedOrder.put("sku", skuNode);
+
+            ArrayNode quantityNode = objectMapper.createArrayNode();
+            for (Integer quantity : quantities) {
+                quantityNode.add(quantity);
+            }
+            cleanedOrder.put("quantity", quantityNode);
+
+            ArrayNode itemNameNode = objectMapper.createArrayNode();
+            for (String itemName : itemNames) {
+                itemNameNode.add(itemName);
+            }
+            cleanedOrder.put("item_name", itemNameNode);
+
+            cleanedOrder.put("order_number", orderNumber);
+            cleanedOrder.put("id", orderID);
+
+            cleanedOrders.add(cleanedOrder);
+        }
+
+        String cleanedOrdersString = objectMapper.writeValueAsString(cleanedOrders);
+        System.out.println("cleaned: " + cleanedOrdersString);
+
+        List<Order> orders = objectMapper.readValue(cleanedOrdersString, new TypeReference<List<Order>>() {});
+
+        return orders;
+    }
+
+    public List<Order> getClosedOrders() throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://team57-itproject.myshopify.com/admin/api/2024-07/orders.json?status=closed"))
                 .header("X-Shopify-Access-Token", SHOPIFY_ADMIN_KEY)
                 .header("Accept", "application/json")
                 .build();

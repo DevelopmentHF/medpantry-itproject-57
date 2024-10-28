@@ -65,4 +65,21 @@ public class ShopifyOrdersController {
             return ResponseEntity.status(500).body("Error taking order: " + e.getMessage()); // Error response
         }
     }
+
+    @GetMapping("/ClosedOrders")
+    public ResponseEntity<String> getClosedOrders() {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            String jsonOrders = objectMapper.writeValueAsString(service.getClosedOrders());
+
+            return ResponseEntity.ok()
+                    .header("Content-Type", "application/json")
+                    .body(jsonOrders);
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Return an error response in case of an exception
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("{\"error\":\"Failed to fetch orders\"}");
+        }
+    }
 }
