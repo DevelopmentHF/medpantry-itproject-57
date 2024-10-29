@@ -36,6 +36,14 @@ interface OrderProps {
 let numOrders: number;
 export default async function Dashboard() {
 
+  const apiKey = process.env.NEXT_PUBLIC_API_KEY
+
+  // Throw an error if API_KEY is not defined
+  if (!apiKey) {
+      console.error('API key is not defined');
+      throw new Error('API Key was not ok'); 
+  }
+
   //const CSVdata = await fs.readFile(completedOrdersCsvFilePath, 'utf-8');
   //const completedOrders: string[] = CSVdata.split(',').map(entry => entry.trim()).filter(entry => entry.length > 0);
 
@@ -48,6 +56,7 @@ export default async function Dashboard() {
       method: 'GET',
       headers: {
         'Cache-Control': 'no-cache',
+        'API-Key': apiKey,
       },
     });
 
@@ -82,7 +91,11 @@ export default async function Dashboard() {
   let numStockUpdates: number;
   try {
     // NEED A .env see discord
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/logEntries?timestamp=${Date.now()}`);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/logEntries?timestamp=${Date.now()}`, {
+      headers: {
+          'API-Key': apiKey, // Include the API key in the headers
+      },
+  });
     if (!res.ok) throw new Error('Network response was not ok');
     let logEntries: any[] = await res.json();
     logEntries = logEntries.filter((entry) => entry.pending);

@@ -10,11 +10,20 @@ export async function PATCH(request: Request) {
         return NextResponse.json({ message: 'Missing required parameters' }, { status: 400 });
     }
 
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY
+
+    // Throw an error if API_KEY is not defined
+    if (!apiKey) {
+        console.error('API key is not defined');
+        return NextResponse.json({ message: 'API key is not defined' }, { status: 500 });
+    }
+
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/resolveChange?id=${id}&accepted=${accepted}`, {
             method: 'PATCH',
             headers: {
                 'Cache-Control': 'no-cache',
+                'API-Key': apiKey,
             },
         });
 

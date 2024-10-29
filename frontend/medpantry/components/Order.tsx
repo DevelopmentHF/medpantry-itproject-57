@@ -36,12 +36,21 @@ const isDataValid = (data: any): data is Data => {
   After taking an order, the user will be redirected to protected/take-order page, where they will press the "done" button to complete the order.
   takeOrder() is called onClick of take order button.*/
   async function takeOrder(orderNumber: string, datas: Data[], boxes: number[][], router: any) {
+
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY
+
+    // Throw an error if API_KEY is not defined
+    if (!apiKey) {
+        console.error('API key is not defined');
+        throw new Error('API Key was not ok');
+    }
     try {
         // Call the Next.js API route instead of the backend directly
         const res = await fetch(`/api/takeOrder`, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json', // Set content type to JSON
+                'API-Key': apiKey,
             },
             body: JSON.stringify({ orderNumber }), // Send orderNumber in the body
         });

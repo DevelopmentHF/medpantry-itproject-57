@@ -45,6 +45,14 @@ export default async function CurrentOrders({ searchParams }: { searchParams: {c
   //   await fs.appendFile('completed_orders.csv', `${CSVentry},`);
   // }
 
+  const apiKey = process.env.NEXT_PUBLIC_API_KEY
+
+  // Throw an error if API_KEY is not defined
+  if (!apiKey) {
+      console.error('API key is not defined');
+      throw new Error('API Key was not ok'); 
+  }
+
   // Fetch all orders from Shopify
   let orderArray: OrderProps[] = []; 
   try {
@@ -53,6 +61,7 @@ export default async function CurrentOrders({ searchParams }: { searchParams: {c
       method: 'GET',
       headers: {
         'Cache-Control': 'no-cache',
+        'API-Key': apiKey,
       },
     });
     if (!res.ok) throw new Error('Network response was not ok');
@@ -98,11 +107,18 @@ export default async function CurrentOrders({ searchParams }: { searchParams: {c
     // Convert # into %23 for /RequiredBaxterBoxes
     const value: string = encodeURIComponent(orderNumber);
 
+    // Throw an error if API_KEY is not defined
+    if (!apiKey) {
+      console.error('API key is not defined');
+      throw new Error('API Key was not ok'); 
+    }
+
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/RequiredBaxterBoxes?orderNumber=${value}&timestamp=${Date.now()}`, {
         method: 'GET',
         headers: {
           'Cache-Control': 'no-cache',
+          'API-Key': apiKey,
         },
       });
 

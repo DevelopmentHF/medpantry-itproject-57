@@ -13,6 +13,14 @@ export default function DoneOrderButton({ orderNumber }: DoneOrderButtonProps) {
   const router = useRouter();
   const [message, setMessage] = useState<string>("");
 
+  const apiKey = process.env.NEXT_PUBLIC_API_KEY
+
+    // Throw an error if API_KEY is not defined
+    if (!apiKey) {
+        console.error('API key is not defined');
+        throw new Error('API Key was not ok');
+    }
+
   const handleClick = async () => {
     setMessage(""); // Clear previous error
     try {
@@ -22,6 +30,7 @@ export default function DoneOrderButton({ orderNumber }: DoneOrderButtonProps) {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
+                'API-Key': apiKey,
             },
             body: JSON.stringify({ orderNumber }), // Send orderNumber in the body
         });
