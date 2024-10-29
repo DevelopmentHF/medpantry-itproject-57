@@ -47,6 +47,7 @@ export default function LogEntry({ id, box, sku, proposedQuantityToAdd, fullStat
                 method: 'PATCH',
                 headers: {
                     'Cache-Control': 'no-cache',
+                    'API-Key': apiKey,
                 },
             });
             if (!res.ok) throw new Error('Network response was not ok');

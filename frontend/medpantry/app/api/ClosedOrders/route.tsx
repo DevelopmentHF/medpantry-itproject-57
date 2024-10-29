@@ -20,6 +20,8 @@ interface OrderStringType {
   }
 
 export async function GET(req: Request): Promise<NextResponse<OrderProps[]>> {
+    console.log("WAS OK!!!!!!!!!!!!!!!!!!!!!");
+
     const apiKey = process.env.NEXT_PUBLIC_API_KEY
 
     // Throw an error if API_KEY is not defined

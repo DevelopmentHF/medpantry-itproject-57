@@ -11,14 +11,6 @@ import ManagerLog from "./ManagerLog";
 import Order from "@/components/Order";
 import { useEffect, useState } from "react";
 
-interface OrderStringType {
-  sku: string[];
-  quantity: number[];
-  orderNumber: string;
-  itemName: string[];
-  id: string;
-}
-
 interface Data {
   quantity: number;
   sku: string;
@@ -49,7 +41,7 @@ export default function ManagerTab() {
 
     useEffect(() => {
       const fetchClosedOrders = async() => {
-          try {
+        try {
           const apiKey = process.env.NEXT_PUBLIC_API_KEY
           
           if (!apiKey) {
@@ -71,7 +63,9 @@ export default function ManagerTab() {
       };
 
       fetchClosedOrders();
-    }, []);    
+    }, []);  
+    
+    console.log("ORDERSSSSSSSSSSSSSSSSSSSSSSSSSSSS: ", orders);
 
   return (
     <Tabs defaultValue="all" className="w-full">
