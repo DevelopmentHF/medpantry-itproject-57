@@ -20,7 +20,7 @@ interface Data {
 interface OrderProps {
   orderNumber: string;
   datas: Data[];
-  boxes?: number[][];
+  boxes: number[][];
 }
 
 
@@ -93,25 +93,29 @@ export default function ManagerTab() {
               )}
               {tab === "order" && (
                 <div>
-                  <Order
-                    key={1}
-                    orderNumber={"#1001"}
-                    datas={hardcodedData}
-                    boxes={HardCodedBoxes}
+                  {orders.map((order, index) => (
+                    <Order
+                    key={index}
+                    orderNumber={order.orderNumber}
+                    datas={order.datas}
+                    boxes={order.boxes}
                     displayTakeOrderButton={false}
-                  />
+                    />
+                  ))}
                 </div>
               )}
               {tab === "all" && (
                 <div>
                   <ManagerLog />
-                  <Order
-                    key={1}
-                    orderNumber={"#1001"}
-                    datas={hardcodedData}
-                    boxes={HardCodedBoxes}
+                  {orders.map((order, index) => (
+                    <Order
+                    key={index}
+                    orderNumber={order.orderNumber}
+                    datas={order.datas}
+                    boxes={order.boxes}
                     displayTakeOrderButton={false}
-                  />
+                    />
+                  ))}
                 </div>
               )}
             </CardContent>
