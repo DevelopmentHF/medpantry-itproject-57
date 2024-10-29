@@ -20,7 +20,6 @@ interface OrderStringType {
   }
 
 export async function GET(req: Request): Promise<NextResponse<OrderProps[]>> {
-    console.log("WAS OK!!!!!!!!!!!!!!!!!!!!!");
 
     const apiKey = process.env.NEXT_PUBLIC_API_KEY
 
@@ -96,6 +95,7 @@ export async function GET(req: Request): Promise<NextResponse<OrderProps[]>> {
         if (!res.ok) throw new Error('Network response was not ok');
 
         const boxes = await res.json();
+        console.log("BOXESSSSSSSSSSSSSSSSSSSSS", boxes);
 
         // Validate the box data structure
         if (!Array.isArray(boxes)) {
@@ -114,12 +114,12 @@ export async function GET(req: Request): Promise<NextResponse<OrderProps[]>> {
     // Prepare orders with their corresponding box IDs
     const ordersWithBoxIds = await Promise.all(
         orderArray.map(async (order) => {
-        const boxes: number[][] = await getBoxId(order.orderNumber)
-        return {
-            ...order,
-            boxes: boxes || [],
-        };
+            const boxes: number[][] = await getBoxId(order.orderNumber)
+            return {
+                ...order,
+                boxes: boxes || [],
+            };
         })
     );
-    return NextResponse.json(ordersWithBoxIds);
+    return NextResponse.json(ordersWithBoxIds, { status: 200 });
 }

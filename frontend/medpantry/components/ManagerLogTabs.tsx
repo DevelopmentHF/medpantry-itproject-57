@@ -48,7 +48,7 @@ export default function ManagerTab() {
             throw new Error('API key is not defined');
           }
 
-          const res = await fetch(`/api/ClosedOrders`, {
+          const res = await fetch(`/api/ClosedOrders?timestamp=${Date.now()}`, {
             method: 'GET',
             headers: {
                 'Cache-Control': 'no-cache',
