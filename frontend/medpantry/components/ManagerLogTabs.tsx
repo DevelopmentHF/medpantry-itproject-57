@@ -1,3 +1,5 @@
+'use client'
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/Tabs";
 import {
   Card,
@@ -7,6 +9,27 @@ import {
 } from "@/components/TableCard";
 import ManagerLog from "./ManagerLog";
 import Order from "@/components/Order";
+import { useEffect, useState } from "react";
+
+interface OrderStringType {
+  sku: string[];
+  quantity: number[];
+  orderNumber: string;
+  itemName: string[];
+  id: string;
+}
+
+interface Data {
+  quantity: number;
+  sku: string;
+  itemName: string;
+}
+
+interface OrderProps {
+  orderNumber: string;
+  datas: Data[];
+  boxes?: number[][];
+}
 
 
 export default function ManagerTab() {
@@ -19,6 +42,37 @@ export default function ManagerTab() {
     ];
 
     const HardCodedBoxes = [[7]];
+
+    const[orders, setOrders] = useState<OrderProps[]>([]);
+
+    
+
+    useEffect(() => {
+      const fetchClosedOrders = async() => {
+          try {
+          const apiKey = process.env.NEXT_PUBLIC_API_KEY
+          
+          if (!apiKey) {
+            throw new Error('API key is not defined');
+          }
+
+          const res = await fetch(`/api/ClosedOrders`, {
+            method: 'GET',
+            headers: {
+                'Cache-Control': 'no-cache',
+                'API-Key': apiKey,
+            },
+          });
+          if (!res.ok) throw new Error('Network response was not ok');
+          setOrders(await res.json());
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+        }
+      };
+
+      fetchClosedOrders();
+    }, []);    
+
   return (
     <Tabs defaultValue="all" className="w-full">
       <TabsList className="grid w-full grid-cols-3 mb-6 bg-gray-100 shadow-sm">
