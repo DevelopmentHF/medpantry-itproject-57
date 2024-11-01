@@ -3,8 +3,6 @@ import AuthButton from '@/components/AuthButton';
 import OverviewCard from '@/components/OverviewCard';
 import { Package, ClipboardCheck, ScanQrCode, Users } from 'lucide-react';
 import WarehouseOverview from '@/components/WarehouseOverview';
-// import { promises as fs } from 'fs';
-// import path from 'path';
 
 interface OrderStringType {
   sku: string[];
@@ -25,14 +23,6 @@ interface OrderProps {
 	boxes?: number[];
 }
 
-//const completedOrdersCsvFilePath = path.join(process.cwd(), 'completed_orders.csv');
-
-// async function updateCompletedOrdersCsv(orderString: OrderStringType[], completedOrders: string[]) {
-//   const validOrderNumbers = new Set(orderString.map(entry => entry.orderNumber));
-//   const updatedOrders = completedOrders.filter(orderNumber => !validOrderNumbers.has(orderNumber));
-//   await fs.writeFile(completedOrdersCsvFilePath, updatedOrders.join(',') + (updatedOrders.length > 0 ? ', ' : ''));
-// }
-
 let numOrders: number;
 export default async function Dashboard() {
 
@@ -43,9 +33,6 @@ export default async function Dashboard() {
       console.error('API key is not defined');
       throw new Error('API Key was not ok'); 
   }
-
-  //const CSVdata = await fs.readFile(completedOrdersCsvFilePath, 'utf-8');
-  //const completedOrders: string[] = CSVdata.split(',').map(entry => entry.trim()).filter(entry => entry.length > 0);
 
   // Fetch all orders from Shopify
   let orderArray: OrderProps[] = [];
