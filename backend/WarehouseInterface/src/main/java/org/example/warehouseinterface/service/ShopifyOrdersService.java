@@ -208,8 +208,11 @@ public class ShopifyOrdersService {
                     requiredQuantitiesRemaining.set(i, requiredQuantitiesRemaining.get(i) - matchingBoxes.get(i).get(j).getUnits());
                     baxterBoxService.freeBaxterBox(matchingBoxes.get(i).get(j));
 
-                    locationIDNode.add(matchingBoxes.get(i).get(j).getId());
-                    unitsNode.add(matchingBoxes.get(i).get(j).getUnits());
+                    if (matchingBoxes.get(i).get(j).getUnits() > 0) {
+                        locationIDNode.add(matchingBoxes.get(i).get(j).getId());
+                        unitsNode.add(matchingBoxes.get(i).get(j).getUnits());
+                    }
+                    
                     // System.out.println(box.getSKU());
                     if (requiredQuantitiesRemaining.get(i) == 0) {
                         break;
