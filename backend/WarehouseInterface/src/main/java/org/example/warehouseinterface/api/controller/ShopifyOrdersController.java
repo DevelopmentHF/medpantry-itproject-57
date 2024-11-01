@@ -82,4 +82,21 @@ public class ShopifyOrdersController {
                     .body("{\"error\":\"Failed to fetch orders\"}");
         }
     }
+
+    @GetMapping("/OrderTakenFrom")
+    public ResponseEntity<String> orderTakenFrom(@RequestParam String orderNumber) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            String jsonOrderTakenFrom = service.orderTakenFrom(orderNumber);
+
+            return ResponseEntity.ok()
+                    .header("Content-Type", "application/json")
+                    .body(jsonOrderTakenFrom);
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Return an error response in case of an exception
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("{\"error\":\"Failed to fetch where the order was taken from\"}");
+        }
+    }
 }

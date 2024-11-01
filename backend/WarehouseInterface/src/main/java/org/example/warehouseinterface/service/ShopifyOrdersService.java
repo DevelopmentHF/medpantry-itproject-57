@@ -9,6 +9,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import org.example.warehouseinterface.api.model.BaxterBox;
 import org.example.warehouseinterface.api.model.Order;
 
+import org.example.warehouseinterface.api.model.OrderTakenFrom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -181,25 +182,65 @@ public class ShopifyOrdersService {
         List<List<BaxterBox>> matchingBoxes = findCorrectBaxterBoxes(order);
         //System.out.println("Num matching boxes: " + matchingBoxes.size());
 
+        // update db to store information on what Baxter Boxes this order was taken from
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        ObjectNode orderTakenFrom = objectMapper.createObjectNode();
+        ArrayNode locationIDNode = objectMapper.createArrayNode();
+        ArrayNode unitsNode = objectMapper.createArrayNode();
+
         for (int i = 0; i < matchingBoxes.size(); i++) {
+
             for (int j = 0; j < matchingBoxes.get(i).size(); j++) {
                 if (matchingBoxes.get(i).get(j).getUnits() > requiredQuantitiesRemaining.get(i)) {
                     // there are more than enough units in this box to satisfy the order
 
                     //System.out.println("Required quant:" + requiredQuantityRemaining);
                     baxterBoxService.updateBaxterBox(matchingBoxes.get(i).get(j), -requiredQuantitiesRemaining.get(i));
+
+                    locationIDNode.add(matchingBoxes.get(i).get(j).getId());
+                    unitsNode.add(requiredQuantitiesRemaining.get(i));
+
                     break;
                 } else {
                     // Baxter box will be depleted, so it needs to be marked as free in the system
 
                     requiredQuantitiesRemaining.set(i, requiredQuantitiesRemaining.get(i) - matchingBoxes.get(i).get(j).getUnits());
                     baxterBoxService.freeBaxterBox(matchingBoxes.get(i).get(j));
+
+                    locationIDNode.add(matchingBoxes.get(i).get(j).getId());
+                    unitsNode.add(matchingBoxes.get(i).get(j).getUnits());
                     // System.out.println(box.getSKU());
                     if (requiredQuantitiesRemaining.get(i) == 0) {
                         break;
                     }
                 }
             }
+        }
+
+        orderTakenFrom.put("locationIDs", locationIDNode);
+        orderTakenFrom.put("units", unitsNode);
+        orderTakenFrom.put("orderNumber", orderNumber);
+        orderTakenFrom.put("orderID", order.getId());
+
+        String jsonRequestBody = objectMapper.writeValueAsString(orderTakenFrom);
+        System.out.println("JSON for where orders were taken from " + jsonRequestBody);
+
+        // ... post it to the OrdersTakenFrom db
+        HttpClient client1 = HttpClient.newHttpClient();
+        HttpRequest request1 = HttpRequest.newBuilder()
+                .uri(URI.create(SUPABASE_URL + "/rest/v1/OrderTakenFrom"))
+                .header("apikey", SUPABASE_API_KEY)
+                .header("Authorization", "Bearer " + SUPABASE_API_KEY)
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(jsonRequestBody))
+                .build();
+
+        HttpResponse<String> response1 = client1.send(request1, HttpResponse.BodyHandlers.ofString());
+
+        if (response1.statusCode() != 201) { // HTTP 201 Created
+            // Parse and return the created BaxterBox
+            throw new Exception("Failed to add order to OrderTakenFrom table: " + response1.statusCode() + " - " + response1.body());
         }
 
         // remove the order from the list of orders that are being worked on (on Supabase)
@@ -530,5 +571,39 @@ public class ShopifyOrdersService {
         List<Order> orders = objectMapper.readValue(cleanedOrdersString, new TypeReference<List<Order>>() {});
 
         return orders;
+    }
+
+    /**
+     * Given an order number, returns a json containing where that order was taken from
+     * @param orderNumber
+     * @return
+     */
+    public String orderTakenFrom(String orderNumber) throws Exception {
+
+        // get all OrderTakenFrom rows from supabase
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(SUPABASE_URL + "/rest/v1/OrderTakenFrom"))
+                .header("apikey", SUPABASE_API_KEY)
+                .header("Authorization", "Bearer " + SUPABASE_API_KEY)
+                .header("Accept", "application/json")
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            throw new Exception("Failed to fetch Orders currently being worked on: " + response.statusCode());
+        }
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<OrderTakenFrom> orderTakenFroms = objectMapper.readValue(response.body(), new TypeReference<List<OrderTakenFrom>>() {});
+        OrderTakenFrom correctOrder = null;
+        for (OrderTakenFrom orderTakenFrom : orderTakenFroms) {
+            if (orderTakenFrom.getOrderNumber().equals(orderNumber)) {
+                correctOrder = orderTakenFrom;
+                break;
+            }
+        }
+
+        return objectMapper.writeValueAsString(correctOrder);
     }
 }
