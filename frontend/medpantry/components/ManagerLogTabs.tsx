@@ -64,8 +64,6 @@ export default function ManagerTab() {
 
       fetchClosedOrders();
     }, []);  
-    
-    console.log("ORDERSSSSSSSSSSSSSSSSSSSSSSSSSSSS: ", orders);
 
   return (
     <Tabs defaultValue="all" className="w-full">

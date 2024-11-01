@@ -57,8 +57,6 @@ const isDataValid = (data: any): data is Data => {
 
         if (!res.ok) throw new Error("Network response was not ok");
 
-        console.log("Order taken:", res);
-
         // Redirect to /take-order page with query parameters
         const queryParams = new URLSearchParams({
             orderNumber,
