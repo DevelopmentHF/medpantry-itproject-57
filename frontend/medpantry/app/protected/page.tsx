@@ -92,6 +92,21 @@ export default async function Dashboard() {
     return null;
   }
 
+  try {
+    // NEED A .env see discord
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/ClosedOrders?timestamp=${Date.now()}`, {
+      headers: {
+          'API-Key': apiKey, // Include the API key in the headers
+      },
+  });
+    if (!res.ok) throw new Error('Network response was not ok');
+    let closedOrders: any[] = await res.json();
+    numStockUpdates += closedOrders.length;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+
 
   return (
     <div className="flex-1 w-full flex flex-col gap-12 items-center p-6">
