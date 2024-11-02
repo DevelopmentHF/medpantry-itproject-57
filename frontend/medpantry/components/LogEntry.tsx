@@ -47,6 +47,7 @@ export default function LogEntry({ id, box, sku, proposedQuantityToAdd, fullStat
                 method: 'PATCH',
                 headers: {
                     'Cache-Control': 'no-cache',
+                    'API-Key': apiKey,
                 },
             });
             if (!res.ok) throw new Error('Network response was not ok');
@@ -58,7 +59,7 @@ export default function LogEntry({ id, box, sku, proposedQuantityToAdd, fullStat
 
     return (
         <div className="bg-card-foreground border-solid border-border rounded-md p-4 flex flex-col gap-2 w-full">
-            <h1 className="font-bold text-xl">Stock Update</h1>
+            <h1 className="font-bold text-xl">Inventory</h1>
 
             <div className="flex justify-between">
                 <p>Baxter Box</p>

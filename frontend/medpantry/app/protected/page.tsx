@@ -3,8 +3,6 @@ import AuthButton from '@/components/AuthButton';
 import OverviewCard from '@/components/OverviewCard';
 import { Package, ClipboardCheck, ScanQrCode, Users } from 'lucide-react';
 import WarehouseOverview from '@/components/WarehouseOverview';
-// import { promises as fs } from 'fs';
-// import path from 'path';
 
 interface OrderStringType {
   sku: string[];
@@ -25,14 +23,6 @@ interface OrderProps {
 	boxes?: number[];
 }
 
-//const completedOrdersCsvFilePath = path.join(process.cwd(), 'completed_orders.csv');
-
-// async function updateCompletedOrdersCsv(orderString: OrderStringType[], completedOrders: string[]) {
-//   const validOrderNumbers = new Set(orderString.map(entry => entry.orderNumber));
-//   const updatedOrders = completedOrders.filter(orderNumber => !validOrderNumbers.has(orderNumber));
-//   await fs.writeFile(completedOrdersCsvFilePath, updatedOrders.join(',') + (updatedOrders.length > 0 ? ', ' : ''));
-// }
-
 let numOrders: number;
 export default async function Dashboard() {
 
@@ -43,9 +33,6 @@ export default async function Dashboard() {
       console.error('API key is not defined');
       throw new Error('API Key was not ok'); 
   }
-
-  //const CSVdata = await fs.readFile(completedOrdersCsvFilePath, 'utf-8');
-  //const completedOrders: string[] = CSVdata.split(',').map(entry => entry.trim()).filter(entry => entry.length > 0);
 
   // Fetch all orders from Shopify
   let orderArray: OrderProps[] = [];
@@ -105,6 +92,21 @@ export default async function Dashboard() {
     return null;
   }
 
+  try {
+    // NEED A .env see discord
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_LINK}/ClosedOrders?timestamp=${Date.now()}`, {
+      headers: {
+          'API-Key': apiKey, // Include the API key in the headers
+      },
+  });
+    if (!res.ok) throw new Error('Network response was not ok');
+    let closedOrders: any[] = await res.json();
+    numStockUpdates += closedOrders.length;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+
 
   return (
     <div className="flex-1 w-full flex flex-col gap-12 items-center p-6">
@@ -127,7 +129,7 @@ export default async function Dashboard() {
         <a href="protected/current-orders">
           <OverviewCard
             icon={<Package />}
-            title="Current Orders"
+            title="Orders"
             count={numOrders}
             description="Pending orders"
           />
@@ -135,7 +137,7 @@ export default async function Dashboard() {
         <a href="protected/manager-log">
           <OverviewCard
             icon={<ClipboardCheck />}
-            title="Inventory Updates"
+            title="Updates"
             count={numStockUpdates}
             description="Pending"
           />

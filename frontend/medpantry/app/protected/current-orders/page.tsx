@@ -24,26 +24,8 @@ interface OrderProps {
   boxes?: number[][];
 }
 
-//const completedOrdersCsvFilePath = path.join(process.cwd(), 'completed_orders.csv');
-
-// async function updateCompletedOrdersCsv(orderString: OrderStringType[], completedOrders: string[]) {
-//   const validOrderNumbers = new Set(orderString.map(entry => entry.orderNumber));
-//   const updatedOrders = completedOrders.filter(orderNumber => !validOrderNumbers.has(orderNumber));
-//   //await fs.writeFile(completedOrdersCsvFilePath, updatedOrders.join(',') + (updatedOrders.length > 0 ? ', ' : ''));
-// }
-
 export default async function CurrentOrders({ searchParams }: { searchParams: {completedOrder: string }}) {
   //logic behind taking orders are handled within the Order component.
-  const completedOrder = searchParams.completedOrder;
-
-  //const CSVdata = await fs.readFile(completedOrdersCsvFilePath, 'utf-8');
-  //const completedOrders: string[] = CSVdata.split(',').map(entry => entry.trim()).filter(entry => entry.length > 0);
-
-  // const CSVentry: string = decodeURIComponent(completedOrder);
-  // if (completedOrder && !completedOrders.includes(CSVentry)) {
-  //   completedOrders.push(completedOrder);
-  //   await fs.appendFile('completed_orders.csv', `${CSVentry},`);
-  // }
 
   const apiKey = process.env.NEXT_PUBLIC_API_KEY
 
@@ -165,7 +147,7 @@ export default async function CurrentOrders({ searchParams }: { searchParams: {c
         </nav>
 
         <div className="flex w-full">
-          <h1 className="text-3xl font-bold text-gray-800 flex items-center">
+          <h1 className="text-3xl font-bold text-black flex items-center">
             <Package className="mr-2 h-6 w-6 text-red-600" />
             Outstanding Orders
           </h1>
