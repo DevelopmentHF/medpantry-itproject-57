@@ -2,6 +2,7 @@ package org.example.warehouseinterface.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.example.warehouseinterface.EnvironmentManager;
 import org.example.warehouseinterface.api.model.BaxterBox;
 import org.example.warehouseinterface.api.model.ManagerLogEntry;
 import org.springframework.stereotype.Service;
@@ -26,9 +27,9 @@ public class ManagerLogService {
     // REQUIRES A .env FILE IN resources/
     // backend/WarehouseInterface/src/main/resources/.env
     //private static final Dotenv dotenv = Dotenv.configure().directory(".env").load();
-    private static final String SUPABASE_URL = System.getenv("SUPABASE_URL");
-    private static final String SUPABASE_API_KEY = System.getenv("SUPABASE_API_KEY");
-    private static final String SHOPIFY_ADMIN_KEY = System.getenv("SHOPIFY_ADMIN_KEY");
+    private static final String SUPABASE_URL = EnvironmentManager.getEnvVariable("SUPABASE_URL");
+    private static final String SUPABASE_API_KEY = EnvironmentManager.getEnvVariable("SUPABASE_API_KEY");
+    private static final String SHOPIFY_ADMIN_KEY = EnvironmentManager.getEnvVariable("SHOPIFY_ADMIN_KEY");
 
     @Autowired
     private BaxterBoxService baxterBoxService;

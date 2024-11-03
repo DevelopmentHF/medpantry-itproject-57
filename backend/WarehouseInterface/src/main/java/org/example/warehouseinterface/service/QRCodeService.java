@@ -3,6 +3,7 @@ package org.example.warehouseinterface.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.example.warehouseinterface.EnvironmentManager;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -21,7 +22,7 @@ public class QRCodeService {
     // REQUIRES A .env FILE IN resources/
     // backend/WarehouseInterface/src/main/resources/.env
     //private static final Dotenv dotenv = Dotenv.configure().directory(".env").load();
-    private static final String SHOPIFY_ADMIN_KEY = System.getenv("SHOPIFY_ADMIN_KEY");
+    private static final String SHOPIFY_ADMIN_KEY = EnvironmentManager.getEnvVariable("SHOPIFY_ADMIN_KEY");
 
     /**
      * Takes in a string generated from the qr code and returns the associated product

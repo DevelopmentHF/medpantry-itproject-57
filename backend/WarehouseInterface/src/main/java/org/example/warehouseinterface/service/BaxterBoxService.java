@@ -1,5 +1,6 @@
 package org.example.warehouseinterface.service;
 
+import org.example.warehouseinterface.EnvironmentManager;
 import org.example.warehouseinterface.api.model.BaxterBox;
 import org.example.warehouseinterface.api.model.ManagerLogEntry;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +24,8 @@ public class BaxterBoxService {
     // REQUIRES A .env FILE IN resources/
     // backend/WarehouseInterface/src/main/resources/.env
     //private static final Dotenv dotenv = Dotenv.configure().directory(".env").load();
-    private static String SUPABASE_URL = System.getenv("SUPABASE_URL");
-    private static String SUPABASE_API_KEY = System.getenv("SUPABASE_API_KEY");
+    private static String SUPABASE_URL = EnvironmentManager.getEnvVariable("SUPABASE_URL");
+    private static String SUPABASE_API_KEY = EnvironmentManager.getEnvVariable("SUPABASE_API_KEY");
 
     public static HttpClient httpClient = HttpClient.newHttpClient();
     public static ObjectMapper objectMapper = new ObjectMapper();

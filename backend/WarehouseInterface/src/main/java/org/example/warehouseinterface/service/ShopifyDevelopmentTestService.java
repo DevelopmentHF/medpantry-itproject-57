@@ -1,5 +1,6 @@
 package org.example.warehouseinterface.service;
 
+import org.example.warehouseinterface.EnvironmentManager;
 import org.example.warehouseinterface.api.model.BaxterBox;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class ShopifyDevelopmentTestService {
     /* Requires a backend/WarehouseInterface/src/main/resources/.env file loaded with shopify key from dev store page */
     //private static final Dotenv dotenv = Dotenv.configure().directory(".env").load();
-    private static final String SHOPIFY_ADMIN_KEY = System.getenv("SHOPIFY_ADMIN_KEY");
+    private static final String SHOPIFY_ADMIN_KEY = EnvironmentManager.getEnvVariable("SHOPIFY_ADMIN_KEY");
 
     /**
      * Calls the shopify development store and lists out all the products currently on the store.

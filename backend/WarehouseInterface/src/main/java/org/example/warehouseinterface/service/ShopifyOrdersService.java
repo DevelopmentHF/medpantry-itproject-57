@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.example.warehouseinterface.EnvironmentManager;
 import org.example.warehouseinterface.api.model.BaxterBox;
 import org.example.warehouseinterface.api.model.Order;
 
@@ -26,9 +27,9 @@ import java.util.List;
 @Service
 public class ShopifyOrdersService {
     //private static final Dotenv dotenv = Dotenv.configure().directory(".env").load();
-    private static String SUPABASE_URL = System.getenv("SUPABASE_URL");
-    private static String SUPABASE_API_KEY = System.getenv("SUPABASE_API_KEY");
-    private static final String SHOPIFY_ADMIN_KEY = System.getenv("SHOPIFY_ADMIN_KEY");
+    private static String SUPABASE_URL = EnvironmentManager.getEnvVariable("SUPABASE_URL");
+    private static String SUPABASE_API_KEY = EnvironmentManager.getEnvVariable("SUPABASE_API_KEY");
+    private static final String SHOPIFY_ADMIN_KEY = EnvironmentManager.getEnvVariable("SHOPIFY_ADMIN_KEY");
     public static HttpClient httpClient = HttpClient.newHttpClient();
 
     @Autowired
