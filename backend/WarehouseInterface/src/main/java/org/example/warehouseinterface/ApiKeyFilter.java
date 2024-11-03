@@ -7,14 +7,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import io.github.cdimascio.dotenv.Dotenv;
+//import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.IOException;
 
 @Component
 public class ApiKeyFilter extends OncePerRequestFilter {
 
-    private static final Dotenv dotenv = Dotenv.configure().directory(".env").load();
+    //private static final Dotenv dotenv = Dotenv.configure().directory(".env").load();
     //private static String KEY = dotenv.get("API_KEY");
 
     @Override
