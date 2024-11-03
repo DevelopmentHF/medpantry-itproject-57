@@ -22,9 +22,9 @@ public class BaxterBoxService {
 
     // REQUIRES A .env FILE IN resources/
     // backend/WarehouseInterface/src/main/resources/.env
-    private static final Dotenv dotenv = Dotenv.configure().directory(".env").load();
-    private static String SUPABASE_URL = dotenv.get("SUPABASE_URL");
-    private static String SUPABASE_API_KEY = dotenv.get("SUPABASE_API_KEY");
+    //private static final Dotenv dotenv = Dotenv.configure().directory(".env").load();
+    private static String SUPABASE_URL = System.getenv("SUPABASE_URL");
+    private static String SUPABASE_API_KEY = System.getenv("SUPABASE_API_KEY");
 
     public static HttpClient httpClient = HttpClient.newHttpClient();
     public static ObjectMapper objectMapper = new ObjectMapper();

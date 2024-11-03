@@ -15,8 +15,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
 public class ShopifyDevelopmentTestService {
     /* Requires a backend/WarehouseInterface/src/main/resources/.env file loaded with shopify key from dev store page */
-    private static final Dotenv dotenv = Dotenv.configure().directory(".env").load();
-    private static final String SHOPIFY_ADMIN_KEY = dotenv.get("SHOPIFY_ADMIN_KEY");
+    //private static final Dotenv dotenv = Dotenv.configure().directory(".env").load();
+    private static final String SHOPIFY_ADMIN_KEY = System.getenv("SHOPIFY_ADMIN_KEY");
 
     /**
      * Calls the shopify development store and lists out all the products currently on the store.
