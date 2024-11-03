@@ -16,7 +16,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
 
     //private static final Dotenv dotenv = Dotenv.configure().directory(".env").load();
     //private static String KEY = dotenv.get("API_KEY");
-    private static String KEY = System.getenv("API_KEY");
+    private static String KEY = EnvironmentManager.getEnvVariable("API_KEY");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
